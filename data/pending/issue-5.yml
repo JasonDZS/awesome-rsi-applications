@@ -1,101 +1,101 @@
-# Issue #5 推荐论文的标注。一行一个字段，写成 `字段: 取值`；取值里不能有竖线。
-# 拿不准的写 待核对（验证成本写 未报告），并在 review_points 里给出选项和你的建议。
-# 不要添加编号和确认信息：确认人在 Issue 页面评论 /confirm 后由流程写入。
+# Annotation for the paper recommended in issue #5. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
 
-# 论文标题（原文标题）
+# Title, as printed on the paper
 title: ADAS: Automated Design of Agentic Systems
 
-# 链接，优先 arXiv 摘要页
+# Link; prefer the arXiv abstract page
 url: https://arxiv.org/abs/2408.08435
 
-# 首发年月，YYYY-MM
+# First released, YYYY-MM
 date: 2024-08
 
-# 发表状态：预印本，或会议/期刊名与年份
+# Publication status: arXiv preprint, or venue and year
 venue: ICLR 2025
 
-# 领域标签，可多选，用 ; 分隔：0 AI 研发自身，1 工程科学，2 自然科学，3 物理与具身，4 社会科学
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
 tags: 0;2
 
-# 子类，多个用 ； 分隔；用 README 里已有的子类名，归不进去就在 review_points 里提出
-subclass: 智能体自我改进；数学
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Mathematics
 
-# 任务：系统在做什么
-task: ARC 逻辑谜题（≤5×5 网格子集）；DROP 阅读理解；MGSM 多语种数学；MMLU 多任务；GPQA 科学问答；迁移到 GSM8K、GSM-Hard、SVAMP、ASDiv
+# Task: what the system does in the experiments
+task: ARC logic puzzles (subset with grids up to 5x5); DROP reading comprehension; MGSM multilingual math; MMLU multi-task; GPQA science QA; transfer to GSM8K, GSM-Hard, SVAMP and ASDiv
 
-# 满足的纳入标准，用 ； 分隔：闭环、自指、累积（三条都不满足的是 R0 边界案例）
-criteria: 闭环；累积
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; accumulation
 
-# 改进对象：被改的是什么（提示、技能库、脚手架代码、权重……）
-object: 仅外部产物：元智能体用代码设计新的智能体（forward 函数），元智能体自身不变
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: External artifacts only: the meta agent designs new agents in code (their forward function); the meta agent itself does not change
 
-# 自指深度：R0 仅外部产物 / R1 提示、记忆、技能库 / R2 脚手架与自身代码 / R3 权重与训练流程 / R4 改进“改进过程”本身
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
 R: R0
 
-# 自指深度的依据：原文章节或语句
-r_evidence: 第 3 节：“adopt FMs as meta agents to iteratively program interestingly new agents based on an ever-growing archive of previous discoveries”；元智能体（GPT-4）和它的提示在整个搜索中固定（附录 B）；第 6 节把改进元智能体列为未来工作：“ADAS can become self-referential where the meta agent can be improved through ADAS as well”
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 3: “adopt FMs as meta agents to iteratively program interestingly new agents based on an ever-growing archive of previous discoveries”; the meta agent (GPT-4) and its prompt are fixed throughout the search (Appendix B); Section 6 lists improving the meta agent as future work: “ADAS can become self-referential where the meta agent can be improved through ADAS as well”
 
-# 反馈来源，用 ； 分隔：形式验证、自动评测、仿真、真实实验、人类评审、学习型评判、自评
-feedback: 自动评测
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation
 
-# 闭环程度：人在回路、半自动、全自动
-loop: 全自动
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
 
-# 累积方式：单轮、单一谱系的多代迭代、种群或档案库式的开放演化
-accumulation: 种群或档案库式的开放演化
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
 
-# 改进轮数：原文报告的轮数或代数，没有报告就写 未报告
-rounds: ARC 25 轮（4.1 节）；DROP、MGSM、MMLU、GPQA 各 30 轮（4.2 节）
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: ARC: 25 iterations (Section 4.1); DROP, MGSM, MMLU and GPQA: 30 iterations each (Section 4.2)
 
-# 验证成本（只记原文报告的，不推断）：秒到分钟、小时、天到周、月以上或必须人工、未报告
-cost: 未报告
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
 
-# 失败可逆性：完全可逆、有消耗可重试、不可逆
-reversibility: 完全可逆
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
 
-# 自称程度：作者自己怎么称呼这项工作（是否自称 RSI / 自我改进）
-claim: 未自称（第 6 节把元智能体的自我改进列为未来工作）
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: not claimed (Section 6 lists self-improvement of the meta agent as future work)
 
-# 证据强度：任务内、跨任务、跨任务且独立验证
-evidence: 跨任务
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: cross-task
 
-# 主要结果：一句话，带数字
-result: DROP F1 79.4（最好的手工基线 65.8，提示优化 OPRO 69.1）；MGSM 53.4%（LLM Debate 39.0%）；ARC 13.7%（COT-SC 8.0%，GPT-3.5）；MGSM 上搜到的智能体迁移到 GSM8K 69.5%（基线最高 43.6%）（表 1–3）
+# Main result: one sentence with numbers
+result: DROP F1 79.4 (best hand-designed baseline 65.8, prompt optimization with OPRO 69.1); MGSM 53.4% (LLM Debate 39.0%); ARC 13.7% (COT-SC 8.0%, GPT-3.5); the agent found on MGSM transfers to GSM8K at 69.5% (best baseline 43.6%) (Tables 1-3)
 
-# 失败与局限：原文承认的，或你读出来的
-limits: 只评测了单步问答任务（第 6 节）；只优化单一目标（性能）；评估函数只看数值分数，成本高且丢失信息（第 6 节、附录 J）；科学和多任务领域的提升小，作者归因于基座模型知识不足（4.2 节）；数学领域搜到的智能体迁移到其他领域后不如针对该领域搜到的，科学领域只与基线持平（附录 A 表 5）；GPT-3.5 上最好的智能体换到更强的模型后不再最好（第 6 节）；数学领域从空档案库开始反而更好，原因未查明（附录 I）；数据集都是抽样的子集（附录 D、E）
+# Failures and limitations: as reported in the paper
+limits: Evaluated only on one-step question-answering tasks (Section 6); optimizes a single objective (performance); the evaluation function looks only at a numeric score, which is costly and loses information (Section 6, Appendix J); gains are small in the science and multi-task domains, which the authors attribute to the base model lacking knowledge (Section 4.2); agents found in the math domain do worse in other domains than agents searched for those domains, and only match the baselines in the science domain (Appendix A, Table 5); the best agent on GPT-3.5 is no longer the best when moved to stronger models (Section 6); in the math domain, starting from an empty archive works better, for reasons not investigated (Appendix I); all datasets are sampled subsets (Appendices D and E)
 
-# 阅读深度：全文、部分全文、仅摘要（仅摘要的论文不能被确认）
-reading: 部分全文
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: partial text
 
-# 你对这份标注的置信度：高、中、低
-confidence: 中
+# Your confidence in this annotation: high / medium / low
+confidence: medium
 
-# 备注：其他字段的原文出处等
-notes: 反馈细节：自动评测，新智能体在目标领域验证集上的准确率或 F1 写入档案库，供元智能体下一轮参考（第 3 节：“we calculate the performance ... as the metrics for the meta agent to maximize”）；每个新智能体都加入档案库，不做淘汰（附录 H 算法 1 第 12 行）。元智能体另有两步自我反思检查新颖性，出错时最多自我修正 5 次，这些不决定保留与否。闭环：人只写框架代码、领域描述和初始种子智能体（第 3 节、附录 B）；第 6 节提到对生成代码“thorough manual inspections”，这是安全检查，原文没说是否在回路内。证据：表 2、表 4、表 5 迁移到没用于搜索的数学和非数学基准，表 3 迁移到其他基座模型；都是作者自己跑的评测。验证成本：附录 J 只报告了每次运行的 API 费用（ARC 约 500 美元，其他领域约 300 美元），没有报告时间。发表状态：PDF 首页标注 “Published as a conference paper at ICLR 2025”。阅读：正文和附录 A、B（部分）、E（开头）、H、I、J 已读，附录 C、D、F、G 是框架代码、ARC 细节和示例智能体代码，只看了结构
+# Notes: sources for the other fields, feedback details, open questions
+notes: Feedback details: automated evaluation; each new agent's accuracy or F1 on the target domain's validation set is written into the archive for the meta agent to consult in the next iteration (Section 3: “we calculate the performance ... as the metrics for the meta agent to maximize”); every new agent is added to the archive and none is removed (Appendix H, Algorithm 1, line 12). The meta agent also runs two rounds of self-reflection to check novelty and self-corrects up to 5 times on errors; these do not decide what is kept. Loop: people only write the framework code, the domain descriptions and the initial seed agents (Section 3, Appendix B); Section 6 mentions “thorough manual inspections” of the generated code as a safety measure, and the paper does not say whether this is inside the loop. Evidence: Tables 2, 4 and 5 transfer to math and non-math benchmarks not used in the search, and Table 3 transfers to other base models; all evaluations were run by the authors. Verification cost: Appendix J reports only the API cost per run (about USD 500 for ARC, about USD 300 for the other domains), not the time. Publication status: the first page of the PDF reads “Published as a conference paper at ICLR 2025”. Reading: main text and Appendices A, B (in part), E (beginning), H, I and J read; Appendices C, D, F and G contain framework code, ARC details and example agent code, and were only skimmed for structure
 
-# 需要确认人核对的点。每条给出：具体问题、选项（各自的依据）、你的建议和理由、去原文哪里看。
-# 这段会原样显示在 Issue 页面上，可以写多行 Markdown，每行前面保留两个空格。
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
 review_points: |
-  1. **自指深度是 R0 还是 R1？**（影响字段：R、criteria；去看第 3 节、附录 B、附录 H）
-     - A. R0：被改进的是元智能体写出来的新智能体，元智能体（GPT-4 加固定提示）自身不变。标注规则原文：“元智能体设计别的智能体，自身不变 → R0”。第 6 节也把“改进元智能体”列为未来工作。
-     - B. R1：档案库不断增长，并作为元智能体下一轮的上下文（附录 B 的 [Discovered Agent Archive]），可以看成元智能体的经验库。规则里“不断增长的经验库 → R1”。
-     - **建议：A。** 档案库里存的是被设计出来的产物和它们的分数，不是元智能体之后会调用的工具或技能；这和旧清单里 OPRO、TextGrad 的 R0 口径一致。如果你认为“把自己的历史产出放进上下文”就算经验库，应改选 B，那样 OPRO 也要一起改。
-  2. **领域标签要不要加 2（自然科学）？**（影响字段：tags、subclass；去看 4.2 节、4.3 节）
-     - A. 0;2，子类“智能体自我改进；数学”：核心实验之一是 MGSM 数学，迁移实验全在数学基准上（GSM8K、GSM-Hard、SVAMP、ASDiv），另有 GPQA 科学问答。和 P001 STaR 因算术、GSM8K 加 2 的口径一致。
-     - B. 只标 0：这些都是通用推理基准，论文的目标是通用的智能体设计，不针对某个科学领域。
-     - **建议：A。** 规则是按实验任务所在领域标。如果你觉得 GPQA 也该体现，子类可以再加“跨子类”，但我不建议，因为 GPQA 只是四个领域之一，提升也最小。
-  3. **证据强度是“跨任务”还是“任务内”？**（影响字段：evidence；去看 4.3 节、表 2–5）
-     - A. 跨任务：在 MGSM 上搜到的智能体，迁移到没用于搜索的 GSM8K、GSM-Hard、SVAMP、ASDiv、MMLU、DROP 上仍然超过手工基线（表 2、表 4、表 5）；ARC 上的智能体换到 Claude-Haiku、GPT-4、Claude-Sonnet 也成立（表 3）。
-     - B. 任务内：表 1 的主结果是每个领域单独搜索、在同一基准的留出测试集上测的。
-     - **建议：A。** 规则看的是有没有在没用于调优的其他基准上见效，表 2 到表 5 满足。注意这里证实的是“产物能迁移”，不是“改进过程变强”，因为这是 R0。不是独立验证，作者自己跑的。
-  4. **阅读深度填“全文”还是“部分全文”？**（影响字段：reading；可否确认不受影响）
-     - A. 部分全文：附录 C、D、F、G（框架代码、ARC 实验细节、基线和示例智能体代码）只看了结构。
-     - B. 全文：正文和所有与标注相关的附录（A 迁移、B 提示、H 伪代码、I 初始化、J 成本）都读了。
-     - **建议：A。** 如实反映没读的部分；“部分全文”同样可以被确认。
-  5. **验证成本填“未报告”是否合适？**（影响字段：cost；去看附录 J）
-     - A. 未报告：附录 J 只给了每次运行的 API 费用（ARC 约 500 美元，其他约 300 美元），没给评估一个智能体要多久。
-     - B. 小时：按每轮评测 128 到 800 道题推断。
-     - **建议：A。** 这一项记的是时间，原文没报告，按“不推断”规则不能填 B。费用已写进 notes。
+  1. **Is the self-reference depth R0 or R1?** (affects: R, criteria; see Section 3, Appendix B, Appendix H)
+     - A. R0: what improves are the new agents the meta agent writes; the meta agent (GPT-4 with a fixed prompt) does not change. The annotation rules say: "A meta-agent designs other agents and does not change itself → R0". Section 6 also lists improving the meta agent as future work.
+     - B. R1: the archive keeps growing and is the meta agent's context in the next iteration ([Discovered Agent Archive] in Appendix B), so it can be seen as the meta agent's experience library. The rules say: "A growing tool, skill or experience library → R1".
+     - **Recommendation: A.** The archive holds the designed artifacts and their scores, not tools or skills the meta agent calls later; this matches the R0 annotations of OPRO and TextGrad in the earlier list. If you consider "putting its own past outputs into the context" an experience library, choose B, and OPRO should then change too.
+  2. **Should domain tag 2 (Natural sciences) be added?** (affects: tags, subclass; see Sections 4.2 and 4.3)
+     - A. 0;2, subfields "Agent self-improvement; Mathematics": one of the core experiments is MGSM math, all transfer experiments are on math benchmarks (GSM8K, GSM-Hard, SVAMP, ASDiv), and there is also GPQA science QA. This matches P001 STaR, which got tag 2 for arithmetic and GSM8K.
+     - B. Tag 0 only: these are all general reasoning benchmarks, and the paper aims at general agent design, not a particular scientific domain.
+     - **Recommendation: A.** The rule is to tag by the domain of the experimental tasks. If you think GPQA should also be reflected, "Cross-subfield" could be added as a subfield, but I do not recommend it: GPQA is only one of four domains and shows the smallest gain.
+  3. **Is the evidence strength cross-task or in-task?** (affects: evidence; see Section 4.3, Tables 2-5)
+     - A. cross-task: the agent found on MGSM still beats the hand-designed baselines after transfer to GSM8K, GSM-Hard, SVAMP, ASDiv, MMLU and DROP, which were not used in the search (Tables 2, 4 and 5); the ARC agents also hold up on Claude-Haiku, GPT-4 and Claude-Sonnet (Table 3).
+     - B. in-task: the main results in Table 1 come from a separate search per domain, tested on the held-out test set of the same benchmark.
+     - **Recommendation: A.** The rule asks whether the improvement holds on other benchmarks not used for tuning, which Tables 2 to 5 show. Note that what this shows is that the artifacts transfer, not that the improvement process gets better, since this is R0. It is not independently verified; the authors ran the evaluations themselves.
+  4. **Should the reading depth be "full text" or "partial text"?** (affects: reading; either can be confirmed)
+     - A. partial text: Appendices C, D, F and G (framework code, ARC experiment details, baselines and example agent code) were only skimmed for structure.
+     - B. full text: the main text and every appendix relevant to the annotation (A transfer, B prompts, H pseudocode, I initialization, J cost) were read.
+     - **Recommendation: A.** It honestly reflects the parts not read, and "partial text" can be confirmed just the same.
+  5. **Is "not reported" right for the verification cost?** (affects: cost; see Appendix J)
+     - A. not reported: Appendix J gives only the API cost per run (about USD 500 for ARC, about USD 300 for the others), not how long it takes to evaluate one agent.
+     - B. hours: inferred from evaluating 128 to 800 questions per iteration.
+     - **Recommendation: A.** This field records time, which the paper does not report, and the "do not infer" rule rules out B. The cost in dollars is in the notes.
 
-  阅读情况：正文全部读完；附录 A、B（部分）、E（开头）、H、I、J 已读，C、D、F、G 只看了结构。
+  Reading: the main text was read in full; Appendices A, B (in part), E (beginning), H, I and J were read; C, D, F and G were only skimmed for structure.
