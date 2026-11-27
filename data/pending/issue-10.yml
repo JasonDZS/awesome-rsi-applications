@@ -77,19 +77,9 @@ notes: Feedback details: the agent's interact or evaluate action scores the curr
 # Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
 # Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
 review_points: |
-  1. **Self-reference depth: R4 or R2?** (affects: R; see Section 3, Section 6.2, Section 6.3, Appendices C and E)
-     - A. R4 (changes to the improvement logic shown only qualitatively): the design rewrites both the policy and its own self-improvement algorithm (Section 3), and the paper reports that this actually happened: in the Game of 24 case study it added error-trace analysis and parallel optimization to its optimization process (Section 6.3), and in the robustness study some runs broke because it modified its recursive improvement module (Section 6.2).
-     - B. R2: every quantitative result and every code listing (Appendices C, E) is an improved solver policy, which is the agent's own code but not the improvement process; the changes to the improvement logic are a one-paragraph description, and Section 6.3 says that with stronger initial policies it reached its limit "without further enhancing its optimization capabilities".
-     - C. "R2 or R4 (unclear)": record both readings and leave it open.
-     - **Recommendation: A.** The rules use the highest level the paper actually achieves, and Sections 6.2 and 6.3 report that the improvement module was in fact modified, not only proposed. The qualifier keeps the weak evidence visible. Choose B if you require that a change to the improvement process be shown to contribute to the measured gains.
-  2. **Evidence strength: "in-task", although the abstract claims generalizability?** (affects: evidence; see Section 5.2, Table 1)
-     - A. in-task: each benchmark is optimized on its own validation set and tested on its own test set; the paper reports no transfer of an optimized agent to another task or model.
-     - B. cross-task: the same framework, with only the environment description changed, works across four benchmarks and Game of 24.
-     - **Recommendation: A.** The rules ask whether an improvement holds on tasks not used for tuning; running the same method separately on several tasks is not transfer. This gap between the abstract ("generalizability") and the experiments is worth noting for the survey.
-  3. **Which numbers go in the main result: Gödel-base or Gödel-free?** (affects: result; see Table 1, Section 5.3)
-     - A. Gödel-base: it uses GPT-3.5 at test time like the baselines, so the comparison is fair.
-     - B. Gödel-free: the paper's headline numbers (for example MGSM 90.6%), but Section 5.3 says the gains come mainly from the agent calling stronger models such as GPT-4o.
-     - **Recommendation: A**, with Gödel-free mentioned in limits, which is how the draft is written.
-  4. **Domain tags 0;2 and venue.** No choice needed, for your information: the benchmarks are the same as ADAS (P002), which was decided as 0;2 with subfield Mathematics, so this follows it. The arXiv v4 PDF shows no venue, so venue is "arXiv preprint"; if you have checked a publication venue, it can be changed.
+  1. **Self-reference depth: decided by the maintainer as "R4 (changes to the improvement logic shown only qualitatively, in the Game of 24 case study)".** The rules use the highest level actually achieved: Section 6.3 reports that it changed its own optimization process (error-trace analysis, parallel optimization), and Section 6.2 reports runs that broke after it modified its recursive improvement module. The qualifier records that all quantitative results and code listings show only improved solver policies.
+  2. **Evidence strength: decided by the maintainer as "in-task".** Each benchmark is optimized on its own validation set and tested on its own test set; running the same method separately on several tasks is not transfer. The abstract's claim of generalizability is not backed by a transfer experiment.
+  3. **Main result: decided by the maintainer to use Gödel-base.** It uses GPT-3.5 at test time like the baselines; the Gödel-free numbers are mentioned in limits, since their gains come mainly from calling stronger models.
+  4. **Domain tags 0;2 and venue "arXiv preprint": confirmed.** Tags follow ADAS (P002), which uses the same benchmarks; the arXiv v4 PDF shows no venue.
 
   Reading: the whole paper was read; the policy code listings in Appendices C and E were skimmed.
