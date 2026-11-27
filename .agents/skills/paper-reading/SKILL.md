@@ -1,118 +1,118 @@
 ---
 name: paper-reading
-description: 辅助研究人员阅读一篇 RSI（递归自我改进）相关论文，并按本仓库的 Schema 产出“待确认”的标注草稿：逐字段取值、原文出处、需要人核对的要点。在用户要求阅读、标注、添加或复核某篇论文（给出 arXiv 链接、PDF 或标题）时使用。不用于泛泛的论文总结，也不用于确认论文。
+description: Helps a researcher read a paper related to RSI (recursive self-improvement) and produce a draft annotation in this repository's schema, awaiting confirmation: a value for each field, the source in the paper, and the points a person needs to check. Use when the user asks to read, annotate, add or re-check a paper (given an arXiv link, a PDF or a title). Not for general paper summaries, and never for confirming papers.
 ---
 
-# 论文阅读
+# Paper reading
 
-把一篇论文读成一份**可供真人快速确认的标注草稿**。目标是把确认人的工作量从“通读全文”降到“核对几处关键判断”。你起草，人确认。
+Turn a paper into a **draft annotation that a human can confirm quickly**. The goal is to reduce the confirmer's work from reading the whole paper to checking a few key judgements. You draft; a person confirms.
 
-## 不可违反的规则
+## Rules that must not be broken
 
-1. **绝不确认。** 你只产出标注草稿。不要填写编号、`status`、`confirmed_by`、`confirmed_at`，不要运行 `scripts/confirm.py`，不要替任何人发 `/confirm` 评论。即使用户让你“顺便确认”，也要说明确认必须由真人对照原文、在 Issue 页面评论 `/confirm` 完成（CONTRIBUTING.md 第 5 步）。
-2. **如实报告读了多少。** 读到全文、部分全文还是只有摘要，按实际情况填 `reading`。工具截断了正文、附录没读到、PDF 打不开，都要明说。
-3. **每个判断附出处。** `R`、`feedback`、`loop`、`evidence` 四项必须给出原文的章节或页码，加一两句引文。找不到出处就标 `待核对`。
-4. **不推断。** 论文没写的内容不要补。验证成本没报告就填 `未报告`，不要根据评估器类型猜。
-5. **不改分类法。** 论文归不进现有的领域、子类或取值时，照最接近的填，并在“需要你核对的点”里提出，由维护者决定是否新增。
-6. **给出选项和建议，但不替人决定。** 凡是需要人确认的点，都要列出可选的取值、各自的依据，并明确说出你建议哪一个、为什么。是否收录、有争议的归类同样如此。最终由人选择，你不能因为自己有建议就当作已定。
+1. **Never confirm.** You produce draft annotations only. Do not fill in an id, `status`, `confirmed_by` or `confirmed_at`, do not run `scripts/confirm.py`, and do not post a `/confirm` comment for anyone. Even if the user asks you to "confirm it while you are at it", explain that confirmation must be done by a person who has checked the paper, by commenting `/confirm` on the issue page (CONTRIBUTING.md, step 5).
+2. **Report honestly how much you read.** Set `reading` to what you actually read: full text, partial text, or abstract only. Say so explicitly if a tool truncated the text, an appendix was not read, or the PDF would not open.
+3. **Cite a source for every judgement.** `R`, `feedback`, `loop` and `evidence` must each give the section or page in the paper and a quotation of a sentence or two. If you cannot find a source, write `unclear`.
+4. **Do not infer.** Do not add what the paper does not say. If the verification cost is not reported, write `not reported`; do not guess it from the kind of evaluator.
+5. **Do not change the taxonomy.** If a paper fits no existing domain, subfield or value, use the closest one and raise it in "Points for you to check"; the maintainers decide whether to add a new one.
+6. **Give options and a recommendation, but do not decide for the person.** For every point that needs human confirmation, list the candidate values with the evidence for each, and say clearly which one you recommend and why. The same applies to whether to include the paper and to disputed classifications. The person makes the final choice; having a recommendation does not make it settled.
 
-## 步骤
+## Steps
 
-### 1. 取原文
+### 1. Get the paper
 
-优先拿 PDF 全文（arXiv 用 `https://arxiv.org/pdf/<编号>`）。拿不到全文时退到摘要页，并把 `reading` 记为 `仅摘要`；这种情况下判断类字段多数应为 `待核对`。
+Prefer the full-text PDF (for arXiv, `https://arxiv.org/pdf/<id>`). If you cannot get the full text, fall back to the abstract page and set `reading` to `abstract only`; in that case most judgement fields should be `unclear`.
 
-### 2. 查重
+### 2. Check for duplicates
 
-在 `data/papers.tsv` 和 `data/pending/` 里按链接和标题查找。已收录就告诉用户编号，转为“复核已有标注”：对照原文逐项检查现有取值，报告不一致之处。
+Search `data/papers.tsv` and `data/pending/` by link and title. If the paper is already listed, tell the user its ID and switch to re-checking the existing annotation: compare each existing value with the paper and report the discrepancies.
 
-### 3. 带着七个问题读
+### 3. Read with seven questions in mind
 
-- 系统在迭代中改了自身的什么？（提示、记忆、技能；脚手架或自身代码；权重；改进过程本身；还是只改外部产物）
-- 改动是否被保留并在后续轮次或任务中复用？
-- 用什么信号判断一次改动是否更好？
-- 回路里人的角色是什么？跑了多少轮？
-- 改进在哪里被证实：只在训练或调优所用的任务上，还是在留出的或其他任务上？有没有独立评测？
-- 论文怎么称呼自己：递归自我改进、自我改进或自演化，还是都没有？它有没有明确否认？
-- 实验做的是什么任务？属于哪些应用领域？
+- What part of itself does the system change across iterations? (Prompts, memory, skills; scaffold or its own code; weights; the improvement process itself; or only external artifacts.)
+- Are the changes kept and reused in later rounds or tasks?
+- What signal decides whether a change is better?
+- What role do people play in the loop? How many rounds were run?
+- Where is the improvement shown: only on the tasks used for training or tuning, or on held-out or other tasks? Is there an independent evaluation?
+- What does the paper call itself: recursive self-improvement, self-improvement or self-evolving, or neither? Does it explicitly disclaim either?
+- What tasks are the experiments on, and which application domains do they belong to?
 
-同时留意论文自己报告的失败：评估器被钻空子、性能在若干轮后下降、目标漂移。
+Also look for failures the paper reports itself: the evaluator being gamed, performance dropping after some rounds, goal drift.
 
-### 4. 按规则取值
+### 4. Assign values by the rules
 
-逐字段判定的规则、界线案例和常见误判见 [references/annotation-rules.md](references/annotation-rules.md)。取值前先读它。枚举字段的允许取值以 `scripts/check_data.py` 为准。
+The rules for each field, borderline cases and common mistakes are in [references/annotation-rules.md](references/annotation-rules.md). Read it before assigning values. The allowed values of the enumerated fields are defined in `scripts/paperlib.py`.
 
-### 5. 对照已有清单校准
+### 5. Calibrate against the existing list
 
-从 `data/papers.tsv` 里找出最相近的两三篇（同子类，或做法相似），比较 `R`、`feedback`、`evidence` 的取值。如果你的判断和相近论文的口径不同，要么调整，要么在核对要点里说明为什么这篇不一样。
+Find the two or three most similar papers in `data/papers.tsv` (same subfield, or a similar approach) and compare their `R`, `feedback` and `evidence`. If your judgement differs from how similar papers were annotated, either adjust it or explain in the points to check why this paper is different.
 
-### 6. 输出
+### 6. Output
 
-按下面的格式输出，顺序不要变：
+Use the format below, in this order:
 
 ```
-## <论文简称>：<一句话说明它是什么>
+## <Short name>: <one sentence on what it is>
 
-阅读情况：<全文 / 部分全文 / 仅摘要>。<没读到的部分>
+Reading: <full text / partial text / abstract only>. <What was not read>
 
-### 标注草稿
-| 字段 | 取值 | 出处 |
+### Draft annotation
+| Field | Value | Source |
 | --- | --- | --- |
-| 领域标签 | ... | 实验任务：第 x 节 |
-| 子类 | ... | |
-| 纳入标准 | 闭环；自指；累积 | |
-| 改进对象 | ... | 第 x 节 |
-| 自指深度 | R? | 第 x 节：“原文引文” |
-| 反馈来源 | ... | 第 x 节：“原文引文” |
-| 闭环程度 | ... | ... |
-| 累积方式 | ... | ... |
-| 改进轮数 | ... | ... |
-| 验证成本 | ... | ... |
-| 失败可逆性 | ... | ... |
-| 自称程度 | ... | 标题或摘要 |
-| 证据强度 | ... | 第 x 节 |
-| 主要结果 | ... | 表 x |
-| 失败与局限 | ... | ... |
-| 置信度 | 高 / 中 / 低 | |
+| Domain tags | ... | Experimental tasks: Section x |
+| Subfield | ... | |
+| Inclusion criteria | closed loop; self-reference; accumulation | |
+| What is improved | ... | Section x |
+| Self-reference depth | R? | Section x: "quotation" |
+| Feedback source | ... | Section x: "quotation" |
+| Loop automation | ... | ... |
+| Accumulation | ... | ... |
+| Improvement rounds | ... | ... |
+| Verification cost | ... | ... |
+| Failure reversibility | ... | ... |
+| Authors' claim | ... | Title or abstract |
+| Evidence strength | ... | Section x |
+| Main result | ... | Table x |
+| Failures and limitations | ... | ... |
+| Confidence | high / medium / low | |
 
-### 需要你核对的点
-1. **<要定的问题>**（影响字段：<字段名>；去看 <章节或页码>）
-   - 选项 A：<取值>。依据：<原文里支持它的内容>
-   - 选项 B：<取值>。依据：<原文里支持它的内容>
-   - **建议：A。** <一句话理由，以及什么情况下应改选 B>
-2. ...（3 到 5 条，按重要性排序）
+### Points for you to check
+1. **<The question to decide>** (affects: <field>; see <section or page>)
+   - Option A: <value>. Evidence: <what in the paper supports it>
+   - Option B: <value>. Evidence: <what in the paper supports it>
+   - **Recommendation: A.** <One sentence of reasoning, and when B should be chosen instead>
+2. ... (3 to 5 points, most important first)
 
-### 与已有清单的对照
-- 最相近：P0xx <简称>（R?，<反馈来源>）。<口径是否一致>
+### Comparison with the existing list
+- Most similar: P0xx <short name> (R?, <feedback source>). <Whether the annotations are consistent>
 
-### 对综述有用的信号
-- <自称与证据的落差 / 论文报告的失败 / 可能的反例；没有就写“无”>
+### Signals useful for the survey
+- <Gap between claim and evidence / failures reported in the paper / possible counterexamples; write "none" if there are none>
 ```
 
-“需要你核对的点”是最重要的部分，每一条都要让确认人能直接做选择：
+"Points for you to check" is the most important part. Each point must let the confirmer choose directly:
 
-- **问题要具体。** 不要写“请核对自指深度”，要写“系统改的是工具库还是调用工具的代码”。
-- **选项是真实的备选取值**，通常两到三个，每个都带原文依据。只有一种合理读法的事项不要硬凑选项，直接放进标注草稿。
-- **必须有建议。** 说明你选哪个、理由是什么、看到什么证据应该改选另一个。草稿表里填的就是你建议的那个取值。
-- **建议不等于决定。** 即使你很有把握，也要把选项列出来；只读了摘要时，要说明建议的把握不大。
+- **Make the question specific.** Not "please check the self-reference depth", but "does the system change the tool library or the code that calls the tools?"
+- **Options are real candidate values**, usually two or three, each with evidence from the paper. Do not invent options for something with only one reasonable reading; put it straight into the draft annotation.
+- **Always recommend.** Say which option you choose, why, and what evidence should make the confirmer choose another. The draft table holds the value you recommend.
+- **A recommendation is not a decision.** Even when you are confident, list the options; if you read only the abstract, say that your recommendation is weakly supported.
 
-示例：
+Example:
 
 ```
-1. **系统改的是工具库，还是调用工具的代码？**（影响字段：自指深度；去看 3.2 节和附录 B）
-   - 选项 A：R1。依据：3.2 节说新工具“are added to the tool library for later reuse”，只是往库里加内容。
-   - 选项 B：R2。依据：附录 B 提到智能体“rewrites its tool-selection routine”，这属于改自身代码。
-   - **建议：A。** 正文的所有实验只涉及往工具库里添加工具，附录 B 的做法没有出现在实验里。如果你在实验设置中看到改写选择逻辑的版本被实际评测，应改选 B。
+1. **Does the system change the tool library, or the code that calls the tools?** (affects: self-reference depth; see Section 3.2 and Appendix B)
+   - Option A: R1. Evidence: Section 3.2 says new tools "are added to the tool library for later reuse", which only adds content to the library.
+   - Option B: R2. Evidence: Appendix B says the agent "rewrites its tool-selection routine", which changes its own code.
+   - **Recommendation: A.** All experiments in the main text only add tools to the library, and the Appendix B variant does not appear in the experiments. If the experimental setup shows that the variant that rewrites the selection logic was actually evaluated, choose B.
 ```
 
-### 7. 写入仓库（仅当用户要求）
+### 7. Write to the repository (only when the user asks)
 
-每篇论文对应一个 Issue 和一个标注文件，不直接改 `data/papers.tsv`。
+Each paper has one issue and one annotation file; do not edit `data/papers.tsv` directly.
 
-1. 确认论文有对应的 Issue（没有就请用户先用“推荐论文”表单开一个），并且当前在分支 `paper/issue-<编号>` 上。
-2. 运行 `python3 scripts/new_paper.py <编号>` 生成 `data/pending/issue-<编号>.yml`，按文件里的注释逐项填写。取值里不能有 `|`。出处写进 `r_evidence`（自指深度）和 `notes`（其他）。
-3. 把“需要你核对的点”原样写进文件末尾的 `review_points`：它会显示在 Issue 页面上，是确认人主要看的内容，所以选项、依据、建议和去哪里看都要保留。
-4. 运行 `python3 scripts/check_data.py`。不需要运行 `build_readme.py`，标注文件不影响 README。
-5. 只提交这一个文件。告诉用户接下来发起 pull request，由确认人在 Issue 页面核对并评论 `/confirm`。
+1. Check that the paper has an issue (if not, ask the user to open one with the "Recommend a paper" form) and that you are on the branch `paper/issue-<number>`.
+2. Run `python3 scripts/new_paper.py <number>` to create `data/pending/issue-<number>.yml`, and fill it in following the comments in the file. Values must not contain `|`. Put sources in `r_evidence` (for the self-reference depth) and `notes` (for everything else).
+3. Copy "Points for you to check" unchanged into `review_points` at the end of the file. It is shown on the issue page and is what the confirmer reads first, so keep the options, evidence, recommendation and where to look.
+4. Run `python3 scripts/check_data.py`. You do not need to run `build_readme.py`; annotation files do not affect the README.
+5. Commit only this one file. Tell the user to open a pull request next; a confirmer checks it on the issue page and comments `/confirm`.
 
-复核已有论文时不要改数据：把不一致之处连同出处列给用户，由他们在 Issue 里提出。
+When re-checking a paper that is already listed, do not change the data: list the discrepancies with their sources for the user, who raises them in an issue.

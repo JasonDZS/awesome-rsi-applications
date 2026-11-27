@@ -4,7 +4,7 @@
   python3 scripts/confirm.py --file issue-12.yml --by <github login> --date YYYY-MM-DD
 
 Checks that the commenter is on the confirmer list and is not an automation account, that the
-annotation is valid and was read in full, then appends the row to data/papers.tsv as 已确认.
+annotation is valid and was read in full, then appends the row to data/papers.tsv as confirmed.
 Prints the new paper id on success; prints the reason and exits 1 on refusal.
 """
 import argparse
@@ -31,18 +31,19 @@ def main():
     args = ap.parse_args()
 
     if pl.NOT_HUMAN.search(args.by):
-        sys.exit(f"@{args.by} 是自动化账号，不能确认论文。")
+        sys.exit(f"@{args.by} is an automation account and cannot confirm papers.")
     if args.by.lower() not in confirmers():
-        sys.exit(f"@{args.by} 不在确认人名单（.github/confirmers.txt）里。")
+        sys.exit(f"@{args.by} is not on the confirmer list (.github/confirmers.txt).")
     row, errors = load(args.file)
     if errors:
-        sys.exit("标注还有格式问题，修正后再确认：\n" + "\n".join(f"- {e}" for e in errors))
+        sys.exit("The annotation still has format problems; fix them before confirming:\n"
+                 + "\n".join(f"- {e}" for e in errors))
     if row.get("reading") not in pl.READ_IN_FULL:
-        sys.exit("阅读深度是“仅摘要”，读过全文之前不能确认。")
+        sys.exit("Reading depth is 'abstract only'; the paper cannot be confirmed until it has been read in full.")
 
     _, rows = pl.load_tsv()
     new = {c: row.get(c, "") for c in pl.COLUMNS}
-    new.update(id=pl.next_id(rows), status="已确认", confirmed_by=args.by, confirmed_at=args.date)
+    new.update(id=pl.next_id(rows), status=pl.STATUS_CONFIRMED, confirmed_by=args.by, confirmed_at=args.date)
     problems = pl.validate_confirmation(new, new["id"])
     if problems:
         sys.exit("\n".join(problems))

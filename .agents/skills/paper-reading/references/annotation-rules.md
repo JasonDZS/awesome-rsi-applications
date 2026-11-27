@@ -1,107 +1,124 @@
-# 标注规则
+# Annotation rules
 
-逐字段的判定规则。界线案例来自已收录论文的标注经验。
+Rules for each field. The borderline cases come from experience annotating the papers already in the list.
 
-## 纳入标准（criteria）
+Values are written exactly as listed here (lower case, except subfield names and R levels). Multi-valued fields are separated by `; `.
 
-- **闭环**：系统生成候选，得到评估，评估结果驱动下一轮。
-- **自指**：被改进的对象包含系统自身的一部分，而不只是外部产物。
-- **累积**：改进被保留，并参与后续轮次的改进。
+## Inclusion criteria (criteria)
 
-只满足闭环的工作是边界案例，`R` 标 R0。三条都不满足的论文不属于本清单，告诉用户并说明原因。
+- **closed loop**: the system generates candidates, they are evaluated, and the evaluation drives the next round.
+- **self-reference**: the thing being improved includes part of the system itself, not only external artifacts.
+- **accumulation**: improvements are kept and take part in later rounds of improvement.
 
-## 领域标签（tags）
+Work that has only a closed loop is a borderline case and gets `R0`. A paper that meets none of the three does not belong in the list; tell the user and explain why.
 
-可多选，写成 `0;2` 这样的形式。
+## Domain tags (tags)
 
-- **0 AI 研发自身**：通用的 AI 优化自身，不限于某个应用领域。判定：任务本身是 AI 研发，或改的是智能体自身的脚手架、代码或改进过程。只训练某个应用领域策略的工作（如机器人策略）不标 0。
-- **1 工程科学**：软件工程、算法发现、芯片设计与系统优化。闭环只经过数字环境。
-- **2 自然科学**：数学、化学与材料、生物与医药、物理与地球科学。
-- **3 物理与具身**：闭环经过物理世界或其仿真。游戏环境中的具身智能体也归这里。
-- **4 社会科学**：经济与金融、社会仿真、预测、已部署的服务型智能体、政策与教育、法律。
+One or more, written like `0;2`.
 
-第 0 类与 1–4 类不互斥。自我改进的编程智能体同时标 `0;1`。按实验任务所在的领域标 1–4，一篇论文在三个领域做了实验就标三个。
+- **0 AI R&D itself**: general-purpose AI that improves itself, not tied to one application domain. Applies when the task itself is AI research and development, or when what changes is the agent's own scaffold, code or improvement process. Work that only trains a policy for one application domain (such as a robot policy) is not tagged 0.
+- **1 Engineering**: software engineering, algorithm discovery, chip design and systems optimization. The loop runs only through digital environments.
+- **2 Natural sciences**: mathematics, chemistry and materials, biology and medicine, physics and earth sciences.
+- **3 Physical and embodied systems**: the loop runs through the physical world or a simulation of it. Embodied agents in game environments also belong here.
+- **4 Social sciences**: economics and finance, social simulation, forecasting, deployed service agents, policy and education, law.
 
-## 自指深度（R）
+Domain 0 and domains 1–4 are not mutually exclusive. A self-improving coding agent is tagged `0;1`. Tag 1–4 by the domain of the experimental tasks; a paper with experiments in three domains gets three tags.
 
-取论文**实际做到**的最高一级。
+## Subfield (subclass)
 
-| 等级 | 改的是什么 |
+Use these names; several are separated by `; `.
+
+| Domain | Subfields |
 | --- | --- |
-| R0 | 仅外部产物 |
-| R1 | 提示、记忆、技能库、工具库 |
-| R2 | 脚手架与自身代码 |
-| R3 | 权重与训练流程 |
-| R4 | 改进“改进过程”本身 |
+| 0 | Agent self-improvement; Data and weight self-adaptation; Automated ML research |
+| 1 | Software engineering; Algorithm discovery; Chip design and systems optimization |
+| 2 | Mathematics; Chemistry and materials; Biology and medicine; Physics and earth sciences |
+| 3 | Robot skill acquisition; Automated reward and curriculum design; Open-ended embodied learning |
+| 4 | Economics and finance; Social simulation; Forecasting; Deployed service agents; Policy and education; Law |
 
-界线案例：
+`Cross-subfield` is used when the experiments span many subfields and no single one describes the paper.
 
-- **元智能体设计别的智能体，自身不变** → R0。被设计出来的是外部产物。
-- **优化器迭代优化提示、代码、分子，优化器自身不变** → R0。
-- **不断增长的工具库、技能库、经验库** → R1。它们是智能体自己之后会调用的东西，不算外部产物。
-- **改的是组织记忆的代码，而不只是往记忆里写内容** → R2。
-- **权重更新只是提出、没有执行** → 不算 R3，按实际做到的那一级标。
-- **每轮从原始模型重新训练，但数据来自上一轮的模型** → 仍是 R3，在备注里写明。
-- **变异提示本身也被演化（改进“生成改进”的那部分）** → R4，并注明限于哪一层，如“R4（限于提示层）”。
-- **外层回路改内层回路的搜索代码，外层自己不变** → R2，不是 R4。
-- 拿不准时写成“R2，或 R4 待核对”，并把两种读法的依据写进核对要点。
+## Self-reference depth (R)
 
-## 反馈来源（feedback）
+Use the highest level the paper **actually achieves**.
 
-指**回路内部**用来决定保留或丢弃一次改动的信号。只在最终评测时用到的评判不算。可多选，用 `；` 连接。
+| Level | What is improved |
+| --- | --- |
+| R0 | External artifacts only |
+| R1 | Prompts, memory, skill and tool libraries |
+| R2 | Scaffold and own code |
+| R3 | Weights and training pipeline |
+| R4 | The improvement process itself |
 
-- **形式验证**：证明检查器、类型检查等。
-- **自动评测**：测试、基准分数、回测、与标准答案比对。
-- **仿真**：物理仿真器、世界模型、社会仿真。
-- **真实实验**：湿实验、真机、线上 A/B、真实市场或真实事件的结果。
-- **人类评审**：人工打分、人工纠正、专家评审。
-- **学习型评判**：用**另一个**模型打分。
-- **自评**：**被改进的模型自己**打分，包括自一致性投票、伪标签、模型自任评审。
+Borderline cases:
 
-学习型评判与自评的区别在于评判者是不是被改进的那个模型。
+- **A meta-agent designs other agents and does not change itself** → R0. The designed agents are external artifacts.
+- **An optimizer iteratively optimizes prompts, code or molecules, and the optimizer itself does not change** → R0.
+- **A growing tool, skill or experience library** → R1. These are things the agent itself calls later, not external artifacts.
+- **What changes is the code that organizes memory, not just what is written into memory** → R2.
+- **Weight updates are only proposed, never executed** → not R3; use the level actually achieved.
+- **Each round retrains from the original model, but on data produced by the previous round's model** → still R3; say so in the notes.
+- **The mutation prompts themselves are also evolved (the part that generates improvements is improved)** → R4, stating which level it is limited to, e.g. `R4 (limited to the prompt level)`.
+- **An outer loop changes the inner loop's search code and does not change itself** → R2, not R4.
+- When unsure, write e.g. `R2 or R4 (unclear)` and put the evidence for both readings in the points to check.
 
-信号可靠性不单独标注，按所选来源中最弱的一档推导，由强到弱：形式验证、自动评测、真实实验、仿真、人类评审与学习型评判、自评。
+## Feedback source (feedback)
 
-## 闭环程度（loop）
+The signal **inside the loop** that decides whether a change is kept or discarded. A judge used only in the final evaluation does not count. One or more, separated by `; `.
 
-- **全自动**：回路运行期间没有人参与。人只负责搭建和启动。
-- **半自动**：人在固定环节介入，如提供一次示范、上线前确认、重置环境、失败后接管。
-- **人在回路**：人持续提供反馈或纠正，是反馈信号的一部分。
+- **formal verification**: proof checkers, type checking, and similar.
+- **automated evaluation**: tests, benchmark scores, backtests, comparison with ground-truth answers.
+- **simulation**: physics simulators, world models, social simulations.
+- **real-world experiment**: wet-lab experiments, physical robots, online A/B tests, outcomes in real markets or real events.
+- **human review**: human scoring, human corrections, expert review.
+- **learned judge**: scoring by a **different** model.
+- **self-evaluation**: scoring by **the model being improved**, including self-consistency voting, pseudo-labels, and the model acting as its own judge.
 
-## 累积方式（accumulation）
+The difference between a learned judge and self-evaluation is whether the judge is the model being improved.
 
-单轮；单一谱系的多代迭代；种群或档案库式的开放演化。
+Signal reliability is not annotated separately. It is derived from the weakest of the chosen sources, from strongest to weakest: formal verification, automated evaluation, real-world experiment, simulation, human review and learned judge, self-evaluation.
 
-## 验证成本（cost）
+## Loop automation (loop)
 
-得到一次可信评估所需的时间：秒到分钟；小时；天到周；月以上或必须人工。论文没有报告就填 `未报告`，不要推断。
+- **fully automatic**: no person takes part while the loop runs. People only build and start it.
+- **semi-automatic**: people step in at fixed points, such as providing one demonstration, approving before deployment, resetting the environment, or taking over after a failure.
+- **human-in-the-loop**: people continuously give feedback or corrections and are part of the feedback signal.
 
-## 失败可逆性（reversibility）
+## Accumulation (accumulation)
 
-- **完全可逆**：如代码回滚。
-- **有消耗可重试**：如试剂、样本、机器人磨损、真实资金的小额损失。
-- **不可逆**：如硬件损坏、对人或社会的真实影响。
+`single round`; `multi-generation single lineage`; `open-ended population or archive`.
 
-## 自称程度（claim）
+## Verification cost (cost)
 
-看标题和摘要的用词：`RSI`（明确用 recursive self-improvement）；`自我改进`（self-improving、self-evolving 等）；`未自称`。
+The time needed to obtain one trustworthy evaluation: `seconds to minutes`; `hours`; `days to weeks`; `months or longer, or requires humans`. If the paper does not report it, write `not reported`; do not infer it.
 
-论文明确否认时要写出来，如“自我改进（文中说明不是递归）”。这类表述对综述很有用。
+## Failure reversibility (reversibility)
 
-## 证据强度（evidence）
+- **fully reversible**: e.g. rolling back code.
+- **retryable at a cost**: e.g. reagents, samples, robot wear, small losses of real money.
+- **irreversible**: e.g. damaged hardware, real effects on people or society.
 
-- **任务内**：只在训练或调优所用的任务上见效。同一基准的留出测试集、同一任务的留出时间段，都算任务内。
-- **跨任务**：在没有用于调优的其他任务、其他基准或其他领域上见效。
-- **跨任务且独立验证**：上一条，并且由第三方或独立评测证实。作者自己跑的评测不算独立。
+## Authors' claim (claim)
 
-## 阅读深度（reading）
+Judge by the wording of the title and abstract: `RSI` (explicitly uses "recursive self-improvement"); `self-improvement` (self-improving, self-evolving, and similar); `not claimed`.
 
-新标注用 `全文`、`部分全文`、`仅摘要`。数据里还有早期遗留的 `摘要`、`片段`、`未读`。只有 `全文` 或 `部分全文` 的行才能被确认。
+When the paper explicitly disclaims something, record it in parentheses, e.g. `self-improvement (states it is not recursive)`. Such statements are useful for the survey.
 
-## 其他字段
+## Evidence strength (evidence)
 
-- **result**：一句话，含改进前后的关键数字和所用基准。
-- **limits**：论文自己报告的失败与局限，不是你的批评。
-- **r_evidence**：自指深度的出处，章节号加引文。
-- **notes**：其他字段的出处、反馈细节、存疑点、人工介入点。
-- **confidence**：对整条标注的把握。只读了摘要时不要高于“低”。
+- **in-task**: improvement shown only on the tasks used for training or tuning. Held-out test sets of the same benchmark and held-out time periods of the same task count as in-task.
+- **cross-task**: improvement shown on other tasks, benchmarks or domains that were not used for tuning.
+- **cross-task, independently verified**: as above, and confirmed by a third party or an independent evaluation. Evaluations run by the authors themselves are not independent.
+
+## Reading depth (reading)
+
+New annotations use `full text`, `partial text` or `abstract only`. Older data may also contain `abstract`, `excerpt` or `unread`. Only rows with `full text` or `partial text` can be confirmed.
+
+## Other fields
+
+- **venue**: `arXiv preprint`, or the venue and year.
+- **result**: one sentence with the key numbers before and after improvement and the benchmark used.
+- **limits**: failures and limitations reported by the paper itself, not your own criticism.
+- **r_evidence**: the source for the self-reference depth: section number and quotation.
+- **notes**: sources for the other fields, feedback details, open questions, points where people intervene.
+- **confidence**: how sure you are of the whole annotation: `high`, `medium` or `low`. If you read only the abstract, do not go above `low`.

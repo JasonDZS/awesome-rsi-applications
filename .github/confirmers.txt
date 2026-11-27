@@ -1,3 +1,3 @@
-# 确认人名单：一行一个 GitHub 用户名。只有名单里的人在 Issue 评论 /confirm 才会生效。
-# 确认人可以确认自己填写的论文。改这个文件需要代码所有者审核。
+# Confirmers: one GitHub login per line. Only a /confirm comment from someone on this list takes effect.
+# Confirmers may confirm papers they annotated themselves. Changes to this file need code-owner review.
 JasonDZS

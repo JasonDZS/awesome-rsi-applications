@@ -18,30 +18,54 @@ PENDING_KEYS = [c for c in COLUMNS if c != "id" and c not in CONFIRM_COLS] + ["r
 REQUIRED = ["title", "url", "date", "tags", "reading"]
 
 LABELS = {
-    "title": "论文标题", "url": "链接", "date": "首发年月", "venue": "发表状态", "tags": "领域标签",
-    "subclass": "子类", "task": "任务", "criteria": "纳入标准", "object": "改进对象", "R": "自指深度",
-    "r_evidence": "自指深度的依据", "feedback": "反馈来源", "loop": "闭环程度",
-    "accumulation": "累积方式", "rounds": "改进轮数", "cost": "验证成本",
-    "reversibility": "失败可逆性", "claim": "自称程度", "evidence": "证据强度", "result": "主要结果",
-    "limits": "失败与局限", "reading": "阅读深度", "confidence": "置信度", "notes": "备注",
+    "title": "Title", "url": "Link", "date": "First released", "venue": "Publication status",
+    "tags": "Domain tags", "subclass": "Subfield", "task": "Task", "criteria": "Inclusion criteria",
+    "object": "What is improved", "R": "Self-reference depth", "r_evidence": "Evidence for the depth",
+    "feedback": "Feedback source", "loop": "Loop automation", "accumulation": "Accumulation",
+    "rounds": "Improvement rounds", "cost": "Verification cost", "reversibility": "Failure reversibility",
+    "claim": "Authors' claim", "evidence": "Evidence strength", "result": "Main result",
+    "limits": "Failures and limitations", "reading": "Reading depth", "confidence": "Confidence",
+    "notes": "Notes",
 }
-DOMAINS = {"0": "AI 研发自身", "1": "工程科学", "2": "自然科学", "3": "物理与具身", "4": "社会科学"}
-FEEDBACK = ["形式验证", "自动评测", "仿真", "真实实验", "人类评审", "学习型评判", "自评", "待核对"]
-CRITERIA = ["闭环", "自指", "累积"]
+UNCLEAR = "unclear"          # not enough information to decide; the confirmer has to check
+NOT_REPORTED = "not reported"
+STATUS_PENDING, STATUS_CONFIRMED = "pending", "confirmed"
+
+DOMAINS = {"0": "AI R&D itself", "1": "Engineering", "2": "Natural sciences",
+           "3": "Physical and embodied systems", "4": "Social sciences"}
+SUBFIELDS = {
+    "0": ["Agent self-improvement", "Data and weight self-adaptation", "Automated ML research"],
+    "1": ["Software engineering", "Algorithm discovery", "Chip design and systems optimization"],
+    "2": ["Mathematics", "Chemistry and materials", "Biology and medicine", "Physics and earth sciences"],
+    "3": ["Robot skill acquisition", "Automated reward and curriculum design", "Open-ended embodied learning"],
+    "4": ["Economics and finance", "Social simulation", "Forecasting", "Deployed service agents",
+          "Policy and education", "Law"],
+}
+LEVELS = {"R0": "External artifacts only", "R1": "Prompts, memory, skill and tool libraries",
+          "R2": "Scaffold and own code", "R3": "Weights and training pipeline",
+          "R4": "The improvement process itself"}
+FEEDBACK = ["formal verification", "automated evaluation", "simulation", "real-world experiment",
+            "human review", "learned judge", "self-evaluation", UNCLEAR]
+CRITERIA = ["closed loop", "self-reference", "accumulation"]
 ENUMS = {
-    "loop": ["人在回路", "半自动", "全自动", "待核对"],
-    "accumulation": ["单轮", "单一谱系的多代迭代", "种群或档案库式的开放演化", "待核对"],
-    "cost": ["秒到分钟", "小时", "天到周", "月以上或必须人工", "未报告"],
-    "reversibility": ["完全可逆", "有消耗可重试", "不可逆", "待核对"],
-    "evidence": ["任务内", "跨任务", "跨任务且独立验证", "待核对"],
-    "confidence": ["高", "中", "低"],
+    "loop": ["human-in-the-loop", "semi-automatic", "fully automatic", UNCLEAR],
+    "accumulation": ["single round", "multi-generation single lineage", "open-ended population or archive",
+                     UNCLEAR],
+    "cost": ["seconds to minutes", "hours", "days to weeks", "months or longer, or requires humans",
+             NOT_REPORTED],
+    "reversibility": ["fully reversible", "retryable at a cost", "irreversible", UNCLEAR],
+    "evidence": ["in-task", "cross-task", "cross-task, independently verified", UNCLEAR],
+    "confidence": ["high", "medium", "low"],
 }
-READING_NEW = ["全文", "部分全文", "仅摘要"]
-READING_LEGACY = ["摘要", "片段", "未读"]          # only in rows drafted before the review workflow
-READ_IN_FULL = {"全文", "部分全文"}
+CLAIMS = ["RSI", "self-improvement", "not claimed"]       # may be followed by a note in parentheses
+READING_NEW = ["full text", "partial text", "abstract only"]
+READING_LEGACY = ["abstract", "excerpt", "unread"]      # only in rows drafted before the review workflow
+READ_IN_FULL = {"full text", "partial text"}
 # accounts that must never be recorded as the confirmer: confirmation has to come from a person
 NOT_HUMAN = re.compile(r"(\[bot\]$|^claude$|^copilot$|^codex$|^github-actions$|bot$)", re.I)
-SPLIT = re.compile(r"\s*[;；,，、]\s*")
+# separators accepted in multi-valued fields; "; " is canonical
+SPLIT = re.compile(r"\s*[;；、]\s*")
+MULTI = ("subclass", "criteria", "feedback")
 
 
 def load_tsv(path=DATA):
@@ -77,10 +101,10 @@ def parse_pending(text):
             continue
         m = re.match(r"^([A-Za-z_]+):[ \t]*(.*)$", line)
         if not m:
-            raise ValueError(f"第 {i} 行无法解析：{line.strip()[:40]}")
+            raise ValueError(f"line {i} cannot be parsed: {line.strip()[:40]}")
         key, value = m.group(1), m.group(2).strip()
         if key in out:
-            raise ValueError(f"字段 {key} 出现了两次")
+            raise ValueError(f"field {key} appears twice")
         if value == "|":
             block = []
             while i < len(lines) and (not lines[i].strip() or lines[i][:1] in " \t"):
@@ -94,14 +118,18 @@ def parse_pending(text):
     return out
 
 
+def split_multi(value):
+    return [x for x in SPLIT.split(value or "") if x]
+
+
 def normalise(row):
     """Canonical separators for multi-valued fields; trims everything else."""
     r = {k: (v or "").strip() for k, v in row.items()}
     if r.get("tags"):
         r["tags"] = ";".join(sorted(set(re.findall(r"[0-4]", r["tags"]))))
-    for key in ("subclass", "criteria", "feedback"):
+    for key in MULTI:
         if r.get(key):
-            r[key] = "；".join(x for x in SPLIT.split(r[key]) if x)
+            r[key] = "; ".join(split_multi(r[key]))
     return r
 
 
@@ -110,48 +138,48 @@ def validate(r, where, legacy_ok=False):
     e = []
     for key in REQUIRED:
         if not r.get(key):
-            e.append(f"{where}：必填字段 {LABELS[key]}（{key}）为空")
+            e.append(f"{where}: required field {LABELS[key]} ({key}) is empty")
     for key, v in r.items():
         if key != "review_points" and v and ("|" in v or "\n" in v):
-            e.append(f"{where}：{key} 不能包含竖线或换行")
+            e.append(f"{where}: {key} must not contain '|' or a line break")
     if r.get("url") and not re.match(r"https?://\S+$", r["url"]):
-        e.append(f"{where}：url 不是合法链接")
+        e.append(f"{where}: url is not a valid link")
     if r.get("date") and not re.fullmatch(r"\d{4}(-\d{2})?", r["date"]):
-        e.append(f"{where}：date 应为 YYYY-MM")
+        e.append(f"{where}: date must be YYYY-MM")
     if r.get("tags") and not re.fullmatch(r"[0-4](;[0-4])*", r["tags"]):
-        e.append(f"{where}：tags 应为 0–4 的数字，用 ; 分隔")
-    if r.get("R") and not re.match(r"(R[0-4]|待核对)", r["R"]):
-        e.append(f"{where}：R 应以 R0–R4 开头，或为 待核对")
-    for item in filter(None, r.get("feedback", "").split("；")):
-        if item not in FEEDBACK:
-            e.append(f"{where}：未知的反馈来源“{item}”，允许：{'、'.join(FEEDBACK)}")
-    for item in filter(None, r.get("criteria", "").split("；")):
-        if item not in CRITERIA:
-            e.append(f"{where}：未知的纳入标准“{item}”，允许：{'、'.join(CRITERIA)}")
+        e.append(f"{where}: tags must be digits 0-4 separated by ;")
+    if r.get("R") and not re.match(rf"(R[0-4]|{UNCLEAR})", r["R"]):
+        e.append(f"{where}: R must start with R0-R4, or be '{UNCLEAR}'")
+    for key, allowed in (("feedback", FEEDBACK), ("criteria", CRITERIA)):
+        for item in split_multi(r.get(key, "")):
+            if item not in allowed:
+                e.append(f"{where}: unknown {LABELS[key].lower()} '{item}'; allowed: {', '.join(allowed)}")
     for key, allowed in ENUMS.items():
         if r.get(key) and r[key] not in allowed:
-            e.append(f"{where}：{LABELS[key]}（{key}）=“{r[key]}” 不在允许取值内：{'、'.join(allowed)}")
+            e.append(f"{where}: {LABELS[key]} ({key}) = '{r[key]}' is not one of: {' / '.join(allowed)}")
+    if r.get("claim") and not any(r["claim"] == c or r["claim"].startswith(c + " (") for c in CLAIMS):
+        e.append(f"{where}: claim must be one of {', '.join(CLAIMS)}, optionally followed by a note in parentheses")
     readings = READING_NEW + (READING_LEGACY if legacy_ok else [])
     if r.get("reading") and r["reading"] not in readings:
-        e.append(f"{where}：阅读深度应为 {'、'.join(READING_NEW)}")
+        e.append(f"{where}: reading must be one of: {', '.join(READING_NEW)}")
     return e
 
 
 def validate_confirmation(r, where):
     e = []
     by, at = r.get("confirmed_by", ""), r.get("confirmed_at", "")
-    if r.get("status") == "已确认":
+    if r.get("status") == STATUS_CONFIRMED:
         if not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})", by) or NOT_HUMAN.search(by):
-            e.append(f"{where}：已确认的行需要 confirmed_by 为真人的 GitHub 用户名")
+            e.append(f"{where}: a confirmed row needs confirmed_by to be a human GitHub login")
         if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", at):
-            e.append(f"{where}：已确认的行需要 confirmed_at 为 YYYY-MM-DD")
+            e.append(f"{where}: a confirmed row needs confirmed_at as YYYY-MM-DD")
         if r.get("reading") not in READ_IN_FULL:
-            e.append(f"{where}：已确认的论文阅读深度必须是全文或部分全文")
-    elif r.get("status") == "待确认":
+            e.append(f"{where}: a confirmed paper must have been read in full or in part (reading)")
+    elif r.get("status") == STATUS_PENDING:
         if by or at:
-            e.append(f"{where}：待确认的行不能填写 confirmed_by 或 confirmed_at")
+            e.append(f"{where}: a pending row must not have confirmed_by or confirmed_at")
     else:
-        e.append(f"{where}：status 应为 待确认 或 已确认")
+        e.append(f"{where}: status must be '{STATUS_PENDING}' or '{STATUS_CONFIRMED}'")
     return e
 
 
@@ -159,19 +187,20 @@ def render_review(r, errors=(), source=""):
     """Markdown shown to the confirmer on the issue page."""
     def v(key):
         return r.get(key) or "—"
-    tags = "；".join(f"{t} {DOMAINS[t]}" for t in r.get("tags", "").split(";") if t in DOMAINS) or "—"
+    tags = "; ".join(f"{t} {DOMAINS[t]}" for t in r.get("tags", "").split(";") if t in DOMAINS) or "—"
     link = f"[{r.get('title', '')}]({r['url']})" if r.get("url") else r.get("title", "")
-    lines = [f"### 待确认的标注：{link}", ""]
+    lines = [f"### Annotation awaiting confirmation: {link}", ""]
     if source:
         lines += [source, ""]
-    lines += ["| 字段 | 取值 |", "| --- | --- |",
-              f"| 首发年月 / 发表状态 | {v('date')} / {v('venue')} |",
-              f"| 领域标签 | {tags} |"]
+    lines += ["| Field | Value |", "| --- | --- |",
+              f"| First released / publication status | {v('date')} / {v('venue')} |",
+              f"| Domain tags | {tags} |"]
     for key in ["subclass", "task", "criteria", "object", "R", "r_evidence", "feedback", "loop",
                 "accumulation", "rounds", "cost", "reversibility", "claim", "evidence", "result",
                 "limits", "reading", "confidence", "notes"]:
         lines.append(f"| {LABELS[key]} | {v(key)} |")
-    lines += ["", "#### 需要你核对的点", "", r.get("review_points") or "填写人没有列出需要核对的点。"]
+    lines += ["", "#### Points for you to check", "",
+              r.get("review_points") or "The annotator listed no points to check."]
     if errors:
-        lines += ["", "#### ⚠️ 格式问题（修正前不能确认）", ""] + [f"- {x}" for x in errors]
+        lines += ["", "#### ⚠️ Format problems (fix before confirming)", ""] + [f"- {x}" for x in errors]
     return "\n".join(lines)

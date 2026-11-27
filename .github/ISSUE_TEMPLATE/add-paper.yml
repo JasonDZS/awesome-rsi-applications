@@ -1,41 +1,42 @@
-name: 推荐论文
-description: 推荐一篇 RSI（递归自我改进）应用方向的论文
-title: "[论文] "
-labels: ["论文"]
+name: Recommend a paper
+description: Recommend a paper that applies RSI (recursive self-improvement)
+title: "[Paper] "
+labels: ["paper"]
 body:
   - type: markdown
     attributes:
       value: |
-        这里只需要说明是哪篇论文、为什么值得收录。详细标注由认领的人读完原文后在分支里填写，
-        再由确认人在本 Issue 页面核对并评论 `/confirm`。流程见 [CONTRIBUTING.md](https://github.com/JasonDZS/awesome-rsi-applications/blob/main/CONTRIBUTING.md)。
+        Only say which paper it is and why it belongs in the list. The full annotation is written on a
+        branch by whoever takes the paper, after reading it, and a confirmer then checks it on this issue
+        page and comments `/confirm`. See [CONTRIBUTING.md](https://github.com/JasonDZS/awesome-rsi-applications/blob/main/CONTRIBUTING.md).
   - type: input
     id: title
     attributes:
-      label: 论文标题
+      label: Paper title
     validations:
       required: true
   - type: input
     id: url
     attributes:
-      label: 链接
-      description: "优先 arXiv 摘要页，例如 https://arxiv.org/abs/2505.22954"
+      label: Link
+      description: "Prefer the arXiv abstract page, e.g. https://arxiv.org/abs/2505.22954"
     validations:
       required: true
   - type: textarea
     id: reason
     attributes:
-      label: 推荐理由
-      description: "它的改进回路是什么，在哪个应用领域，为什么和这份清单有关。一两句即可。"
+      label: Why it belongs in the list
+      description: "What its improvement loop is, which application domain it is in, and why it is relevant. One or two sentences."
     validations:
       required: true
   - type: checkboxes
     id: tags
     attributes:
-      label: 领域标签
-      description: "可选，可多选；拿不准可以不选，由填写人判断。"
+      label: Domain tags
+      description: "Optional; select any that apply. If unsure, leave them for the annotator."
       options:
-        - label: "0 AI 研发自身"
-        - label: "1 工程科学"
-        - label: "2 自然科学"
-        - label: "3 物理与具身"
-        - label: "4 社会科学"
+        - label: "0 AI R&D itself"
+        - label: "1 Engineering"
+        - label: "2 Natural sciences"
+        - label: "3 Physical and embodied systems"
+        - label: "4 Social sciences"

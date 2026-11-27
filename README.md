@@ -1,133 +1,135 @@
 # Awesome RSI Applications
 
-递归自我改进（Recursive Self-Improvement，RSI）的应用论文清单，配套我们正在撰写的综述。
+A list of papers that apply recursive self-improvement (RSI), maintained alongside a survey we are writing.
 
-已有的 RSI 综述和清单大多按机制组织（改的是模型还是脚手架、闭环到什么程度）。这份清单按**应用领域**组织，回答一个问题：**RSI 在各应用领域走到了哪一步**。
+Most existing RSI surveys and lists are organized by mechanism: whether the model or the scaffold is changed, and how closed the loop is. This list is organized by **application domain** and asks one question: **how far has RSI progressed in each application domain?**
 
-目前收录 1 篇，每篇都按同一组字段标注，可以横向比较。
+It currently holds 1 paper(s). Every paper is annotated with the same set of fields, so papers can be compared side by side.
 
-> **人工确认：1 / 1。** 每篇论文都必须由一位真实的开发人员对照原文确认后才算正式收录；“确认”一列标明了确认人，标为“待确认”的条目是 AI 助手起草的初步标注，请勿直接引用。
+> **Human confirmation: 1 / 1.** A paper is only formally included once a human developer has checked its annotation against the paper. The "Confirmed" column names the confirmer; entries marked "pending" are preliminary annotations drafted by an AI assistant and should not be cited as they are.
 >
-> **状态：进行中。** 1 篇读了原文，0 篇只读到摘要或片段，0 篇未能读取；“阅读”一列标明了每篇的情况，“待核对”表示信息不足以判断。引用前请核对原文。
+> **Status: in progress.** 1 paper(s) were read in full or in part, 0 only as far as the abstract or an excerpt, and 0 could not be accessed; the "Reading" column gives the details. "unclear" means there was not enough information to decide. Check the original paper before citing.
 
-## 目录
+## Contents
 
-- [各领域走到了哪一步](#各领域走到了哪一步)
-- [如何阅读这份清单](#如何阅读这份清单)
-- [论文清单](#论文清单)
-- [数据与更新方式](#数据与更新方式)
-- [相关资源](#相关资源)
+- [How far each domain has progressed](#how-far-each-domain-has-progressed)
+- [How to read this list](#how-to-read-this-list)
+- [Papers](#papers)
+- [Data and contributions](#data-and-contributions)
+- [Related resources](#related-resources)
 
-## 各领域走到了哪一步
+## How far each domain has progressed
 
-各领域论文在自指深度（R0–R4）上的分布。一篇论文可以有多个领域标签，所以各行合计之和大于论文总数。
+Papers in each domain by self-reference depth (R0–R4). A paper can carry several domain tags, so the row totals add up to more than the number of papers.
 
-| 领域 | R0 | R1 | R2 | R3 | R4 | 待核对 | 合计 |
+| Domain | R0 | R1 | R2 | R3 | R4 | Unclear | Total |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0. AI 研发自身 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |
-| 1. 工程科学 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 2. 自然科学 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |
-| 3. 物理与具身 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 4. 社会科学 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 0. AI R&D itself | 0 | 0 | 0 | 1 | 0 | 0 | 1 |
+| 1. Engineering | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 2. Natural sciences | 0 | 0 | 0 | 1 | 0 | 0 | 1 |
+| 3. Physical and embodied systems | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 4. Social sciences | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
-基于当前标注的几点观察（样本有限，属于候选发现）：
+Observations from the annotations so far (tentative, given the sample size):
 
-- **AI 研发自身最成熟。** 改自身脚手架和代码（R2）的工作集中在这一类，R4 也主要出现在这里。
-- **真实实验闭环的科学工作停在 R0 或 R1。** 用湿实验或真实仪器作反馈的工作，改的是记忆和技能库，没有一篇改脚手架或权重。
-- **真机上的权重改进几乎都离不开人。** 在真实机器人上训练权重的工作多为人在回路或半自动，且只在训练任务上评测。
-- **社会科学最薄，但金融可能是例外。** 金融有回测和真实盈亏这类快而量化的反馈。
+- **AI R&D itself is the most mature domain.** Work that modifies its own scaffold and code (R2) is concentrated here, and R4 also appears mainly here.
+- **Scientific work with real-world experimental feedback stops at R0 or R1.** Systems that use wet-lab experiments or real instruments as feedback modify memory and skill libraries; none modifies its scaffold or weights.
+- **Weight-level improvement on real robots almost always involves people.** Work that trains weights on physical robots is mostly human-in-the-loop or semi-automatic, and is evaluated only on the training tasks.
+- **Social sciences are the thinnest domain, with finance a possible exception.** Finance has fast, quantitative feedback such as backtests and real profit and loss.
 
-## 如何阅读这份清单
+## How to read this list
 
-**纳入标准。** 一项工作需满足：闭环（生成、评估、再生成）、自指（被改进的对象包含系统自身的一部分）、累积（改进被保留并参与后续改进）。只满足闭环、只改外部产物的工作作为边界案例收录，标为 R0。
+**Inclusion criteria.** A work must have a closed loop (generate, evaluate, generate again), self-reference (the thing being improved includes part of the system itself), and accumulation (improvements are kept and feed into later improvement). Work that has only a closed loop and changes only external artifacts is included as a borderline case and marked R0.
 
-**领域标签**可多选。第 0 类表示通用的 AI 优化自身；1–4 类按实验任务所在的应用领域标注。
+**Domain tags** can be combined. Domain 0 is general-purpose AI improving itself; domains 1–4 are assigned by the application domain of the experimental tasks.
 
-**自指深度 R0–R4**：改的是什么。
+**Self-reference depth R0–R4**: what is being improved.
 
-| 等级 | 含义 |
+| Level | What is improved |
 | --- | --- |
-| R0 | 仅外部产物（边界案例） |
-| R1 | 提示、记忆、技能库 |
-| R2 | 脚手架与自身代码 |
-| R3 | 权重与训练流程 |
-| R4 | 改进“改进过程”本身 |
+| R0 | External artifacts only |
+| R1 | Prompts, memory, skill and tool libraries |
+| R2 | Scaffold and own code |
+| R3 | Weights and training pipeline |
+| R4 | The improvement process itself |
 
-R0–R4 与物理 RSI 综述（[arXiv:2610.18842](https://arxiv.org/abs/2610.18842)）的 L0–L5 不是同一套分级，两者的轴不同，不能一一对应。
+R0 marks a borderline case. R0–R4 is not the same scale as the L0–L5 levels of the physical-RSI survey ([arXiv:2610.18842](https://arxiv.org/abs/2610.18842)): the two measure different things and do not map one-to-one.
 
-**其他列**
+**Other columns**
 
-| 列 | 取值 |
+| Column | Values |
 | --- | --- |
-| 反馈来源 | 形式验证；自动评测（测试、基准、回测）；仿真；真实实验（湿实验、真机、线上）；人类评审；学习型评判（另一个模型打分）；自评（被改进的模型给自己打分）。可多选 |
-| 闭环 | 人在回路；半自动；全自动 |
-| 证据 | 任务内（只在训练或调优所用的任务上见效）；跨任务（在留出或其他任务上见效）；跨任务且独立验证 |
-| 自称 | RSI；自我改进（含自演化）；未自称 |
-| 阅读 | 全文；摘要；片段；未读 |
-| 确认 | 待确认；或确认人的 GitHub 用户名 |
+| Feedback | The signal inside the loop that decides whether a change is kept: formal verification; automated evaluation (tests, benchmarks, backtests); simulation; real-world experiment (wet lab, physical robots, online A/B tests); human review; learned judge (a different model scores); self-evaluation (the model being improved scores itself). Several may apply |
+| Loop | human-in-the-loop; semi-automatic; fully automatic |
+| Evidence | in-task (improvement shown only on the tasks used for training or tuning); cross-task (shown on held-out or other tasks); cross-task, independently verified |
+| Claim | RSI; self-improvement (including self-evolving); not claimed |
+| Reading | full text; partial text; abstract only (older rows may say abstract, excerpt or unread) |
+| Confirmed | pending; or the confirmer's GitHub login |
 
-## 论文清单
+## Papers
 
-### 0. AI 研发自身（1 篇）
+### 0. AI R&D itself (1)
 
-通用的 AI 优化自身，不限于某个应用领域。可与 1–4 类并列标注。
+General-purpose AI that improves itself, not tied to one application domain. May be tagged together with domains 1–4.
 
-| 编号 | 论文 | 首发 | 子类 | 改进对象 | R | 反馈来源 | 闭环 | 证据 | 自称 | 阅读 | 确认 |
+| ID | Paper | First released | Subfield | What is improved | R | Feedback | Loop | Evidence | Claim | Reading | Confirmed |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| P001 | [STaR: Bootstrapping Reasoning With Reasoning](https://arxiv.org/abs/2203.14465)（另见 2） | 2022-03 | 数据与权重的自适应；数学 | 用自生成的推理微调权重，每轮从原始模型重训 | R3 | 自动评测 | 全自动 | 任务内 | 自我改进 | 全文 | ✅ @JasonDZS |
+| P001 | [STaR: Bootstrapping Reasoning With Reasoning](https://arxiv.org/abs/2203.14465) (also 2) | 2022-03 | Data and weight self-adaptation; Mathematics | Model weights, fine-tuned on self-generated rationales; each iteration retrains from the original model | R3 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
 
-### 1. 工程科学（0 篇）
+### 1. Engineering (0)
 
-软件工程、算法发现、芯片设计与系统优化。闭环只经过数字环境。
+Software engineering, algorithm discovery, chip design and systems optimization. The loop runs only through digital environments.
 
-| 编号 | 论文 | 首发 | 子类 | 改进对象 | R | 反馈来源 | 闭环 | 证据 | 自称 | 阅读 | 确认 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-
-### 2. 自然科学（1 篇）
-
-数学、化学与材料、生物与医药、物理与地球科学。
-
-| 编号 | 论文 | 首发 | 子类 | 改进对象 | R | 反馈来源 | 闭环 | 证据 | 自称 | 阅读 | 确认 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| P001 | [STaR: Bootstrapping Reasoning With Reasoning](https://arxiv.org/abs/2203.14465)（另见 0） | 2022-03 | 数据与权重的自适应；数学 | 用自生成的推理微调权重，每轮从原始模型重训 | R3 | 自动评测 | 全自动 | 任务内 | 自我改进 | 全文 | ✅ @JasonDZS |
-
-### 3. 物理与具身（0 篇）
-
-机器人技能习得、奖励与课程的自动设计、开放式具身学习。
-
-| 编号 | 论文 | 首发 | 子类 | 改进对象 | R | 反馈来源 | 闭环 | 证据 | 自称 | 阅读 | 确认 |
+| ID | Paper | First released | Subfield | What is improved | R | Feedback | Loop | Evidence | Claim | Reading | Confirmed |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
-### 4. 社会科学（0 篇）
+### 2. Natural sciences (1)
 
-经济与金融、社会仿真、预测、已部署的服务型智能体、政策与教育、法律。
+Mathematics, chemistry and materials, biology and medicine, physics and earth sciences.
 
-| 编号 | 论文 | 首发 | 子类 | 改进对象 | R | 反馈来源 | 闭环 | 证据 | 自称 | 阅读 | 确认 |
+| ID | Paper | First released | Subfield | What is improved | R | Feedback | Loop | Evidence | Claim | Reading | Confirmed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| P001 | [STaR: Bootstrapping Reasoning With Reasoning](https://arxiv.org/abs/2203.14465) (also 0) | 2022-03 | Data and weight self-adaptation; Mathematics | Model weights, fine-tuned on self-generated rationales; each iteration retrains from the original model | R3 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
+
+### 3. Physical and embodied systems (0)
+
+Robot skill acquisition, automated reward and curriculum design, open-ended embodied learning. The loop runs through the physical world or a simulation of it.
+
+| ID | Paper | First released | Subfield | What is improved | R | Feedback | Loop | Evidence | Claim | Reading | Confirmed |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
-## 数据与更新方式
+### 4. Social sciences (0)
 
-**确认规则。** 每篇进入清单的论文都必须由一位真实的开发人员确认：本人读过原文，核对过各项标注，然后在论文对应的 Issue 页面评论 `/confirm`。确认人和日期由流程写入数据，不靠手工修改文件。AI 助手可以起草标注，但不能确认；自动化账号不能作为确认人。
+Economics and finance, social simulation, forecasting, deployed service agents, policy and education, law.
 
-完整的分步教程见 [CONTRIBUTING.md](CONTRIBUTING.md)。流程概要：
+| ID | Paper | First released | Subfield | What is improved | R | Feedback | Loop | Evidence | Claim | Reading | Confirmed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
-1. **推荐**：任何人用 [“推荐论文”表单](../../issues/new?template=add-paper.yml)开一个 Issue，只需要标题、链接和推荐理由。
-2. **开分支**：认领的人基于这个 Issue 建分支 `paper/issue-<编号>`，运行 `python3 scripts/new_paper.py <编号>` 生成标注文件 `data/pending/issue-<编号>.yml`。
-3. **读论文、填标注**：读原文，把各字段填进标注文件，拿不准的地方写成“需要核对的点”（带选项和建议），提交并发起 pull request。
-4. **在 Issue 页面审阅**：标注会自动显示在 Issue 页面上。确认人对照原文核对；有不同意见就评论要改什么，填写人更新分支后页面上的标注会刷新。
-5. **确认**：确认人在 Issue 评论 `/confirm`。流程核对评论者在[确认人名单](.github/confirmers.txt)里且是真人账号，分配编号，把论文写入 [`data/papers.tsv`](data/papers.tsv) 并记下确认人和日期，更新 README，关闭 pull request 和 Issue。
+## Data and contributions
 
-数据文件以 `|` 分隔，一行一篇，共 28 列。除上表展示的列以外，还有发表状态、任务、纳入标准、自指深度的依据、累积方式、改进轮数、验证成本、失败可逆性、主要结果、失败与局限、置信度和备注；早期收录的论文这些列多数还是空的。**信号可靠性**不单独标注，按反馈来源中最弱的一档得出，由强到弱为：形式验证、自动评测、真实实验、仿真、人类评审与学习型评判、自评。不要直接改 README 里的表格，它由脚本生成。
+**Confirmation rule.** Every paper in the list must be confirmed by a human developer who has read the paper, checked each field of the annotation, and then commented `/confirm` on the paper's issue. The workflow records the confirmer and the date; nobody edits them by hand. AI assistants may draft annotations but cannot confirm them, and automation accounts cannot be confirmers.
 
-**用 AI 助手辅助阅读。** 仓库自带一个 `paper-reading` 技能（[`.agents/skills/paper-reading/`](.agents/skills/paper-reading/SKILL.md)），遵循开放的 Agent Skills 格式，Codex、Claude Code 等支持该格式的工具都能使用。它把一篇论文读成带原文出处的标注草稿，并列出需要人核对的要点；它只产出“待确认”的草稿，不能代替人工确认。
+The step-by-step guide is in [CONTRIBUTING.md](CONTRIBUTING.md). In short:
 
-- 纠正已有标注请提 Issue，并附上判断依据（原文中的章节或语句）。
+1. **Recommend.** Anyone opens an issue with the ["Recommend a paper" form](../../issues/new?template=add-paper.yml); only the title, link and a reason are needed.
+2. **Branch.** Whoever takes the paper creates the branch `paper/issue-<number>` and runs `python3 scripts/new_paper.py <number>` to create the annotation file `data/pending/issue-<number>.yml`.
+3. **Read and annotate.** Read the paper, fill in the fields, write anything uncertain as points to check (with options and a recommendation), commit, and open a pull request.
+4. **Review on the issue page.** The annotation is shown on the issue page automatically. The confirmer checks it against the paper; if they disagree, they comment what should change, and the rendering is replaced when the annotator updates the branch.
+5. **Confirm.** The confirmer comments `/confirm` on the issue. The workflow checks that the commenter is a human on the [confirmer list](.github/confirmers.txt), assigns an ID, writes the paper to [`data/papers.tsv`](data/papers.tsv) with the confirmer and date, updates the README, and closes the pull request and the issue.
 
-## 相关资源
+The data file is `|`-separated, one paper per row, 28 columns. Besides the columns shown above it records publication status, task, inclusion criteria, evidence for the depth, accumulation, improvement rounds, verification cost, failure reversibility, main result, failures and limitations, confidence, and notes. **Signal reliability** is not a separate column: it is the weakest of the paper's feedback sources, from strongest to weakest formal verification, automated evaluation, real-world experiment, simulation, human review and learned judge, self-evaluation. Do not edit the tables in this README; they are generated by a script.
 
-- [awesome-rsi](https://github.com/lobehub/awesome-rsi)：按机制组织的 RSI 清单，含基准与安全分区。
-- [Awesome-Self-Evolving-Scientific-Agents](https://github.com/REAL-Lab-NU/Awesome-Self-Evolving-Scientific-Agents)：科学发现方向的自演化智能体清单。
-- [Recursive Self-Improvement in AI: From Bounded Self-Refinement to Autonomous Research Loops](https://arxiv.org/abs/2607.07663)：按“改进什么 × 闭环程度”组织的综述。
-- [Self-Improvements in Modern Agentic Systems: A Survey](https://arxiv.org/abs/2607.13104)：按基础模型更新与脚手架更新组织的综述。
-- [Who Improves the Robot? Toward Physical Recursive Self-Improvement](https://arxiv.org/abs/2610.18842)：物理与具身方向的专门综述。
-- [A Survey of Self-Evolving Agents](https://arxiv.org/abs/2507.21046)：自演化智能体综述。
+**Reading with an AI assistant.** The repository includes a `paper-reading` skill ([`.agents/skills/paper-reading/`](.agents/skills/paper-reading/SKILL.md)) in the open Agent Skills format, usable from Codex, Claude Code and other tools that support it. It turns a paper into a draft annotation with sources from the paper and a list of points for a person to check. It only produces drafts awaiting confirmation and does not replace human confirmation.
+
+**LaTeX tables and figures** for the survey are generated from the data by [`figure/build_figures.py`](figure/README.md).
+
+To correct an existing annotation, open an issue and cite the evidence (the section or sentence in the paper).
+
+## Related resources
+
+- [awesome-rsi](https://github.com/lobehub/awesome-rsi): an RSI list organized by mechanism, with sections on benchmarks and safety.
+- [Awesome-Self-Evolving-Scientific-Agents](https://github.com/REAL-Lab-NU/Awesome-Self-Evolving-Scientific-Agents): self-evolving agents for scientific discovery.
+- [Recursive Self-Improvement in AI: From Bounded Self-Refinement to Autonomous Research Loops](https://arxiv.org/abs/2607.07663): a survey organized by what is improved and how closed the loop is.
+- [Self-Improvements in Modern Agentic Systems: A Survey](https://arxiv.org/abs/2607.13104): a survey organized by foundation-model updates versus scaffold updates.
+- [Who Improves the Robot? Toward Physical Recursive Self-Improvement](https://arxiv.org/abs/2610.18842): a survey dedicated to physical and embodied RSI.
+- [A Survey of Self-Evolving Agents](https://arxiv.org/abs/2507.21046): a survey of self-evolving agents.

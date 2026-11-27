@@ -1,4 +1,4 @@
-# 数据、确认人名单、校验与确认流程的改动都需要维护者审核
+# Changes to the data, the confirmer list, and the checks and confirmation workflow need maintainer review
 /data/papers.tsv        @JasonDZS
 /.github/               @JasonDZS
 /scripts/               @JasonDZS
