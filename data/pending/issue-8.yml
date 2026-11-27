@@ -77,23 +77,10 @@ notes: Feedback details: inside one idea, experiment results and errors drive th
 # Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
 # Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
 review_points: |
-  1. **Feedback source: is it "automated evaluation; self-evaluation" or "automated evaluation; learned judge"?** (affects: feedback; see Section 3, Section 6 first paragraphs, Section 4)
-     - A. automated evaluation; self-evaluation: inside an idea, experiment results drive the next experiment; across ideas, the generating model scores its own ideas and runs its own novelty check to discard ideas. Section 6 says the reviewer's scores were not appended to the archive in the reported experiments, and the rules say a judge used only in the final evaluation does not count.
-     - B. automated evaluation; learned judge: the paper's design (Section 3, Figure 1) feeds GPT-4o review scores back into the archive, and for the Sonnet, DeepSeek and Llama runs that reviewer is a different model.
-     - **Recommendation: A.** The rules annotate what the paper actually ran, and Section 6 says the review-to-archive step was skipped. Choose B only if you want to annotate the described design rather than the experiments.
-  2. **Verification cost: "seconds to minutes", "hours", or "months or longer, or requires humans"?** (affects: cost; see Section 3, Section 6, Section 8, Appendix B)
-     - A. seconds to minutes: the in-loop evaluation is running the experiment, and Section 3 says the template's baseline run "completes within a few minutes".
-     - B. hours: modified experiments may run up to the 7200-second timeout (Appendix B), and a run of about 50 ideas takes about 12 hours on 8 H100s (Section 6).
-     - C. months or longer, or requires humans: Section 8 says "one should manually check the implementation before trusting the reported results", so a trustworthy evaluation needs a person.
-     - **Recommendation: A.** It is the time the paper reports for the signal used inside the loop. Choose C if you read "trustworthy" as requiring the human check the authors recommend; B mixes a cap with a whole-run time, so I do not recommend it.
-  3. **Evidence strength: "in-task" or "unclear"?** (affects: evidence; see Section 6, Tables 3-5)
-     - A. in-task: the reported gains (for example the 12.8% KL reduction on the dinosaur dataset in Section 5) are on the datasets of the template the run worked on; nothing is transferred to another template.
-     - B. unclear: the paper reports output quality (completed papers and review scores), not an improvement over iterations, so there is no improvement curve to classify.
-     - **Recommendation: A.** The improved artifacts are measured on the tasks they were tuned on, which is what in-task means. Choose B if you think evidence should only describe improvement across rounds of the loop.
-  4. **Loop automation: "fully automatic" or "semi-automatic"?** (affects: loop; see Section 6 and Section 8)
-     - A. fully automatic: people provide the template and 1-2 seed ideas, then the pipeline runs without people.
-     - B. semi-automatic: Section 8 reports one run where the system relaunched itself and needed manual intervention, and the authors recommend manually checking implementations.
-     - **Recommendation: A.** The intervention was an unplanned incident, not a fixed step of the loop, and the manual check is advice for readers of the output, not part of the loop.
-  5. **Self-reference depth R0 and inclusion.** No choice needed, for your information: the idea archive is treated like the ADAS archive (P002, decided as R0): it holds the produced artifacts, not tools or skills the system calls later. The system meets closed loop and accumulation, so it is included as an R0 borderline case. The old list also had it as R0.
+  1. **Feedback source: decided by the maintainer as "automated evaluation; self-evaluation".** Inside an idea, experiment results drive the next experiment; across ideas, the generating model scores its own ideas and runs its own novelty check. The GPT-4o reviewer is not counted: Section 6 says its scores were not appended to the archive in the reported experiments, so it is only a final evaluation.
+  2. **Verification cost: decided by the maintainer as "seconds to minutes".** The in-loop signal is the experiment run, and Section 3 says the template's baseline run "completes within a few minutes". The 7200-second timeout and the 12-hour run time are in the notes.
+  3. **Evidence strength: decided by the maintainer as "in-task".** The reported gains are on the datasets of the template each run worked on; nothing is transferred to another template, and no improvement across iterations is reported.
+  4. **Loop automation: decided by the maintainer as "fully automatic".** People provide the template and 1-2 seed ideas; the one manual intervention in Section 8 was an unplanned incident, not a step of the loop.
+  5. **Self-reference depth R0 and inclusion: confirmed.** The idea archive is treated like the ADAS archive (P002): it holds the produced artifacts, not tools or skills the system calls later. Included as an R0 borderline case (closed loop; accumulation).
 
   Reading: the main text was read in full; Appendix A in part, Appendix B, and the start of Appendix C were read; Appendix D (10 generated papers, about 150 pages) was only skimmed for structure.
