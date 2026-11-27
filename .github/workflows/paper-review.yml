@@ -37,7 +37,7 @@ jobs:
             git show "FETCH_HEAD:$f" > "$RUNNER_TEMP/issue-$n.yml"
             {
               python3 scripts/render_review.py "$RUNNER_TEMP/issue-$n.yml" \
-                --source "填写人 @$AUTHOR，来自 #$PR（提交 ${HEAD_SHA:0:7}）。"
+                --source "Annotated by @$AUTHOR in #$PR (commit ${HEAD_SHA:0:7})."
               echo
               echo "<!-- paper-review pr=$PR sha=$HEAD_SHA -->"
             } > "$RUNNER_TEMP/body.md"

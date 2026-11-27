@@ -13,22 +13,24 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import paperlib as pl  # noqa: E402
 
+LEGACY_STATUS = {"已确认": pl.STATUS_CONFIRMED, "待确认": pl.STATUS_PENDING}
+
 
 def check_tsv(errors):
     cols, rows = pl.load_tsv()
     if cols != pl.COLUMNS:
-        sys.exit(f"papers.tsv 的表头不对：{cols}")
+        sys.exit(f"papers.tsv has the wrong header: {cols}")
     ids, urls = set(), set()
     for n, r in enumerate(rows, start=2):
-        where = f"papers.tsv 第 {n} 行（{r.get('id')}）"
+        where = f"papers.tsv line {n} ({r.get('id')})"
         if None in r or None in r.values():
-            errors.append(f"{where}：列数不对")
+            errors.append(f"{where}: wrong number of columns")
             continue
         if not r["id"] or r["id"] in ids:
-            errors.append(f"{where}：编号为空或重复")
+            errors.append(f"{where}: id is empty or duplicated")
         ids.add(r["id"])
         if r["url"] and r["url"] in urls:
-            errors.append(f"{where}：链接重复")
+            errors.append(f"{where}: duplicate url")
         urls.add(r["url"])
         row = dict(r)
         if not row["url"]:
@@ -47,37 +49,41 @@ def check_pending(errors, rows):
             continue
         count += 1
         if not pl.PENDING_RE.match(rel):
-            errors.append(f"{rel}：文件名应为 issue-<Issue 编号>.yml")
+            errors.append(f"{rel}: the file name must be issue-<issue number>.yml")
             continue
         try:
             raw = pl.parse_pending(path.read_text(encoding="utf-8"))
         except ValueError as exc:
-            errors.append(f"{rel}：{exc}")
+            errors.append(f"{rel}: {exc}")
             continue
         for key in raw:
             if key in pl.CONFIRM_COLS or key == "id":
-                errors.append(f"{rel}：不要填写 {key}，编号和确认信息由 /confirm 流程写入")
+                errors.append(f"{rel}: do not fill in {key}; the id and confirmation are written by the /confirm workflow")
             elif key not in pl.PENDING_KEYS:
-                errors.append(f"{rel}：未知字段 {key}")
+                errors.append(f"{rel}: unknown field {key}")
         row = pl.normalise(raw)
         errors.extend(pl.validate(row, rel))
         if row.get("url") in known:
-            errors.append(f"{rel}：这篇论文已收录为 {known[row['url']]}")
+            errors.append(f"{rel}: this paper is already listed as {known[row['url']]}")
     return count
 
 
 def check_against_base(errors, rows, base_path):
     """In a pull request, confirmation columns must be identical to the base branch."""
     _, base = pl.load_tsv(base_path)
+    for r in base:   # a base branch still on the Chinese vocabulary counts as the same status
+        r["status"] = LEGACY_STATUS.get(r["status"], r["status"])
     before = {r["id"]: r for r in base}
     for r in rows:
         old = before.get(r["id"])
         new_conf = [r[c] for c in pl.CONFIRM_COLS]
         if old is None:
-            if new_conf != ["待确认", "", ""]:
-                errors.append(f"{r['id']}：PR 里新增的行必须是待确认；确认只能通过在 Issue 评论 /confirm 完成")
+            if new_conf != [pl.STATUS_PENDING, "", ""]:
+                errors.append(f"{r['id']}: a row added in a pull request must be '{pl.STATUS_PENDING}'; "
+                              "papers are confirmed only by commenting /confirm on the issue")
         elif new_conf != [old[c] for c in pl.CONFIRM_COLS]:
-            errors.append(f"{r['id']}：确认信息不能手工修改；确认只能通过在 Issue 评论 /confirm 完成")
+            errors.append(f"{r['id']}: confirmation columns must not be edited by hand; "
+                          "papers are confirmed only by commenting /confirm on the issue")
 
 
 def main():
@@ -88,8 +94,8 @@ def main():
         check_against_base(errors, rows, sys.argv[sys.argv.index("--base") + 1])
     if errors:
         print("\n".join(errors))
-        sys.exit(f"共 {len(errors)} 个问题")
-    confirmed = sum(r["status"] == "已确认" for r in rows)
+        sys.exit(f"{len(errors)} problem(s)")
+    confirmed = sum(r["status"] == pl.STATUS_CONFIRMED for r in rows)
     print(f"ok: {len(rows)} papers, {confirmed} confirmed by a human, "
           f"{len(rows) - confirmed} pending confirmation, {pending} annotation file(s) under review")
 
