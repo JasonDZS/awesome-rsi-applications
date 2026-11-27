@@ -1,0 +1,19 @@
+name: check-data
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate data/papers.tsv
+        run: python3 scripts/check_data.py
+      - name: README is up to date
+        run: |
+          python3 scripts/build_readme.py
+          git diff --exit-code README.md

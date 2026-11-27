@@ -38,6 +38,12 @@ def cell(text):
     return text if text else "—"
 
 
+def confirm(r):
+    if r['status'] == '已确认':
+        return f"✅ @{r['confirmed_by']}"
+    return '待确认'
+
+
 def paper_link(r):
     return f"[{r['title']}]({r['url']})" if r["url"] else r["title"]
 
@@ -55,15 +61,15 @@ def matrix(rows):
 
 def domain_table(rows, d):
     sel = sorted((r for r in rows if d in r["tag_list"]), key=lambda r: (r["date"], r["id"]))
-    lines = ["| 编号 | 论文 | 首发 | 子类 | 改进对象 | R | 反馈来源 | 闭环 | 证据 | 自称 | 阅读 |",
-             "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+    lines = ["| 编号 | 论文 | 首发 | 子类 | 改进对象 | R | 反馈来源 | 闭环 | 证据 | 自称 | 阅读 | 确认 |",
+             "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for r in sel:
         other = [t for t in r["tag_list"] if t != d]
         also = f"（另见 {'、'.join(other)}）" if other else ""
         lines.append(
             f"| {r['id']} | {paper_link(r)}{also} | {r['date']} | {r['subclass']} | "
             f"{cell(r['object'])} | {cell(r['R'])} | {cell(r['feedback'])} | "
-            f"{cell(r['loop'])} | {cell(r['evidence'])} | {cell(r['claim'])} | {cell(r['reading'])} |"
+            f"{cell(r['loop'])} | {cell(r['evidence'])} | {cell(r['claim'])} | {cell(r['reading'])} | {confirm(r)} |"
         )
     return len(sel), "\n".join(lines)
 
@@ -72,6 +78,7 @@ def main():
     rows = load()
     n = len(rows)
     reading = Counter(r["reading"] for r in rows)
+    confirmed = sum(r["status"] == "已确认" for r in rows)
     parts = []
     parts.append(f"""# Awesome RSI Applications
 
@@ -81,7 +88,9 @@ def main():
 
 目前收录 {n} 篇，每篇都按同一组字段标注，可以横向比较。
 
-> **状态：进行中。** 标注是初步判断，尚未经第二人复核。{reading.get('全文', 0)} 篇读了原文，{reading.get('摘要', 0) + reading.get('片段', 0)} 篇只读到摘要或片段，{reading.get('未读', 0)} 篇未能读取；“阅读”一列标明了每篇的情况，“待核对”表示信息不足以判断。引用前请核对原文。
+> **人工确认：{confirmed} / {n}。** 每篇论文都必须由一位真实的开发人员对照原文确认后才算正式收录；“确认”一列标明了确认人，标为“待确认”的条目是 AI 助手起草的初步标注，请勿直接引用。
+>
+> **状态：进行中。** {reading.get('全文', 0)} 篇读了原文，{reading.get('摘要', 0) + reading.get('片段', 0)} 篇只读到摘要或片段，{reading.get('未读', 0)} 篇未能读取；“阅读”一列标明了每篇的情况，“待核对”表示信息不足以判断。引用前请核对原文。
 
 ## 目录
 
@@ -131,6 +140,7 @@ R0–R4 与物理 RSI 综述（[arXiv:2610.18842](https://arxiv.org/abs/2610.188
 | 证据 | 任务内（只在训练或调优所用的任务上见效）；跨任务（在留出或其他任务上见效）；跨任务且独立验证 |
 | 自称 | RSI；自我改进（含自演化）；未自称 |
 | 阅读 | 全文；摘要；片段；未读 |
+| 确认 | 待确认；或确认人的 GitHub 用户名 |
 
 ## 论文清单
 """)
@@ -139,10 +149,17 @@ R0–R4 与物理 RSI 综述（[arXiv:2610.18842](https://arxiv.org/abs/2610.188
         parts.append(f"### {d}. {name}（{count} 篇）\n\n{desc}\n\n{table}\n")
     parts.append("""## 数据与更新方式
 
-- **添加论文**：用 [“添加论文”表单](../../issues/new?template=add-paper.yml)提交。只有标题、链接、首发年月、领域标签、阅读深度五项必填，其余字段拿不准可选“待核对”。
-- **数据**：全部在 [`data/papers.tsv`](data/papers.tsv)，以 `|` 分隔，一行一篇，共 25 列，与表单字段一一对应。除上表展示的列以外，还有发表状态、任务、纳入标准、自指深度的依据、累积方式、改进轮数、验证成本、失败可逆性、主要结果、失败与局限、置信度和备注；早期收录的论文这些列多数还是空的。
-- **信号可靠性**不单独标注，按一篇论文的反馈来源中最弱的一档得出，由强到弱为：形式验证、自动评测、真实实验、仿真、人类评审与学习型评判、自评。
-- **维护者流程**：`gh issue view <编号> --json body -q .body | python3 scripts/issue_to_row.py --append` 把表单内容转成一行数据，复核后运行 `python3 scripts/build_readme.py` 重新生成本 README。不要直接改 README 里的表格。
+**确认规则。** 每篇进入清单的论文都必须由一位真实的开发人员确认：本人读过原文，核对过各列标注，并在数据里记下自己的 GitHub 用户名和日期。AI 助手可以起草标注，但不能确认；自动化账号不能作为确认人。
+
+流程：
+
+1. **提交**：任何人用 [“添加论文”表单](../../issues/new?template=add-paper.yml)提交。只有标题、链接、首发年月、领域标签、阅读深度五项必填。
+2. **入库为待确认**：维护者运行 `gh issue view <编号> --json body -q .body | python3 scripts/issue_to_row.py --append`，把表单内容转成 [`data/papers.tsv`](data/papers.tsv) 里的一行，`status` 为 `待确认`。
+3. **人工确认**：一位开发人员对照原文核对后，把该行的 `status` 改为 `已确认`，填上 `confirmed_by`（GitHub 用户名）和 `confirmed_at`（YYYY-MM-DD）。
+4. **合并**：运行 `python3 scripts/check_data.py` 和 `python3 scripts/build_readme.py`，提交 pull request。数据文件的改动需要代码所有者审核，CI 会检查数据格式、确认信息是否完整，以及 README 是否与数据一致。
+
+数据文件以 `|` 分隔，一行一篇，共 28 列。除上表展示的列以外，还有发表状态、任务、纳入标准、自指深度的依据、累积方式、改进轮数、验证成本、失败可逆性、主要结果、失败与局限、置信度和备注；早期收录的论文这些列多数还是空的。**信号可靠性**不单独标注，按反馈来源中最弱的一档得出，由强到弱为：形式验证、自动评测、真实实验、仿真、人类评审与学习型评判、自评。不要直接改 README 里的表格，它由脚本生成。
+
 - 纠正已有标注请提 issue 或 pull request，并附上判断依据（原文中的章节或语句）。
 
 ## 相关资源

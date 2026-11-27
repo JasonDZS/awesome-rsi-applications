@@ -91,6 +91,8 @@ def main():
 
     last = max(int(r["id"][1:]) for r in existing)
     row["id"] = f"P{last + 1:03d}"
+    # every new paper starts unconfirmed; only a human developer may confirm it
+    row["status"] = "待确认"
     line = "|".join(row.get(c, "") for c in columns)
     if append:
         with DATA.open("a", encoding="utf-8") as f:
