@@ -78,21 +78,9 @@ notes: Feedback details: automated evaluation; each new agent's accuracy or F1 o
 # Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
 review_points: |
   1. **Self-reference depth: decided by the maintainer as R0.** The current definition stays: a change counts as self-reference only if the modified part takes part in later improvement. Here the meta agent (GPT-4 with a fixed prompt) does all the improving and never changes; the task agents it designs do not design anything. The archive is the designed artifacts and their scores, not an experience library of the meta agent. This matches rule "A meta-agent designs other agents and does not change itself → R0", and the authors draw the same line: Section 6 calls the meta agent being improved through ADAS the step that would make it self-referential.
-  2. **Should domain tag 2 (Natural sciences) be added?** (affects: tags, subclass; see Sections 4.2 and 4.3)
-     - A. 0;2, subfields "Agent self-improvement; Mathematics": one of the core experiments is MGSM math, all transfer experiments are on math benchmarks (GSM8K, GSM-Hard, SVAMP, ASDiv), and there is also GPQA science QA. This matches P001 STaR, which got tag 2 for arithmetic and GSM8K.
-     - B. Tag 0 only: these are all general reasoning benchmarks, and the paper aims at general agent design, not a particular scientific domain.
-     - **Recommendation: A.** The rule is to tag by the domain of the experimental tasks. If you think GPQA should also be reflected, "Cross-subfield" could be added as a subfield, but I do not recommend it: GPQA is only one of four domains and shows the smallest gain.
-  3. **Is the evidence strength cross-task or in-task?** (affects: evidence; see Section 4.3, Tables 2-5)
-     - A. cross-task: the agent found on MGSM still beats the hand-designed baselines after transfer to GSM8K, GSM-Hard, SVAMP, ASDiv, MMLU and DROP, which were not used in the search (Tables 2, 4 and 5); the ARC agents also hold up on Claude-Haiku, GPT-4 and Claude-Sonnet (Table 3).
-     - B. in-task: the main results in Table 1 come from a separate search per domain, tested on the held-out test set of the same benchmark.
-     - **Recommendation: A.** The rule asks whether the improvement holds on other benchmarks not used for tuning, which Tables 2 to 5 show. Note that what this shows is that the artifacts transfer, not that the improvement process gets better, since this is R0. It is not independently verified; the authors ran the evaluations themselves.
-  4. **Should the reading depth be "full text" or "partial text"?** (affects: reading; either can be confirmed)
-     - A. partial text: Appendices C, D, F and G (framework code, ARC experiment details, baselines and example agent code) were only skimmed for structure.
-     - B. full text: the main text and every appendix relevant to the annotation (A transfer, B prompts, H pseudocode, I initialization, J cost) were read.
-     - **Recommendation: A.** It honestly reflects the parts not read, and "partial text" can be confirmed just the same.
-  5. **Is "not reported" right for the verification cost?** (affects: cost; see Appendix J)
-     - A. not reported: Appendix J gives only the API cost per run (about USD 500 for ARC, about USD 300 for the others), not how long it takes to evaluate one agent.
-     - B. hours: inferred from evaluating 128 to 800 questions per iteration.
-     - **Recommendation: A.** This field records time, which the paper does not report, and the "do not infer" rule rules out B. The cost in dollars is in the notes.
+  2. **Domain tags: decided by the maintainer as 0;2**, subfields "Agent self-improvement; Mathematics". Tagged by the experimental tasks: MGSM math, the transfer experiments on GSM8K, GSM-Hard, SVAMP and ASDiv, and GPQA science; consistent with P001 STaR.
+  3. **Evidence strength: decided by the maintainer as cross-task.** Agents found on MGSM still beat the hand-designed baselines on benchmarks not used in the search (Tables 2, 4, 5), and agents found on ARC with GPT-3.5 still do on other foundation models (Table 3). What transfers is the designed artifacts, not a stronger improvement process; not independently verified.
+  4. **Reading depth: decided by the maintainer as partial text.** Appendices C, D, F and G were only skimmed for structure.
+  5. **Verification cost: decided by the maintainer as not reported.** Appendix J gives only the API cost per run (about USD 500 for ARC, about USD 300 for the others), not the time to evaluate one agent; the dollar cost is in the notes.
 
   Reading: the main text was read in full; Appendices A, B (in part), E (beginning), H, I and J were read; C, D, F and G were only skimmed for structure.
