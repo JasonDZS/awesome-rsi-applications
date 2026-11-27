@@ -1,0 +1,95 @@
+# Annotation for the paper recommended in issue #10. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2410.04444
+
+# First released, YYYY-MM
+date: 2024-10
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;2
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Mathematics
+
+# Task: what the system does in the experiments
+task: DROP reading comprehension; MGSM multilingual math; MMLU multi-task; GPQA science QA; case study on Game of 24
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The agent's own running code, changed by monkey patching: the task policy (solver) and, in the case study, the self-improvement logic itself
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R4 (changes to the improvement logic shown only qualitatively, in the Game of 24 case study)
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 3: a Gödel Agent "updates both the policy π and the meta-learning algorithm I recursively"; Section 6.3 (Game of 24): it "enhances its optimization process by not only retrieving error messages but also using the error-trace library for more detailed analysis. It adds parallel optimization capabilities, improves log outputs, and removes redundant code"; Section 6.2: unexpected terminations "typically occur when Gödel Agent modifies its recursive improvement module". The code listings in Appendices C and E show only improved solver policies, not a modified improvement module
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: multi-generation single lineage
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: 6 independent self-improvement cycles per task with at most 30 iterations each (Section 5.2); 100 optimization trials on MGSM for the robustness analysis (Section 6.2)
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: RSI
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: With GPT-3.5 at test time (Gödel-base), test scores beat Meta Agent Search on all four benchmarks: DROP F1 80.9 vs 79.4, MGSM 64.2% vs 53.4%, MMLU 70.9% vs 69.6%, GPQA 34.9% vs 34.6% (Table 1); on Game of 24 one run rewrote its solver into a search algorithm and reached 100% (Section 6.3)
+
+# Failures and limitations: as reported in the paper
+limits: In 100 MGSM trials it made erroneous changes: 4% terminated unexpectedly, typically after modifying its own recursive improvement module, 92% had temporary performance drops, and 14% ended worse than the initial policy (Section 6.2); the unconstrained version's large gains come mainly from spontaneously calling stronger models such as GPT-4o (Section 5.3); from weaker initial policies it did not surpass Tree of Thought on Game of 24, and with stronger initial policies it reached its limit "without further enhancing its optimization capabilities" (Section 6.3); not compared with complex engineered agent systems, and the experiments only demonstrate feasibility (Limitations); the system may become too complex to understand and improve itself (Limitations); cost grows with its growing historical memory (Appendix D)
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Feedback details: the agent's interact or evaluate action scores the current solver on a validation set (Section 4.1: "a validation set can be used to provide feedback"; Algorithm 1, U(E, π)); the LLM then decides whether to keep a change, try another, or revert (Section 6.2: it can "revert to a previous optimal algorithm when performance declines"). The modifying model is GPT-4o and the solver is tested with GPT-3.5 (Appendix B). Loop: people write the goal prompt, the initial policy (CoT) and the environment interface; no person takes part during a cycle. Accumulation: a single code base is modified in place across iterations, with reverts. Evidence: each task is optimized on its own validation set and tested on that benchmark's test set; no transfer to other tasks or models is reported, although the abstract claims generalizability. Baseline numbers are copied from Hu et al. 2024 (Table 1 footnote), so all evaluations are the authors' own or reused. Cost: Appendix D reports about USD 15 for a full run of 30 iterations across the four benchmarks, but no time. Venue: the arXiv v4 PDF shows no venue. Reading: the whole paper was read; the policy code listings in Appendices C and E were skimmed
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Self-reference depth: R4 or R2?** (affects: R; see Section 3, Section 6.2, Section 6.3, Appendices C and E)
+     - A. R4 (changes to the improvement logic shown only qualitatively): the design rewrites both the policy and its own self-improvement algorithm (Section 3), and the paper reports that this actually happened: in the Game of 24 case study it added error-trace analysis and parallel optimization to its optimization process (Section 6.3), and in the robustness study some runs broke because it modified its recursive improvement module (Section 6.2).
+     - B. R2: every quantitative result and every code listing (Appendices C, E) is an improved solver policy, which is the agent's own code but not the improvement process; the changes to the improvement logic are a one-paragraph description, and Section 6.3 says that with stronger initial policies it reached its limit "without further enhancing its optimization capabilities".
+     - C. "R2 or R4 (unclear)": record both readings and leave it open.
+     - **Recommendation: A.** The rules use the highest level the paper actually achieves, and Sections 6.2 and 6.3 report that the improvement module was in fact modified, not only proposed. The qualifier keeps the weak evidence visible. Choose B if you require that a change to the improvement process be shown to contribute to the measured gains.
+  2. **Evidence strength: "in-task", although the abstract claims generalizability?** (affects: evidence; see Section 5.2, Table 1)
+     - A. in-task: each benchmark is optimized on its own validation set and tested on its own test set; the paper reports no transfer of an optimized agent to another task or model.
+     - B. cross-task: the same framework, with only the environment description changed, works across four benchmarks and Game of 24.
+     - **Recommendation: A.** The rules ask whether an improvement holds on tasks not used for tuning; running the same method separately on several tasks is not transfer. This gap between the abstract ("generalizability") and the experiments is worth noting for the survey.
+  3. **Which numbers go in the main result: Gödel-base or Gödel-free?** (affects: result; see Table 1, Section 5.3)
+     - A. Gödel-base: it uses GPT-3.5 at test time like the baselines, so the comparison is fair.
+     - B. Gödel-free: the paper's headline numbers (for example MGSM 90.6%), but Section 5.3 says the gains come mainly from the agent calling stronger models such as GPT-4o.
+     - **Recommendation: A**, with Gödel-free mentioned in limits, which is how the draft is written.
+  4. **Domain tags 0;2 and venue.** No choice needed, for your information: the benchmarks are the same as ADAS (P002), which was decided as 0;2 with subfield Mathematics, so this follows it. The arXiv v4 PDF shows no venue, so venue is "arXiv preprint"; if you have checked a publication venue, it can be changed.
+
+  Reading: the whole paper was read; the policy code listings in Appendices C and E were skimmed.
