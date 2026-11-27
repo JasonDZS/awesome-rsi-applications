@@ -35,30 +35,30 @@ jobs:
           BY_TYPE: ${{ github.event.comment.user.type }}
         run: |
           set -euo pipefail
-          refuse() { gh issue comment "$ISSUE" --repo "$REPO" --body "未确认：$1"; exit 0; }
+          refuse() { gh issue comment "$ISSUE" --repo "$REPO" --body "Not confirmed: $1"; exit 0; }
 
           [ "$(printf '%s' "$BODY" | head -n1 | tr -d '[:space:]')" = "/confirm" ] || exit 0
-          [ "$BY_TYPE" = "User" ] || refuse "只有真人账号可以确认论文。"
+          [ "$BY_TYPE" = "User" ] || refuse "Only human accounts can confirm papers."
 
           file="data/pending/issue-$ISSUE.yml"
           prs=$(gh pr list --repo "$REPO" --state open --limit 200 --json number,headRefOid,files,author \
                 --jq "[.[] | select(any(.files[]; .path == \"$file\"))]")
-          [ "$(jq length <<<"$prs")" = "1" ] || refuse "需要正好一个打开的 PR 包含 \`$file\`，现在有 $(jq length <<<"$prs") 个。"
+          [ "$(jq length <<<"$prs")" = "1" ] || refuse "Exactly one open pull request must contain \`$file\`; found $(jq length <<<"$prs")."
           pr=$(jq -r '.[0].number' <<<"$prs")
           sha=$(jq -r '.[0].headRefOid' <<<"$prs")
           author=$(jq -r '.[0].author.login' <<<"$prs")
           [ "$(jq -r '.[0].files | length' <<<"$prs")" = "1" ] \
-            || refuse "#$pr 除了 \`$file\` 还改了别的文件，这类 PR 需要维护者按普通 PR 审核合并。"
+            || refuse "#$pr changes files other than \`$file\`. Such pull requests must be reviewed and merged by a maintainer as ordinary pull requests."
 
           # the confirmer must have seen exactly this version on the issue page
           shown=$(gh api "repos/$REPO/issues/$ISSUE/comments" --paginate \
                   --jq '.[] | select(.user.login == "github-actions[bot]") | .body' \
                   | grep -o '<!-- paper-review pr=[0-9]* sha=[0-9a-f]* -->' | tail -n1 || true)
           [ "$shown" = "<!-- paper-review pr=$pr sha=$sha -->" ] \
-            || refuse "分支在标注显示到本页之后又有更新（或标注还没显示出来）。等最新的标注出现后再评论 \`/confirm\`。"
+            || refuse "The branch changed after the annotation was shown on this page (or the annotation has not been shown yet). Wait for the latest annotation to appear, then comment \`/confirm\` again."
 
           git fetch -q origin "pull/$pr/head"
-          [ "$(git rev-parse FETCH_HEAD)" = "$sha" ] || refuse "分支刚刚有更新，请稍后重试。"
+          [ "$(git rev-parse FETCH_HEAD)" = "$sha" ] || refuse "The branch was just updated; try again shortly."
           git show "FETCH_HEAD:$file" > "$RUNNER_TEMP/issue-$ISSUE.yml"
 
           today=$(TZ=Asia/Shanghai date +%F)
@@ -82,5 +82,5 @@ jobs:
           git commit -q -F "$RUNNER_TEMP/msg.txt"
           git push -q origin "HEAD:$BRANCH"
 
-          gh pr close "$pr" --repo "$REPO" --comment "已由 @$BY 在 #$ISSUE 确认，收录为 $id（$(git rev-parse --short HEAD)）。这个分支可以删除了。"
-          gh issue close "$ISSUE" --repo "$REPO" --comment "✅ @$BY 于 $today 确认，已收录为 **$id**。"
+          gh pr close "$pr" --repo "$REPO" --comment "Confirmed by @$BY in #$ISSUE and added as $id ($(git rev-parse --short HEAD)). This branch can be deleted."
+          gh issue close "$ISSUE" --repo "$REPO" --comment "✅ Confirmed by @$BY on $today and added as **$id**."
