@@ -1,0 +1,86 @@
+# A human confirmer comments /confirm on a paper's issue. This workflow checks who commented,
+# records the confirmation in data/papers.tsv, and closes the pull request and the issue.
+# It runs the default branch's scripts only: the pull request's file is read as data, never executed.
+name: paper-confirm
+on:
+  issue_comment:
+    types: [created]
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+concurrency:
+  group: paper-confirm
+  cancel-in-progress: false
+jobs:
+  confirm:
+    if: ${{ !github.event.issue.pull_request && startsWith(github.event.comment.body, '/confirm') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Record the confirmation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.repository.default_branch }}
+          ISSUE: ${{ github.event.issue.number }}
+          BODY: ${{ github.event.comment.body }}
+          BY: ${{ github.event.comment.user.login }}
+          BY_TYPE: ${{ github.event.comment.user.type }}
+        run: |
+          set -euo pipefail
+          refuse() { gh issue comment "$ISSUE" --repo "$REPO" --body "未确认：$1"; exit 0; }
+
+          [ "$(printf '%s' "$BODY" | head -n1 | tr -d '[:space:]')" = "/confirm" ] || exit 0
+          [ "$BY_TYPE" = "User" ] || refuse "只有真人账号可以确认论文。"
+
+          file="data/pending/issue-$ISSUE.yml"
+          prs=$(gh pr list --repo "$REPO" --state open --limit 200 --json number,headRefOid,files,author \
+                --jq "[.[] | select(any(.files[]; .path == \"$file\"))]")
+          [ "$(jq length <<<"$prs")" = "1" ] || refuse "需要正好一个打开的 PR 包含 \`$file\`，现在有 $(jq length <<<"$prs") 个。"
+          pr=$(jq -r '.[0].number' <<<"$prs")
+          sha=$(jq -r '.[0].headRefOid' <<<"$prs")
+          author=$(jq -r '.[0].author.login' <<<"$prs")
+          [ "$(jq -r '.[0].files | length' <<<"$prs")" = "1" ] \
+            || refuse "#$pr 除了 \`$file\` 还改了别的文件，这类 PR 需要维护者按普通 PR 审核合并。"
+
+          # the confirmer must have seen exactly this version on the issue page
+          shown=$(gh api "repos/$REPO/issues/$ISSUE/comments" --paginate \
+                  --jq '.[] | select(.user.login == "github-actions[bot]") | .body' \
+                  | grep -o '<!-- paper-review pr=[0-9]* sha=[0-9a-f]* -->' | tail -n1 || true)
+          [ "$shown" = "<!-- paper-review pr=$pr sha=$sha -->" ] \
+            || refuse "分支在标注显示到本页之后又有更新（或标注还没显示出来）。等最新的标注出现后再评论 \`/confirm\`。"
+
+          git fetch -q origin "pull/$pr/head"
+          [ "$(git rev-parse FETCH_HEAD)" = "$sha" ] || refuse "分支刚刚有更新，请稍后重试。"
+          git show "FETCH_HEAD:$file" > "$RUNNER_TEMP/issue-$ISSUE.yml"
+
+          today=$(TZ=Asia/Shanghai date +%F)
+          if ! id=$(python3 scripts/confirm.py --file "$RUNNER_TEMP/issue-$ISSUE.yml" --by "$BY" --date "$today" 2> "$RUNNER_TEMP/err.txt"); then
+            refuse "$(cat "$RUNNER_TEMP/err.txt")"
+          fi
+          python3 scripts/build_readme.py
+          python3 scripts/check_data.py
+
+          author_id=$(gh api "users/$author" --jq .id)
+          {
+            echo "Add $id from #$ISSUE, confirmed by @$BY"
+            echo
+            echo "Annotation from #$pr at $sha."
+            echo
+            echo "Co-authored-by: $author <$author_id+$author@users.noreply.github.com>"
+          } > "$RUNNER_TEMP/msg.txt"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/papers.tsv README.md
+          git commit -q -F "$RUNNER_TEMP/msg.txt"
+          git push -q origin "HEAD:$BRANCH"
+
+          gh pr close "$pr" --repo "$REPO" --comment "已由 @$BY 在 #$ISSUE 确认，收录为 $id（$(git rev-parse --short HEAD)）。这个分支可以删除了。"
+          gh issue close "$ISSUE" --repo "$REPO" --comment "✅ @$BY 于 $today 确认，已收录为 **$id**。"

@@ -1,2 +1,4 @@
-# 数据文件的任何改动都需要维护者（真人）审核
-/data/papers.tsv @JasonDZS
+# 数据、确认人名单、校验与确认流程的改动都需要维护者审核
+/data/papers.tsv        @JasonDZS
+/.github/               @JasonDZS
+/scripts/               @JasonDZS

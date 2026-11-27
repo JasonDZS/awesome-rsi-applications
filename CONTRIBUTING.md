@@ -1,114 +1,110 @@
-# 如何添加论文
+# 如何添加一篇论文
 
-添加一篇论文分五步：提交表单、转成数据行、真人对照原文确认、校验并生成 README、提 PR 合并。前两步任何人都可以做，第三步必须由一位真实的开发人员完成。
+一篇论文从推荐到收录走五步。前三步由填写人完成，后两步在 Issue 页面上由确认人完成。确认人不需要改任何文件。
 
-**确认规则**：每篇进入清单的论文都必须由一位真实的开发人员对照原文确认。AI 助手可以起草标注，但不能确认；自动化账号不能作为确认人。
+| 步骤 | 谁来做 | 在哪里 |
+| --- | --- | --- |
+| 1. 推荐论文 | 任何人 | 新建 Issue |
+| 2. 基于 Issue 开分支 | 填写人 | 本地或 GitHub 网页 |
+| 3. 读论文、填标注、提交 | 填写人 | 分支上的一个文件 |
+| 4. 审阅 | 确认人 | Issue 页面 |
+| 5. 确认 | 确认人 | 在 Issue 评论 `/confirm` |
 
-## 准备
+**唯一的硬规则：每篇论文都必须由一位真实的开发人员对照原文确认。** AI 助手可以帮忙读论文、起草标注，但不能确认。
 
-本机装好 Python 3 和 [GitHub CLI](https://cli.github.com/)（用 `gh auth login` 登录），并克隆仓库：
+## 第 1 步：推荐论文
 
-```bash
-git clone https://github.com/JasonDZS/awesome-rsi-applications
-cd awesome-rsi-applications
-```
+用[“推荐论文”表单](../../issues/new?template=add-paper.yml)开一个 Issue，填标题、链接和一两句推荐理由。领域标签可选。记下 Issue 的编号，下面用 `12` 举例。
 
-## 第 1 步：提交表单
+收录范围：系统用自己的产出改进自己或后继系统，并且这个改进回路落在某个应用领域上。只满足一部分条件的边界案例（R0）也收，会如实标注。
 
-打开仓库的 [Issues](../../issues)，点 New issue，选“添加论文”。
+## 第 2 步：基于 Issue 开分支
 
-- 必填五项：论文标题、链接、首发年月（如 `2026-09`）、领域标签、阅读深度。
-- 其余字段尽量填，拿不准选“待核对”。字段含义见 [README 的“如何阅读这份清单”](README.md#如何阅读这份清单)。
-- “自指深度的依据”建议填，写原文章节号或一两句引文，确认时省事。
-
-提交后记下 Issue 编号。下面假设是 `12`。
-
-## 第 2 步：把表单转成一行数据
+在 Issue 页面右侧 **Development → Create a branch**，把分支命名为 `paper/issue-12`；或者在本地：
 
 ```bash
-git checkout -b add-paper-12
-gh issue view 12 --json body -q .body | python3 scripts/issue_to_row.py --append
+git switch -c paper/issue-12 origin/main
+python3 scripts/new_paper.py 12
 ```
 
-脚本会检查必填项，按链接查重，分配下一个编号（如 `P116`），并把这一行追加到 `data/papers.tsv` 末尾，状态是“待确认”。如果论文已收录，脚本会报出已有的编号并停止。
+`new_paper.py` 会读取 Issue（需要 `gh` 命令行工具），生成 `data/pending/issue-12.yml`，标题、链接和领域标签已经填好。没有 `gh` 时用 `python3 scripts/new_paper.py 12 --title "……" --url https://……`。
 
-第一次使用时请看一眼追加出来的那一行是否正确。
+没有仓库写权限的人先 fork，在 fork 里做同样的事。
 
-## 第 3 步：真人确认
+## 第 3 步：读论文，填标注，提交
 
-由一位开发人员本人完成：
+打开 `data/pending/issue-12.yml`。每个字段上方的注释写明了含义和允许的取值，一行一个字段：
 
-1. 打开论文原文，对照检查这一行的标注，重点看自指深度、反馈来源、闭环程度、证据强度。有出入就直接改。
-2. 把这一行**最后三列**从 `待确认||` 改成：
+```yaml
+# 自指深度：R0 仅外部产物 / R1 提示、记忆、技能库 / R2 脚手架与自身代码 / R3 权重与训练流程 / R4 改进“改进过程”本身
+R: R2 脚手架与自身代码
 
-   ```
-   已确认|你的GitHub用户名|2026-11-27
-   ```
+# 自指深度的依据：原文章节或语句
+r_evidence: §3.2，智能体直接修改自己的 Python 代码库
+```
 
-注意：
+填写时注意：
 
-- 阅读深度必须是“全文”或“部分全文”才能标为已确认。
-- 文本字段里不要出现 `|`，它是分隔符。
-- 没有亲自核对过的行，保持“待确认”。
+- **必填**：标题、链接、首发年月、领域标签、阅读深度。其余字段尽量填。
+- **如实填写阅读深度。** 只读了摘要就写 `仅摘要`，这样的标注可以提交，但在读过全文之前不能被确认。
+- **不推断。** 原文没写的不要补。拿不准的写 `待核对`，验证成本没有报告就写 `未报告`。
+- **判断要有出处。** 自指深度、反馈来源、闭环程度、证据强度这四项，写上原文的章节或页码。
+- **把拿不准的地方写进 `review_points`。** 这是确认人主要看的内容。每条写清楚具体问题、可选的取值和各自的依据、你建议哪一个和理由、去原文哪里看。例如：
 
-## 第 4 步：校验并重新生成 README
+  ```yaml
+  review_points: |
+    1. **自指深度是 R1 还是 R2？**
+       - A. R1：正文实验只往工具库里添加工具（§4.1）。
+       - B. R2：附录 B 提到智能体会改写自己的工具选择逻辑。
+       - 建议 A。附录 B 的做法没有出现在实验里；如果你在实验设置里看到它被实际评测，应选 B。
+  ```
+- 取值里不能有竖线 `|`。不要填写编号和确认信息。
+
+各字段的详细口径见 [`annotation-rules.md`](.agents/skills/paper-reading/references/annotation-rules.md)。也可以让 AI 助手用仓库自带的 `paper-reading` 技能起草，但内容要由你自己对照原文核对。
+
+检查并提交：
 
 ```bash
 python3 scripts/check_data.py
-python3 scripts/build_readme.py
+git add data/pending/issue-12.yml
+git commit -m "Annotate paper for #12"
+git push -u origin paper/issue-12
+gh pr create --fill          # 或在网页上发起 pull request
 ```
 
-第一条通过时会输出类似 `ok: 116 papers, 1 confirmed by a human, 115 pending`。报错会指明行号和原因，改完再跑。
+一个 pull request 只包含这一个文件。
 
-不要手改 README 里的表格，它由脚本从数据文件生成。
+## 第 4 步：在 Issue 页面审阅
 
-## 第 5 步：提 PR 并合并
+pull request 一发起，标注就会以表格的形式出现在 **Issue #12 的页面**上，后面跟着“需要你核对的点”和格式问题（如果有）。
 
-```bash
-git add -A
-git commit -m "Add P116: 论文简称"
-git push -u origin add-paper-12
-gh pr create --fill --body "Closes #12"
-```
+确认人对照原文核对，重点看自指深度及其依据、反馈来源、闭环程度、证据强度，以及填写人列出的核对点。
 
-PR 页面会带出一份确认清单，请逐项勾选。CI 会自动再跑一遍校验，并检查 README 是否与数据一致。数据文件的改动需要代码所有者审核，通过后合并，对应的 Issue 自动关闭。
+- **有不同意见**：直接在 Issue 里评论要改什么、依据是什么。填写人修改文件并推送后，页面上的标注会换成新的版本。
+- **没有问题**：进入第 5 步。
 
-## 用 AI 助手辅助阅读
+## 第 5 步：确认
 
-仓库自带一个 `paper-reading` 技能，放在 `.agents/skills/paper-reading/`，遵循开放的 Agent Skills 格式。在仓库目录里启动 Codex 或 Claude Code 等支持该格式的工具，然后让它阅读某篇论文即可，例如：
+确认人在 Issue 里单独评论一行：
 
 ```
-用 paper-reading 技能读一下 https://arxiv.org/abs/2505.22954
+/confirm
 ```
 
-它会给出每个字段的取值和原文出处、3 到 5 条“需要你核对的点”，以及与清单里相近论文的对照。你可以让它把草稿追加到数据文件里。
+流程会检查：
 
-它不能替你完成第 3 步：技能只产出“待确认”的草稿。确认时请顺着它给的出处回到原文核对，重点看它列出的核对要点。
+- 评论者是真人账号，并且在[确认人名单](.github/confirmers.txt)里；
+- 页面上显示的标注就是分支上最新的版本（评论之前分支又有更新的话，需要等新标注出现后重新确认）；
+- 标注没有格式问题，阅读深度是全文或部分全文；
+- pull request 只改了这一个标注文件。
 
-- Codex 直接读取 `.agents/skills/`。
-- Claude Code 通过 `.claude/skills/paper-reading` 这个符号链接读取同一份文件。在 Windows 上克隆时如果符号链接没有生效，把 `.agents/skills/paper-reading` 复制到 `.claude/skills/` 下即可。
-- 仓库级的规则（如“AI 助手不能确认论文”）写在 `AGENTS.md`，`CLAUDE.md` 引用它。
+全部通过后，流程给论文分配编号（`P116` 这样），写入 `data/papers.tsv` 并记下确认人和日期，更新 README，关闭 pull request 和 Issue。任何一项不通过，流程会在 Issue 里说明原因，不做任何改动。
+
+确认人可以确认自己填写的论文，前提是本人在确认人名单里。
 
 ## 其他情况
 
-**只确认已有的论文。** 跳过第 1、2 步，从第 3 步开始。一个 PR 可以确认多篇。
-
-**纠正已有标注。** 直接改 `data/papers.tsv` 里对应的行，在 PR 里写明判断依据（原文章节或语句）。如果改的是一篇已确认的论文，把确认人和确认日期更新为你自己的。
-
-**维护者跳过表单直接添加。** 在 `data/papers.tsv` 末尾手写一行，28 列的顺序见文件第一行表头，`status` 填 `待确认`，然后从第 3 步继续。用表格软件打开时把分隔符设成 `|` 会好编辑一些。
-
-**成为确认人。** 请维护者把你的 GitHub 用户名加进 [`.github/CODEOWNERS`](.github/CODEOWNERS)。
-
-## 数据文件的列
-
-| 组 | 列 |
-| --- | --- |
-| 基本信息 | `id`、`title`、`url`、`date`、`venue` |
-| 归类 | `tags`、`subclass`、`task`、`criteria` |
-| 机制 | `object`、`R`、`r_evidence`、`feedback`、`loop`、`accumulation`、`rounds` |
-| 反馈回路 | `cost`、`reversibility` |
-| 声称与证据 | `claim`、`evidence`、`result`、`limits` |
-| 标注信息 | `reading`、`confidence`、`notes` |
-| 人工确认 | `status`、`confirmed_by`、`confirmed_at` |
-
-枚举字段的允许取值以 [`scripts/check_data.py`](scripts/check_data.py) 为准。
+- **纠正已收录论文的标注**：开一个 Issue，写明论文编号、应该改成什么、原文依据。由维护者修改 `data/papers.tsv`。
+- **加入确认人名单**：向 `.github/confirmers.txt` 提 pull request，由维护者审核。
+- **归不进现有的领域或子类**：照最接近的填，在 `review_points` 里提出，由维护者决定是否新增。
+- **手工改确认信息**：不允许。pull request 里改动 `status`、`confirmed_by`、`confirmed_at` 会被检查拦下。

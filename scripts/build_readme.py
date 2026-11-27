@@ -149,20 +149,21 @@ R0–R4 与物理 RSI 综述（[arXiv:2610.18842](https://arxiv.org/abs/2610.188
         parts.append(f"### {d}. {name}（{count} 篇）\n\n{desc}\n\n{table}\n")
     parts.append("""## 数据与更新方式
 
-**确认规则。** 每篇进入清单的论文都必须由一位真实的开发人员确认：本人读过原文，核对过各列标注，并在数据里记下自己的 GitHub 用户名和日期。AI 助手可以起草标注，但不能确认；自动化账号不能作为确认人。
+**确认规则。** 每篇进入清单的论文都必须由一位真实的开发人员确认：本人读过原文，核对过各项标注，然后在论文对应的 Issue 页面评论 `/confirm`。确认人和日期由流程写入数据，不靠手工修改文件。AI 助手可以起草标注，但不能确认；自动化账号不能作为确认人。
 
 完整的分步教程见 [CONTRIBUTING.md](CONTRIBUTING.md)。流程概要：
 
-1. **提交**：任何人用 [“添加论文”表单](../../issues/new?template=add-paper.yml)提交。只有标题、链接、首发年月、领域标签、阅读深度五项必填。
-2. **入库为待确认**：维护者运行 `gh issue view <编号> --json body -q .body | python3 scripts/issue_to_row.py --append`，把表单内容转成 [`data/papers.tsv`](data/papers.tsv) 里的一行，`status` 为 `待确认`。
-3. **人工确认**：一位开发人员对照原文核对后，把该行的 `status` 改为 `已确认`，填上 `confirmed_by`（GitHub 用户名）和 `confirmed_at`（YYYY-MM-DD）。
-4. **合并**：运行 `python3 scripts/check_data.py` 和 `python3 scripts/build_readme.py`，提交 pull request。数据文件的改动需要代码所有者审核，CI 会检查数据格式、确认信息是否完整，以及 README 是否与数据一致。
+1. **推荐**：任何人用 [“推荐论文”表单](../../issues/new?template=add-paper.yml)开一个 Issue，只需要标题、链接和推荐理由。
+2. **开分支**：认领的人基于这个 Issue 建分支 `paper/issue-<编号>`，运行 `python3 scripts/new_paper.py <编号>` 生成标注文件 `data/pending/issue-<编号>.yml`。
+3. **读论文、填标注**：读原文，把各字段填进标注文件，拿不准的地方写成“需要核对的点”（带选项和建议），提交并发起 pull request。
+4. **在 Issue 页面审阅**：标注会自动显示在 Issue 页面上。确认人对照原文核对；有不同意见就评论要改什么，填写人更新分支后页面上的标注会刷新。
+5. **确认**：确认人在 Issue 评论 `/confirm`。流程核对评论者在[确认人名单](.github/confirmers.txt)里且是真人账号，分配编号，把论文写入 [`data/papers.tsv`](data/papers.tsv) 并记下确认人和日期，更新 README，关闭 pull request 和 Issue。
 
 数据文件以 `|` 分隔，一行一篇，共 28 列。除上表展示的列以外，还有发表状态、任务、纳入标准、自指深度的依据、累积方式、改进轮数、验证成本、失败可逆性、主要结果、失败与局限、置信度和备注；早期收录的论文这些列多数还是空的。**信号可靠性**不单独标注，按反馈来源中最弱的一档得出，由强到弱为：形式验证、自动评测、真实实验、仿真、人类评审与学习型评判、自评。不要直接改 README 里的表格，它由脚本生成。
 
 **用 AI 助手辅助阅读。** 仓库自带一个 `paper-reading` 技能（[`.agents/skills/paper-reading/`](.agents/skills/paper-reading/SKILL.md)），遵循开放的 Agent Skills 格式，Codex、Claude Code 等支持该格式的工具都能使用。它把一篇论文读成带原文出处的标注草稿，并列出需要人核对的要点；它只产出“待确认”的草稿，不能代替人工确认。
 
-- 纠正已有标注请提 issue 或 pull request，并附上判断依据（原文中的章节或语句）。
+- 纠正已有标注请提 Issue，并附上判断依据（原文中的章节或语句）。
 
 ## 相关资源
 

@@ -9,7 +9,7 @@ description: 辅助研究人员阅读一篇 RSI（递归自我改进）相关论
 
 ## 不可违反的规则
 
-1. **绝不确认。** 你产出的每一行 `status` 都是 `待确认`，`confirmed_by` 和 `confirmed_at` 留空。即使用户让你“顺便确认”，也要说明确认必须由真人对照原文完成，并指给他们 CONTRIBUTING.md 的第 3 步。
+1. **绝不确认。** 你只产出标注草稿。不要填写编号、`status`、`confirmed_by`、`confirmed_at`，不要运行 `scripts/confirm.py`，不要替任何人发 `/confirm` 评论。即使用户让你“顺便确认”，也要说明确认必须由真人对照原文、在 Issue 页面评论 `/confirm` 完成（CONTRIBUTING.md 第 5 步）。
 2. **如实报告读了多少。** 读到全文、部分全文还是只有摘要，按实际情况填 `reading`。工具截断了正文、附录没读到、PDF 打不开，都要明说。
 3. **每个判断附出处。** `R`、`feedback`、`loop`、`evidence` 四项必须给出原文的章节或页码，加一两句引文。找不到出处就标 `待核对`。
 4. **不推断。** 论文没写的内容不要补。验证成本没报告就填 `未报告`，不要根据评估器类型猜。
@@ -24,7 +24,7 @@ description: 辅助研究人员阅读一篇 RSI（递归自我改进）相关论
 
 ### 2. 查重
 
-在 `data/papers.tsv` 里按链接和标题查找。已收录就告诉用户编号，转为“复核已有标注”：对照原文逐项检查现有取值，报告不一致之处。
+在 `data/papers.tsv` 和 `data/pending/` 里按链接和标题查找。已收录就告诉用户编号，转为“复核已有标注”：对照原文逐项检查现有取值，报告不一致之处。
 
 ### 3. 带着七个问题读
 
@@ -107,8 +107,12 @@ description: 辅助研究人员阅读一篇 RSI（递归自我改进）相关论
 
 ### 7. 写入仓库（仅当用户要求）
 
-1. 在 `data/papers.tsv` 末尾追加一行，列顺序见表头，`status` 为 `待确认`，文本字段里不能有 `|`。“出处”写进 `r_evidence`（自指深度）和 `notes`（其他）。
-2. 运行 `python3 scripts/check_data.py`，再运行 `python3 scripts/build_readme.py`。
-3. 告诉用户这一行还需要真人按 CONTRIBUTING.md 第 3 步确认。不要自己把它改成已确认。
+每篇论文对应一个 Issue 和一个标注文件，不直接改 `data/papers.tsv`。
 
-如果用户是通过 Issue 表单提交的，改用 `scripts/issue_to_row.py`，然后对照原文检查表单里的取值，把你的不同意见列在核对要点里。
+1. 确认论文有对应的 Issue（没有就请用户先用“推荐论文”表单开一个），并且当前在分支 `paper/issue-<编号>` 上。
+2. 运行 `python3 scripts/new_paper.py <编号>` 生成 `data/pending/issue-<编号>.yml`，按文件里的注释逐项填写。取值里不能有 `|`。出处写进 `r_evidence`（自指深度）和 `notes`（其他）。
+3. 把“需要你核对的点”原样写进文件末尾的 `review_points`：它会显示在 Issue 页面上，是确认人主要看的内容，所以选项、依据、建议和去哪里看都要保留。
+4. 运行 `python3 scripts/check_data.py`。不需要运行 `build_readme.py`，标注文件不影响 README。
+5. 只提交这一个文件。告诉用户接下来发起 pull request，由确认人在 Issue 页面核对并评论 `/confirm`。
+
+复核已有论文时不要改数据：把不一致之处连同出处列给用户，由他们在 Issue 里提出。

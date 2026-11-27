@@ -1,0 +1,49 @@
+# Shows the annotation from a pull request on the issue page, where the confirmer reviews it.
+# Runs with the base branch's scripts only: the pull request's files are read as data, never executed.
+name: paper-review
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    paths: ["data/pending/**"]
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Post the annotation on the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          git fetch -q origin "pull/$PR/head"
+          [ "$(git rev-parse FETCH_HEAD)" = "$HEAD_SHA" ] || { echo "head moved, a newer run will handle it"; exit 0; }
+          files=$(git diff --name-only --diff-filter=AM "HEAD...FETCH_HEAD" -- data/pending \
+                  | grep -E '^data/pending/issue-[0-9]+\.yml$' || true)
+          for f in $files; do
+            n=$(basename "$f" .yml); n=${n#issue-}
+            git show "FETCH_HEAD:$f" > "$RUNNER_TEMP/issue-$n.yml"
+            {
+              python3 scripts/render_review.py "$RUNNER_TEMP/issue-$n.yml" \
+                --source "填写人 @$AUTHOR，来自 #$PR（提交 ${HEAD_SHA:0:7}）。"
+              echo
+              echo "<!-- paper-review pr=$PR sha=$HEAD_SHA -->"
+            } > "$RUNNER_TEMP/body.md"
+            # replace the previous rendering so the confirmer is notified of the update
+            gh api "repos/$REPO/issues/$n/comments" --paginate \
+              --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | contains("<!-- paper-review "))) | .id' \
+              | while read -r id; do gh api -X DELETE "repos/$REPO/issues/comments/$id"; done
+            gh issue comment "$n" --repo "$REPO" --body-file "$RUNNER_TEMP/body.md"
+          done
