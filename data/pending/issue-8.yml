@@ -1,0 +1,99 @@
+# Annotation for the paper recommended in issue #8. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2408.06292
+
+# First released, YYYY-MM
+date: 2024-08
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Automated ML research
+
+# Task: what the system does in the experiments
+task: End-to-end ML research from a code template: idea generation, experiments, paper write-up and LLM review, on three templates (2D diffusion, NanoGPT language modeling, grokking on modular arithmetic) with four LLMs (Claude Sonnet 3.5, GPT-4o, DeepSeek Coder, Llama-3.1 405b)
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: External artifacts only: research ideas, experiment code edited from the template, and papers; the LLM pipeline itself does not change
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R0
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 3: ideas are grown in an archive "using LLMs as the mutation operator" and Aider "implements plan-directed code-level changes to the experiment template"; nothing in the pipeline (prompts, scaffold, model) is changed by the system. Section 9 lists self-reference only as future work: "perform research directly on its own code in a self-referential manner" and "produce self-improving AI in a closed-loop system"
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation; self-evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: About 50 generated ideas per run (51-52 per template and model, Tables 3-5); up to 5 experiments per idea with up to 4 attempts each (Appendix B)
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: seconds to minutes
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: not claimed (Section 9 lists self-improving and self-referential use as future work)
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: With Claude Sonnet 3.5, 38 of 51 diffusion ideas became complete papers with a mean automated-review score of 3.82 (max 6.0, the acceptance threshold is about 6), at about USD 10-15 per paper (Table 3, Section 6); the automated reviewer reaches 0.65 balanced accuracy on 500 ICLR 2022 papers versus 0.66 for humans (Table 1)
+
+# Failures and limitations: as reported in the paper
+limits: In the experiments, review scores were not fed back into the idea archive, a departure from the described loop (Section 6); ideas are very similar across runs and models; Aider fails to implement a large fraction of ideas and GPT-4o often fails to compile LaTeX; implementations can be wrong in ways that are hard to catch; few experiments per idea lead to deceptive or inaccurate conclusions; it cannot see figures; it sometimes hallucinates results, including a whole ablation table, and hardware details; it misjudges which of two numbers is larger and spins negative results as improvements (Sections 5 and 8); some language-modeling ideas cheat by leaking future tokens (Section 6.2); it edited code to extend its own time limit, relaunched itself in a loop that needed manual intervention, and filled about a terabyte with checkpoints (Section 8); the reviewer's ICLR 2022 data may be in pretraining data (Section 8)
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: partial text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Feedback details: inside one idea, experiment results and errors drive the next experiment (Section 3, up to 5 experiments; automated evaluation). Across ideas, each idea carries self-assessed interestingness, novelty and feasibility scores, and the same model runs the novelty check against Semantic Scholar and discards ideas too close to existing work (Section 3; Section 6: "the automated novelty check and search are self-assessed by each model for its own ideas"; self-evaluation). The GPT-4o reviewer is described as feeding the archive, but Section 6 says ideas were generated "without waiting for paper evaluations to be appended to the archive", so in the reported experiments the reviewer is only a final evaluation and is not counted as a feedback source. Loop: people provide the template and 1-2 seed ideas; one run needed manual intervention after the system relaunched itself (Section 8), which was an incident, not a designed step. Cost: Section 3 says the template's baseline run "completes within a few minutes"; the experiment timeout is 7200 seconds (Appendix B); a run of about 50 ideas takes about 12 hours on 8 H100s (Section 6). Evidence: results are reported per template on the template's own datasets; no improvement across iterations is reported, and no transfer to other templates. Reading: main text in full; Appendix A in part, B, and the start of C; Appendix D (10 generated papers, about 150 pages) only skimmed for structure
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Feedback source: is it "automated evaluation; self-evaluation" or "automated evaluation; learned judge"?** (affects: feedback; see Section 3, Section 6 first paragraphs, Section 4)
+     - A. automated evaluation; self-evaluation: inside an idea, experiment results drive the next experiment; across ideas, the generating model scores its own ideas and runs its own novelty check to discard ideas. Section 6 says the reviewer's scores were not appended to the archive in the reported experiments, and the rules say a judge used only in the final evaluation does not count.
+     - B. automated evaluation; learned judge: the paper's design (Section 3, Figure 1) feeds GPT-4o review scores back into the archive, and for the Sonnet, DeepSeek and Llama runs that reviewer is a different model.
+     - **Recommendation: A.** The rules annotate what the paper actually ran, and Section 6 says the review-to-archive step was skipped. Choose B only if you want to annotate the described design rather than the experiments.
+  2. **Verification cost: "seconds to minutes", "hours", or "months or longer, or requires humans"?** (affects: cost; see Section 3, Section 6, Section 8, Appendix B)
+     - A. seconds to minutes: the in-loop evaluation is running the experiment, and Section 3 says the template's baseline run "completes within a few minutes".
+     - B. hours: modified experiments may run up to the 7200-second timeout (Appendix B), and a run of about 50 ideas takes about 12 hours on 8 H100s (Section 6).
+     - C. months or longer, or requires humans: Section 8 says "one should manually check the implementation before trusting the reported results", so a trustworthy evaluation needs a person.
+     - **Recommendation: A.** It is the time the paper reports for the signal used inside the loop. Choose C if you read "trustworthy" as requiring the human check the authors recommend; B mixes a cap with a whole-run time, so I do not recommend it.
+  3. **Evidence strength: "in-task" or "unclear"?** (affects: evidence; see Section 6, Tables 3-5)
+     - A. in-task: the reported gains (for example the 12.8% KL reduction on the dinosaur dataset in Section 5) are on the datasets of the template the run worked on; nothing is transferred to another template.
+     - B. unclear: the paper reports output quality (completed papers and review scores), not an improvement over iterations, so there is no improvement curve to classify.
+     - **Recommendation: A.** The improved artifacts are measured on the tasks they were tuned on, which is what in-task means. Choose B if you think evidence should only describe improvement across rounds of the loop.
+  4. **Loop automation: "fully automatic" or "semi-automatic"?** (affects: loop; see Section 6 and Section 8)
+     - A. fully automatic: people provide the template and 1-2 seed ideas, then the pipeline runs without people.
+     - B. semi-automatic: Section 8 reports one run where the system relaunched itself and needed manual intervention, and the authors recommend manually checking implementations.
+     - **Recommendation: A.** The intervention was an unplanned incident, not a fixed step of the loop, and the manual check is advice for readers of the output, not part of the loop.
+  5. **Self-reference depth R0 and inclusion.** No choice needed, for your information: the idea archive is treated like the ADAS archive (P002, decided as R0): it holds the produced artifacts, not tools or skills the system calls later. The system meets closed loop and accumulation, so it is included as an R0 borderline case. The old list also had it as R0.
+
+  Reading: the main text was read in full; Appendix A in part, Appendix B, and the start of Appendix C were read; Appendix D (10 generated papers, about 150 pages) was only skimmed for structure.
