@@ -73,6 +73,22 @@ gh pr create --fill --body "Closes #12"
 
 PR 页面会带出一份确认清单，请逐项勾选。CI 会自动再跑一遍校验，并检查 README 是否与数据一致。数据文件的改动需要代码所有者审核，通过后合并，对应的 Issue 自动关闭。
 
+## 用 AI 助手辅助阅读
+
+仓库自带一个 `paper-reading` 技能，放在 `.agents/skills/paper-reading/`，遵循开放的 Agent Skills 格式。在仓库目录里启动 Codex 或 Claude Code 等支持该格式的工具，然后让它阅读某篇论文即可，例如：
+
+```
+用 paper-reading 技能读一下 https://arxiv.org/abs/2505.22954
+```
+
+它会给出每个字段的取值和原文出处、3 到 5 条“需要你核对的点”，以及与清单里相近论文的对照。你可以让它把草稿追加到数据文件里。
+
+它不能替你完成第 3 步：技能只产出“待确认”的草稿。确认时请顺着它给的出处回到原文核对，重点看它列出的核对要点。
+
+- Codex 直接读取 `.agents/skills/`。
+- Claude Code 通过 `.claude/skills/paper-reading` 这个符号链接读取同一份文件。在 Windows 上克隆时如果符号链接没有生效，把 `.agents/skills/paper-reading` 复制到 `.claude/skills/` 下即可。
+- 仓库级的规则（如“AI 助手不能确认论文”）写在 `AGENTS.md`，`CLAUDE.md` 引用它。
+
 ## 其他情况
 
 **只确认已有的论文。** 跳过第 1、2 步，从第 3 步开始。一个 PR 可以确认多篇。
