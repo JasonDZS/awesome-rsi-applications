@@ -255,7 +255,7 @@ R0–R4 与物理 RSI 综述（[arXiv:2610.18842](https://arxiv.org/abs/2610.188
 
 **确认规则。** 每篇进入清单的论文都必须由一位真实的开发人员确认：本人读过原文，核对过各列标注，并在数据里记下自己的 GitHub 用户名和日期。AI 助手可以起草标注，但不能确认；自动化账号不能作为确认人。
 
-流程：
+完整的分步教程见 [CONTRIBUTING.md](CONTRIBUTING.md)。流程概要：
 
 1. **提交**：任何人用 [“添加论文”表单](../../issues/new?template=add-paper.yml)提交。只有标题、链接、首发年月、领域标签、阅读深度五项必填。
 2. **入库为待确认**：维护者运行 `gh issue view <编号> --json body -q .body | python3 scripts/issue_to_row.py --append`，把表单内容转成 [`data/papers.tsv`](data/papers.tsv) 里的一行，`status` 为 `待确认`。
