@@ -1,0 +1,247 @@
+name: 添加论文
+description: 推荐一篇 RSI 应用论文，并按清单的字段标注
+title: "[论文] "
+labels: ["add-paper"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢补充论文。**只有带星号的五项必填**（标题、链接、首发年月、领域标签、阅读深度）；其余标注字段尽量填，拿不准的选“待核对”，维护者会复核。
+        字段含义见 README 的“如何阅读这份清单”。
+
+  # ---------- A. 基本信息 ----------
+  - type: input
+    id: title
+    attributes:
+      label: 论文标题
+      description: "原标题。系统有通用简称的，把简称写在前面，例如 DGM - Darwin Gödel Machine。"
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 链接
+      description: 优先 arXiv 的 abs 链接或 DOI。
+      placeholder: https://arxiv.org/abs/XXXX.XXXXX
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: 首发年月
+      description: 第一版公开的时间，格式 YYYY-MM。
+      placeholder: 2026-09
+    validations:
+      required: true
+  - type: input
+    id: venue
+    attributes:
+      label: 发表状态
+      description: 预印本，或会议、期刊名称与年份。
+      placeholder: 预印本 / ICLR 2026
+
+  # ---------- B. 归类 ----------
+  - type: dropdown
+    id: tags
+    attributes:
+      label: 领域标签
+      description: 可多选。第 0 类表示通用的 AI 优化自身；1–4 类按实验任务所在的应用领域选。
+      multiple: true
+      options:
+        - 0 AI 研发自身
+        - 1 工程科学
+        - 2 自然科学
+        - 3 物理与具身
+        - 4 社会科学
+    validations:
+      required: true
+  - type: dropdown
+    id: subclass
+    attributes:
+      label: 子类
+      description: 可多选，与上面的领域标签对应。
+      multiple: true
+      options:
+        - 0 · 智能体自我改进
+        - 0 · 自动化 ML 研究
+        - 0 · 数据与权重的自适应
+        - 1 · 软件工程
+        - 1 · 算法发现
+        - 1 · 芯片设计与系统优化
+        - 2 · 数学
+        - 2 · 化学与材料
+        - 2 · 生物与医药
+        - 2 · 物理与地球科学
+        - 3 · 机器人技能习得
+        - 3 · 奖励与课程的自动设计
+        - 3 · 开放式具身学习
+        - 4 · 经济与金融
+        - 4 · 社会仿真
+        - 4 · 预测
+        - 4 · 已部署的服务型智能体
+        - 4 · 政策与教育
+        - 4 · 法律
+        - 其他（请在备注中说明）
+  - type: input
+    id: task
+    attributes:
+      label: 任务
+      description: 一句话说明系统被用来解决什么问题。
+      placeholder: 在 SWE-bench 上修复真实代码仓库的问题
+
+  # ---------- 纳入标准 ----------
+  - type: checkboxes
+    id: criteria
+    attributes:
+      label: 纳入标准
+      description: 勾选论文满足的条件。只满足“闭环”的工作作为边界案例收录，自指深度标 R0。
+      options:
+        - label: 闭环：系统生成候选，得到评估，评估结果驱动下一轮
+        - label: 自指：被改进的对象包含系统自身的一部分，而不只是外部产物
+        - label: 累积：改进被保留，并参与后续轮次的改进
+
+  # ---------- C. 机制 ----------
+  - type: input
+    id: object
+    attributes:
+      label: 改进对象
+      description: 一句话说明系统具体改了自身的什么。只改外部产物的，写明“仅外部产物”及其内容。
+      placeholder: 编程智能体的自身代码，用档案库保存各代变体
+  - type: dropdown
+    id: r_level
+    attributes:
+      label: 自指深度
+      description: 取论文达到的最高一级。
+      options:
+        - R0 仅外部产物（边界案例）
+        - R1 提示、记忆、技能库
+        - R2 脚手架与自身代码
+        - R3 权重与训练流程
+        - R4 改进“改进过程”本身
+        - 待核对
+  - type: textarea
+    id: r_evidence
+    attributes:
+      label: 自指深度的依据
+      description: 引用原文中支持上述判断的章节号或一两句话。这一项最容易有分歧，有依据才便于复核。
+      placeholder: "第 3.2 节：“the agent edits its own codebase, including the tools it uses to edit code”"
+  - type: dropdown
+    id: feedback
+    attributes:
+      label: 反馈来源
+      description: 回路里用什么信号判断一次改动是否更好。可多选。
+      multiple: true
+      options:
+        - 形式验证
+        - 自动评测（测试、基准、回测）
+        - 仿真
+        - 真实实验（湿实验、真机、线上）
+        - 人类评审
+        - 学习型评判（另一个模型打分）
+        - 自评（被改进的模型给自己打分）
+        - 待核对
+  - type: dropdown
+    id: loop
+    attributes:
+      label: 闭环程度
+      options:
+        - 人在回路
+        - 半自动
+        - 全自动
+        - 待核对
+  - type: dropdown
+    id: accumulation
+    attributes:
+      label: 累积方式
+      options:
+        - 单轮
+        - 单一谱系的多代迭代
+        - 种群或档案库式的开放演化
+        - 待核对
+  - type: input
+    id: rounds
+    attributes:
+      label: 改进轮数
+      description: 论文报告的代数或迭代次数；没写就留空。
+
+  # ---------- D. 反馈回路 ----------
+  - type: dropdown
+    id: cost
+    attributes:
+      label: 验证成本
+      description: 得到一次可信评估所需的时间。论文没写就选“未报告”，不要推断。
+      options:
+        - 秒到分钟
+        - 小时
+        - 天到周
+        - 月以上或必须人工
+        - 未报告
+  - type: dropdown
+    id: reversibility
+    attributes:
+      label: 失败可逆性
+      description: 一次失败的候选能否无损回滚。
+      options:
+        - 完全可逆（如代码回滚）
+        - 有消耗可重试（如试剂、样本、机器人磨损）
+        - 不可逆（如硬件损坏、对人或社会的真实影响）
+        - 待核对
+
+  # ---------- E. 声称与证据 ----------
+  - type: dropdown
+    id: claim
+    attributes:
+      label: 自称程度
+      description: 看标题和摘要的用词。
+      options:
+        - RSI（明确自称递归自我改进）
+        - 自我改进（含自演化）
+        - 未自称
+  - type: dropdown
+    id: evidence
+    attributes:
+      label: 证据强度
+      description: 改进在哪里被证实。
+      options:
+        - 任务内（只在训练或调优所用的任务上见效）
+        - 跨任务（在留出任务或其他任务上见效）
+        - 跨任务且独立验证（由第三方或独立评测证实）
+        - 待核对
+  - type: input
+    id: result
+    attributes:
+      label: 主要结果
+      description: 一句话，含改进前后的关键数字。
+      placeholder: SWE-bench 通过率从 20.0% 提高到 50.0%
+  - type: textarea
+    id: limits
+    attributes:
+      label: 失败与局限
+      description: 论文报告的评估器被钻空子、性能崩溃、目标漂移等情况；没有就留空。
+
+  # ---------- F. 标注信息 ----------
+  - type: dropdown
+    id: reading
+    attributes:
+      label: 阅读深度
+      description: 你读到了哪一步。只读摘要的标注不进入统计。
+      options:
+        - 全文
+        - 部分全文
+        - 仅摘要
+    validations:
+      required: true
+  - type: dropdown
+    id: confidence
+    attributes:
+      label: 置信度
+      description: 对以上标注的整体把握。
+      options:
+        - 高
+        - 中
+        - 低
+  - type: textarea
+    id: notes
+    attributes:
+      label: 备注
+      description: 存疑点、归类理由、人工介入点，或与已收录论文的关系。
