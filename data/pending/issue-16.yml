@@ -77,25 +77,16 @@ notes: Feedback details: the reward is whether adapting the model with the self-
 # Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
 # Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
 review_points: |
-  1. **Does SEAL improve its own improvement process, or only its weights?** (affects: self-reference depth; see Section 3.1, Algorithm 1, Appendix B.2)
-     - **R3:** the persistent change is to the weights, made by a fixed outer loop (ReST-EM, binary reward, fixed self-edit prompt). During RL training each self-edit only updates a temporary copy that is scored and discarded, so the improved self-edit policy is not what trains the model across rounds; the fixed "SFT on good self-edits" step is. This is the case "an outer loop changes the inner loop's procedure and does not change itself", at the weight level. STaR (P001), where the improved model produces the next round's data, is R3.
-     - **R4 (limited to the training-pipeline level):** what RL improves is the model's own way of producing its finetuning data and, on ARC, its own training configuration (augmentations, learning rate, epochs, loss tokens); Section 3 calls this meta-learning "how to generate effective self-edits", and at test time the learned self-edits update the model itself (Table 2, Figure 6).
-     - **Recommendation: R3.** The process that persistently improves the model never changes, and the learned self-edit procedure is only applied to throwaway copies inside training. Choose R4 if the learned self-edit procedure should count as the system's own training pipeline even though the outer RL step is fixed.
-  2. **Feedback source: automated evaluation only, or also a learned judge?** (see Appendix B.4, Appendix B.10)
-     - **automated evaluation:** the reward is the adapted model's correctness on the task's own ground-truth answers (SQuAD QA pairs, the ARC test output).
-     - **automated evaluation; learned judge:** SQuAD answers are graded against the gold answer by GPT-4.1, though the paper states this only for evaluation, not for the RL reward.
-     - **Recommendation: automated evaluation.** GPT-4.1 only checks answers against a gold answer, and the paper does not say it is used inside the loop. The GPT-4.1 rubric reward in B.10 is a variant, not the main loop.
-  3. **Evidence strength: in-task or cross-task?** (see Section 4.2, Appendices A.1 and B.1)
-     - **in-task:** both experiments evaluate on held-out items of the same benchmark (SQuAD evaluation passages, ARC evaluation tasks).
-     - **cross-task:** the policy trained on single-passage updates also helps in continued pretraining over many passages, which the paper says "generalizes beyond the original RL setup".
-     - **Recommendation: in-task.** The continued-pretraining runs use the same dataset and task; the rule counts held-out sets of the same benchmark as in-task.
-  4. **Authors' claim: self-improvement or not claimed?** (see the title, abstract and Section 3)
-     - **self-improvement:** the title and abstract say "self-adapting" and "self-directed adaptation", and Section 3 says it "enables language models to improve themselves".
-     - **not claimed:** "self-improvement" itself does not appear in the abstract.
-     - **Recommendation: self-improvement.** The rule counts "self-improving, self-evolving, and similar", and self-adapting through its own weight updates is similar.
-  5. **Domain tags: 0 only?** (see Section 3.2)
-     - **0 only:** knowledge incorporation and ARC few-shot learning are general adaptation abilities, not an application domain; subfield Data and weight self-adaptation, as for STaR.
-     - **0;2:** if ARC abstract reasoning is counted under Mathematics, as STaR's arithmetic and GSM8K were. ARC is not a math benchmark, so this is weak.
-     - **Recommendation: 0 only.**
+  1. **Self-reference depth: decided by the maintainer as R3.** SEAL updates its own weights, and RL improves how it writes its own finetuning data and settings.
+     - **R3 (chosen):** the persistent change is to the weights, made by a fixed outer loop (ReST-EM, binary reward, fixed self-edit prompt). During RL training each self-edit only updates a temporary copy that is scored and discarded, so the improved self-edit policy is not what trains the model across rounds; the fixed "SFT on good self-edits" step is (Section 3.1, Algorithm 1, Appendix B.2). This is the case "an outer loop changes the inner loop's procedure and does not change itself", at the weight level, and matches STaR (P001), where the improved model produces the next round's data and is R3.
+     - **R4 (limited to the training-pipeline level):** what RL improves is the model's own way of producing its finetuning data and, on ARC, its own training configuration; Section 3 calls this meta-learning "how to generate effective self-edits", and at test time the learned self-edits update the model itself (Table 2, Figure 6). Not chosen: the learned procedure is only applied to throwaway copies inside training, never to the model that keeps being improved.
+  2. **Feedback source: decided by the maintainer as automated evaluation.**
+     - **automated evaluation (chosen):** the reward is the adapted model's correctness on the task's own ground-truth answers (SQuAD QA pairs, the ARC test output).
+     - **automated evaluation; learned judge:** SQuAD answers are graded against the gold answer by GPT-4.1, but the paper states this only for evaluation (Appendix B.4), not for the RL reward; the GPT-4.1 rubric reward in Appendix B.10 is a variant, not the main loop.
+  3. **Evidence strength: decided by the maintainer as in-task.**
+     - **in-task (chosen):** both experiments evaluate on held-out items of the same benchmark (SQuAD evaluation passages, ARC evaluation tasks; Appendices A.1 and B.1).
+     - **cross-task:** the policy trained on single-passage updates also helps in continued pretraining (Section 4.2), but on the same dataset and task.
+  4. **Authors' claim: decided by the maintainer as self-improvement.** The title and abstract say "self-adapting" and "self-directed adaptation", and Section 3 says it "enables language models to improve themselves"; the rule counts "self-improving, self-evolving, and similar".
+  5. **Domain tags: decided by the maintainer as 0 only,** with subfield Data and weight self-adaptation, as for STaR. Knowledge incorporation and ARC few-shot learning are general adaptation abilities, and ARC is not a math benchmark, so 2 is not added.
 
   Reading: the whole paper including Appendices A and B was read.
