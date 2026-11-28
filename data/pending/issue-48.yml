@@ -1,0 +1,114 @@
+# Annotation for the paper recommended in issue #48. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: ImProver 2: Iteratively Self-Improving LMs for Neurosymbolic Proof Optimization
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2605.22885
+
+# First released, YYYY-MM
+date: 2026-05
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;2
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Data and weight self-adaptation; Mathematics
+
+# Task: what the system does in the experiments
+task: Rewrite a verified Lean 4 proof into a semantically equivalent, formally correct proof that scores better under a structural metric (length, modularity, or explicit dependencies); a 7B model is trained to do this and evaluated on MiniCTX-v2 research-level theorems
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The model's own weights: a 7B SLM (DeepSeek-R1-Distill-Qwen-7B) fine-tuned each round with IRPO on its own filtered, self-scored proof-rewrite preference pairs
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R3
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 4.1: "at the t-th iteration ImProver 2's core loop aims to train the model Gt+1 from Gt"; Section 4.3.2: "After training with respect to this objective for one epoch, we obtain Gt+1"; the loop generates candidates with the current model Gt and trains it into Gt+1, i.e. weights are updated (R3). The IRPO algorithm and replay-buffer procedure are fixed, so it is not R4.
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: formal verification; automated evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: multi-generation single lineage
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: Up to 4 IRPO iterations per metric; best checkpoint selected per metric (dependency peaks at iteration 2, length and modularity at iteration 3)
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: self-improvement
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: Trained from DeepSeek-R1-Distill-Qwen-7B, mean best@16 improvement on MiniCTX-v2 rises length 0.118->0.330, modularity 0.003->0.143, dependency 0.050->0.206, exceeding DeepSeek-R1 671B (0.308/0.055/0.153) on all three metrics and leading all evaluated unscaffolded systems on modularity
+
+# Failures and limitations: as reported in the paper
+limits: The structural metrics are proxies that may not match maintainers' subjective quality preferences (no maintainer preference study); improvement is not indefinite and plateaus or regresses after 2-3 rounds; stronger optimization lowers compilation accuracy; only single-step rewriting is studied, not agentic systems; when frontier models get the same scaffold several beat ImProver 2; performance varies substantially by repository
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Feedback: Lean kernel verifier v(c,x,y) (formal verification, Section 3.1) plus the computable metric score mu for filtering winners/losers (automated evaluation, Appendix C, Section 3.2). Loop: fully automatic within a round; people choose the three metrics with formal-math experts (Section 3.2.1) and select hyperparameters/checkpoints per round by validation grid search (Appendix E.2, Section 5.1 "train IRPO until validation improvement regresses and report the best checkpoint") - setup, not in-loop human feedback. Object/R: model weights trained Gt->Gt+1 (R3), continual (not retrained from base, unlike STaR), replay buffer prevents collapse (Section 4.3.1). Accumulation: single model lineage + replay buffer. Rounds: Table 2, up to 4 iterations, peaks at 2-3. Evidence: MiniCTX-v2 held out, leakage controlled (Section 5.1); Appendix F.2 adds a qualitative AlphaProof IMO-2024 case study (not held-out benchmark). Cost: hardware reported (8x L40S, Appendix E.1) but no time. Base model DeepSeek-R1-Distill-Qwen-7B; baselines include GPT-5 variants, GPT-oss-120B, DeepSeek-R1 family, and prior ImProver (GPT-4o). Open-sourced code and data (Section 1).
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Does this paper take domain tag 0 (AI R&D / Data and weight self-adaptation), or only domain 2 (Mathematics)?** (affects: domain tags; see Section 4 (the training pipeline) and Section 5 (tasks are Lean 4 proof optimization))
+     - Option A: 0;2. Evidence: The self-reference is at the weights/training-pipeline level (R3) and the central contribution is a self-improvement pipeline (IRPO + replay buffer) that bootstraps a model on its own generations - the same shape as P001 STaR, which is annotated 0;2 with subclass 'Data and weight self-adaptation; Mathematics'
+     - Option B: 2. Evidence: The annotation rule says "Work that only trains a policy for one application domain (such as a robot policy) is not tagged 0"; here the model is trained solely for formal-math proof optimization, a single application domain, so only Mathematics (domain 2) would apply
+     - **Recommendation: A.** I recommend 0;2 for consistency with the closest sibling in the list, P001 STaR (also weight-bootstrapping on self-generated data, annotated 0;2 / 'Data and weight self-adaptation; Mathematics'); the mechanism here is exactly data-and-weight self-adaptation. Choose 2-only if the maintainers read the 'single application domain' carve-out as decisive - ImProver 2 is narrower than STaR (formal math only), which is the real tension to resolve; the subclass should track this choice ('Data and weight self-adaptation; Mathematics' if 0;2, 'Mathematics' if 2).
+     - Annotator's choice: A (0;2).
+
+  2. **Is the evidence in-task or cross-task?** (affects: evidence strength; see Section 5.1 (dataset/split: train on research-math repos, hold out MiniCTX-v2) and Appendix F.2 (AlphaProof case study))
+     - Option A: in-task. Evidence: MiniCTX-v2 is a held-out test set of the same task (proof optimization), with same-file theorems excluded from training; per the rules held-out test sets of the same benchmark/task count as in-task, and all evaluations are the authors' own
+     - Option B: cross-task. Evidence: Training draws from a different set of repositories than the MiniCTX-v2 test theorems, so one could read it as generalization across libraries rather than a held-out split of a single dataset
+     - **Recommendation: A.** I recommend in-task: the task (metric-driven Lean proof rewriting) is identical between train and test, and MiniCTX-v2 is used purely as a held-out benchmark, which the rules classify as in-task. Choose cross-task only if the maintainers treat optimizing proofs in previously-unseen repositories as a genuinely different task; note there is no independent third-party evaluation, so 'cross-task, independently verified' does not apply.
+     - Annotator's choice: A (in-task).
+
+  3. **Is the loop fully automatic or semi-automatic, given per-iteration hyperparameter grid search and per-metric checkpoint selection?** (affects: loop automation; see Section 4.1 (loop), Section 5.1 and Appendix E.2 (hyperparameters tuned per round by validation grid search; best checkpoint reported per metric))
+     - Option A: fully automatic. Evidence: Section 4.1: the loop "is repeated until convergence... or exhaustion of the compute budget"; hyperparameter selection and checkpointing are driven by validation metrics (grid search), not by human judgement inside the loop
+     - Option B: semi-automatic. Evidence: The authors select hyperparameters (preference gap, replay ratio, learning rate) separately for each metric and iteration and pick the best checkpoint per objective (Appendix E.2), which is a fixed human-run offline decision point between rounds
+     - **Recommendation: A.** I recommend fully automatic, consistent with how P001 STaR, P005 SICA and P006 DGM are annotated despite having offline configuration; the per-round selection is validation-metric-driven and automatable. Choose semi-automatic if the maintainers count manual per-iteration hyperparameter and checkpoint selection as people stepping in at fixed points.
+     - Annotator's choice: A (fully automatic).
+
+  4. **Is the in-loop feedback both formal verification and automated evaluation, or only one of them?** (affects: feedback source; see Section 3.1 (Lean kernel verifier) and Appendix C (winner/loser filtering using compilation and the metric score))
+     - Option A: formal verification; automated evaluation. Evidence: Winners must both compile under the Lean kernel (formal verification: v(c,x,y)=1) and have a metric improvement score above a percentile threshold (automated evaluation: the computable metric mu); both gate what enters the preference pairs
+     - Option B: automated evaluation. Evidence: If one treats the Lean-kernel compile check as part of a single computable scoring function rather than a distinct formal-verification signal, only automated evaluation would be listed
+     - **Recommendation: A.** I recommend listing both: the Lean kernel is a genuine proof checker (formal verification per the taxonomy), and it is combined with the metric score to filter and rank, both inside the loop. Choose automated-evaluation-only if the maintainers prefer to subsume the kernel check under automated evaluation; the signal reliability is unchanged since formal verification is the strongest listed source.
+     - Annotator's choice: A (formal verification; automated evaluation).
+
+  5. **Is the self-reference depth R3, or does the per-iteration tuning of the pipeline push it toward R4?** (affects: self-reference depth; see Section 4.1-4.3 (loop and IRPO), Appendix C (replay buffer), Appendix E.2 (per-round hyperparameters))
+     - Option A: R3. Evidence: What is improved is the model's weights via a fixed training pipeline (IRPO + replay buffer); Section 4.1/4.3.2 show Gt is trained into Gt+1, and the improvement algorithm itself is not modified by the system
+     - Option B: R4. Evidence: Hyperparameters (preference gap, replay ratio, learning rate) and checkpoints are selected per iteration (Appendix E.2), which could be read as the improvement process being adapted over rounds
+     - **Recommendation: A.** I recommend R3: weights are the object improved and the IRPO/replay procedure is fixed; per-round hyperparameter tuning is external grid search by the authors, not the system improving its own improvement process (contrast P004 Goedel Agent R4, which rewrites its own improvement module). Choose R4 only if the maintainers regard author-run per-iteration tuning as self-modification of the improvement process.
+     - Annotator's choice: A (R3).
+
+  **Comparison with the existing list:** Most similar is P001 STaR (R3, feedback automated evaluation, in-task, multi-generation single lineage, claim self-improvement, tags 0;2 / 'Data and weight self-adaptation; Mathematics'): ImProver 2 is the formal-math analogue of STaR and my draft is consistent with it (R3, in-task, multi-generation single lineage, self-improvement, 0;2). Two differences worth noting: ImProver 2 adds formal verification (the Lean kernel) as an in-loop feedback source on top of automated evaluation, and it trains continually (Gt->Gt+1) with a replay buffer rather than retraining from the base model each round as STaR does. P005 SICA and P006 DGM are also self-improvement loops but at R2 (the agent's own code), with different objects and open-ended archives, so they are less comparable; ImProver 2 improves weights, not scaffold code. Prior work ImProver (Ahuja et al. 2025, GPT-4o agent) and ProofOptimizer (Gu et al. 2025) are cited baselines but are not in the list.
+
+  **Signals useful for the survey:** Useful signals: (1) Claim-vs-evidence gap - the paper claims "iterative self-improvement" and "monotonic improvement over many rounds," but Section 5.2.3 reports improvement is not indefinite and plateaus/regresses after 2-3 rounds (dependency drops to N/A by iteration 4), a concrete limit on weight-bootstrapping loops. (2) Reward-hacking awareness: the modularity metric required explicit heuristics (Appendix A.5-A.7: duplicate/wrapper detection, nontriviality filter) to stop trivial goal-spawning from inflating the score, and the authors note the metrics are proxies not validated against maintainer preference. (3) A correctness/optimization trade-off: stronger metric optimization lowers Lean compilation accuracy (Section 5.2.5), i.e. the model takes riskier edits as it improves. (4) Evidence is in-task, single base model, authors' own evaluation, no independent verification and no maintainer/human preference study.
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
