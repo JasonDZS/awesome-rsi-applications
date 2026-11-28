@@ -1,0 +1,116 @@
+# Annotation for the paper recommended in issue #44. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: Agentic LLM Reasoning in a Self-Driving Laboratory for Air-Sensitive Lithium Halide Spinel Conductors
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2604.11957
+
+# First released, YYYY-MM
+date: 2026-04
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 2
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Chemistry and materials
+
+# Task: what the system does in the experiments
+task: Autonomous closed-loop design of experiments in a self-driving lab: LLM agents propose compositions and synthesis temperatures for Li2-xM1+/-yCl4 halide spinels; a glovebox robot synthesizes them and characterizes by XRD and EIS, and results feed the next design cycle
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: Material compositions and synthesis temperatures proposed by the agents (external artifacts), plus an accumulating experimental dataset with LLM-generated experiment notes used as agent memory
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R0
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Figure 2 caption: agent workflows are "each with different system prompts to focus on different aspects of scientific reasoning, using the same underlying LLM (OpenAI GPT-5)"; the system optimizes external compositions/temperatures, not its own prompts/code/weights. Methods 4.5: the post-experiment LLM summary "serves as a memory mechanism, allowing the agents to track prior hypotheses" (the R0-vs-R1 borderline)
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: real-world experiment
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: semi-automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: not reported (263 agent-proposed samples over ~53 days in batches; BO-assisted agent introduced after the 289th sample)
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: hours
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: retryable at a cost
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: not claimed
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: Over a 352-sample autonomous campaign the success rate (ionic conductivity >0.05 mS/cm and >80% spinel purity) rose ~4x from 1.33% in the first 75 agent-proposed samples to 5.33% in the final 75, with 72% pairwise coverage of the 171 metal-pair combinations; best composition reached 0.144 mS/cm (Li1.45Mn0.45Sc0.55Cl4)
+
+# Failures and limitations: as reported in the paper
+limits: Characterization limited to XRD and EIS, so agents must infer mechanisms (e.g. cation ordering) from limited evidence and cannot validate them; even after 352 experiments the agents could not eliminate secondary Li3YCl6/Li3InCl6 phases while preserving high conductivity; automated XRD analysis shows occasional over/underfitting; authors call for multimodal characterization and calibrated agent uncertainty
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Base model: OpenAI GPT-5 with high reasoning effort via LiteLLM (Methods 4.5). Three agent workflows share the model but differ by prompt (Figure 2): abnormality-detection (abductive), pattern-finding (inductive), and a BO-assisted pattern-finding agent (GP-based BO proposes 40 candidates, LLM selects). R source: Figure 2 caption + Methods 4.5 (agents/prompts fixed; only compositions/temperatures change). Feedback source: Figure 2e + Methods 4.3-4.4 (physical synthesis, XRD via Dara, EIS fitting) = real-world experiment; human steps (EIS RMSE>1.0 flagging, 13 conductivity values updated, post-campaign manual XRD re-inspection, manually defined feasibility/safety pre-screening) are oversight/pre-checks, not the primary in-loop signal. Loop source: Section 2.1 "semi-automated characterization"; manual sealing/loading and 12 manual submissions. Accumulation source: Methods 4.5 growing JSON dataset with hierarchical clustering (<80 samples/cluster, +10 overlap). Rounds: no explicit cycle count; 77 initial human samples, 12 manual, 263 self-driving, BO after 289th. Cost source: Section 2.1 (21 h heating/cycle). Reversibility: Methods 4.1 (reagents, crucibles, furnace time). Evidence: in-task within one campaign. Claim: abstract uses autonomous/self-driving, not self-improvement. Open question: does the LLM-generated experiment-note memory count as R1 (memory) or accumulated external task data (R0)?
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Does this paper belong in the RSI list, and if so as what?** (affects: inclusion; see Whole paper; Figure 2 caption and Methods 4.5 for whether the system modifies itself)
+     - Option A: include as R0 borderline case. Evidence: Closed loop with an accumulating experimental archive (Methods 4.5: outcomes "added to the experimental dataset" and reused), but the agents (GPT-5 + fixed prompts) never change themselves, so there is no self-reference — the same situation as P003 (AI Scientist, R0) and P002 (ADAS, R0), both included.
+     - Option B: exclude. Evidence: The only thing that improves is task performance (material hit rate) driven by standard active-learning data accumulation; nothing in the agent (prompts, code, weights) is improved, so it is arguably not RSI at all.
+     - Option C: include. Evidence: If the reflective experiment-note memory (Methods 4.5) is read as the agent improving a reusable part of itself, the paper clears the self-reference bar and is a full (non-borderline) entry.
+     - **Recommendation: A.** The loop optimizes external compositions and accumulates a dataset but leaves the agents unchanged, which the repo treats as R0-borderline rather than exclusion (P002/P003 precedent). Choose exclude only if maintainers decide data-accumulation-only self-driving labs are out of scope; choose plain include if the experiment-note memory is judged genuine self-reference.
+     - Annotator's choice: A (include as R0 borderline case).
+
+  2. **Is the self-reference depth R0 (external artifacts only) or R1 (the reflective experiment-note memory is a reused part of the agent)?** (affects: self-reference depth; see Figure 2 caption; Methods 4.5 ("serves as a memory mechanism"))
+     - Option A: R0. Evidence: Figure 2 caption: workflows differ only by "different system prompts ... using the same underlying LLM (OpenAI GPT-5)"; agents output only compositions/temperatures (external artifacts); the memory logs experimental outcomes about the external world, matching "an optimizer iteratively optimizes ... molecules, and the optimizer itself does not change → R0."
+     - Option B: R1. Evidence: Methods 4.5: a post-experiment LLM summary "serves as a memory mechanism, allowing the agents to track prior hypotheses, evaluate their validity, and inform subsequent decision-making" — a growing experience/memory the agent calls later, which the rules map to R1.
+     - **Recommendation: A.** The accumulated notes record external experimental observations, not a skill/prompt/code the agent rewrites, so the primary loop is R0 molecule optimization. Choose R1 if maintainers count an LLM-maintained reflective memory of prior hypotheses as part of the system being improved.
+     - Annotator's choice: A (R0).
+
+  3. **What is the in-loop feedback signal: real-world experiment alone, or combined with human review / automated evaluation?** (affects: feedback source; see Figure 2e; Methods 4.3 (XRD/Dara) and 4.4 (EIS fitting, RMSE>1.0 flagging))
+     - Option A: real-world experiment. Evidence: Proposals are physically synthesized and characterized: Figure 2e feeds back "XRD phase information and ionic conductivity"; the loop runs through an actual glovebox wet-lab, which the rules classify as real-world experiment.
+     - Option B: real-world experiment; human review. Evidence: Methods 4.4: EIS fits with "RMSE >1.0 for human inspection" and "ionic conductivity values for 13 samples were updated"; post-campaign manual XRD re-inspection also occurs.
+     - Option C: real-world experiment; automated evaluation. Evidence: XRD phase ID (Dara) and EIS circuit fitting are automated analyses of the measurements (Methods 4.3-4.4), which could be read as an added automated-evaluation component.
+     - **Recommendation: A.** The decisive signal is physical synthesis and measurement, so real-world experiment is primary; the human XRD/EIS checks are post-hoc oversight and the automated XRD/EIS analysis is just the readout of the physical experiment, not a separate benchmark. Add human review only if maintainers count the RMSE-flag corrections as part of the kept/discarded decision.
+     - Annotator's choice: A (real-world experiment).
+
+  4. **Is the verification cost 'hours' or 'days to weeks' per trustworthy evaluation?** (affects: verification cost; see Section 2.1 (processing and heating times); Section 2.3 (53-day campaign))
+     - Option A: hours. Evidence: Section 2.1: dispensing ~19 min, mixing ~20 min, grinding ~37 min, and "The heating step is the primary rate-limiting step, requiring an average of 21 hours per heating cycle" — the reported bottleneck is <1 day, and up to 6 samples share a heating cycle.
+     - Option B: days to weeks. Evidence: Full per-sample synthesis plus semi-automated XRD and EIS characterization spans roughly a day or more end-to-end, and the 352-sample campaign took 53 days (Section 2.3).
+     - **Recommendation: A.** The only explicitly reported per-sample time is ~21 h heating plus short processing steps, which sits in the hours bucket and is amortized across batched samples; pick days-to-weeks if the confirmer counts the full characterization turnaround as pushing one evaluation past a day.
+     - Annotator's choice: A (hours).
+
+  5. **Is accumulation an 'open-ended population or archive' or 'multi-generation single lineage'?** (affects: accumulation; see Methods 4.5 (growing JSON dataset, hierarchical clustering))
+     - Option A: open-ended population or archive. Evidence: Methods 4.5: all explored samples accumulate into one growing dataset ("All prior experimental data are provided to the agents as a structured JSON string") that is clustered and queried — a growing archive of all 352 samples, like P003's idea archive.
+     - Option B: multi-generation single lineage. Evidence: Each design round builds on the single accumulating dataset/state and there is no competing population with selection, so it could be read as one evolving lineage of data.
+     - **Recommendation: A.** The campaign retains all samples in one growing, queried dataset rather than carrying forward a single evolving artifact, which matches 'open-ended population or archive'; choose single lineage if maintainers reserve 'archive' for cases with explicit candidate selection/competition.
+     - Annotator's choice: A (open-ended population or archive).
+
+  **Comparison with the existing list:** Most similar listed papers: P003 The AI Scientist (R0; tag 0; automated evaluation + self-eval) — like this paper, an LLM pipeline whose own prompts/scaffold are fixed while it optimizes external artifacts; consistent in assigning R0 and "not claimed." P002 ADAS (R0; open-ended archive) — also a fixed meta-agent optimizing external artifacts with an ever-growing archive, consistent with the accumulation/R0 reading here. The main difference is the feedback source: this paper's loop runs through a physical robotic wet-lab (real-world experiment), the strongest in-loop signal among the R0 papers, whereas P002/P003 use automated/self-evaluation on digital tasks; and its domain is Natural sciences (2) rather than AI R&D (0). The R0 / not-claimed / in-task judgments match how P002 and P003 were annotated.
+
+  **Signals useful for the survey:** Useful survey signals: (1) Claim-vs-evidence gap — framed as "autonomous"/"self-driving," not self-improving, and the only improvement shown is a modest in-task hit-rate rise (1.33%→5.33% over one campaign), with no self-modification of the agents. (2) A reported failure resembling proxy-metric tension: the abnormality agent hypothesized a secondary Li3YCl6/Li3InCl6 impurity phase (a known fast ionic conductor) was partly responsible for the high measured conductivity, and "even after 352 experiments, the agents were unable to completely eliminate these secondary phases while preserving high conductivity." (3) Measured shift from external (literature) to dataset-grounded reasoning over the campaign — external-referenced claims drop with batch number (Spearman rho = -0.7489), a concrete read on how in-context accumulation changes agent behavior. (4) The agents independently re-derived a known composition (Li1.8Mn1.1Cl4-type) later published elsewhere — a discovery cross-check, though still author-run and in-task.
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
