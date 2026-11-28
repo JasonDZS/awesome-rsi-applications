@@ -1,0 +1,116 @@
+# Annotation for the paper recommended in issue #46. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: LLM-AutoSciLab: Closed-Loop Scientific Discovery via Active Experimentation with LLMs
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2605.24043
+
+# First released, YYYY-MM
+date: 2026-05
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 2
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Chemistry and materials; Biology and medicine; Physics and earth sciences
+
+# Task: what the system does in the experiments
+task: Closed-loop recovery of hidden scientific mechanisms under a fixed oracle query budget: symbolic physics laws (NewtonBench), symbolic enzyme-kinetic rate laws (ActiveSciBench-Chem), and signed causal gene-regulatory graphs (ActiveSciBench-GRN)
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: Candidate scientific hypotheses / mechanisms: symbolic equations (physics laws, enzyme rate laws) and signed causal (gene-regulatory) graphs
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R0
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: R0: the optimizer itself does not change — only the external scientific hypothesis is refined. §3.2: "LLMs are used to define a hypothesis space for data acquisition via experimentation, rather than to produce a final answer." §3.5: "All models are used in inference mode without task-specific finetuning." The structured memory (§3.4, Appendix E.1) is per-task working state re-injected as prompt context, not a persistent self-modification
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation; simulation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: multi-generation single lineage
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: Per-task fixed oracle budget B; headline comparisons at NewtonBench B=20, Chem B=60, GRN B=20; budget studies up to B=100; 3 seeds
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: not claimed
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: With GPT-4o-mini, 67.6% symbolic accuracy on NewtonBench (best baseline 24.5%), 35.1% on ActiveSciBench-Chem (best baseline BED 31.6%), and 31.1% exact graph recovery on ActiveSciBench-GRN (best baseline GIES 6.7%); 2-5x more sample-efficient than the strongest baselines
+
+# Failures and limitations: as reported in the paper
+limits: Simulator-based oracles so physical-lab noise/failures/costs not modeled; performance depends on LLM hypothesis quality and parser/refinement-backend coverage; exact GRN topology recovery is fragile under observation noise; LLM biases may favor well-represented mechanisms over novel ones
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Sources: R0 = §3.2/§3.5 (LLM inference-only, defines hypothesis space not the answer). feedback = §3 intro (refit + empirical loss + stability filtering = automated evaluation) and §3.5/Appendix B (noiseless simulator oracle = simulation); the final symbolic-accuracy LLM judge (Appendix C) is only the final metric, not an in-loop signal, so it is not counted. loop = fully automatic (Algorithm 1, Impact Statement). accumulation = §3.1/§3.4 (growing dataset + structured memory per task). rounds/budget = Appendix E.3. cost = not reported (query budgets only, no time). evidence = in-task (Table 3, authors' own, spans 3 domains but no cross-task self-improvement transfer). Backbones: GPT-4o-mini primary + Qwen2.5-7B ensemble; Appendix A.2 adds Qwen3-4B/14B/32B (§3.5). Open questions: whether the structured re-injected memory lifts this to R1, whether the simulator makes feedback 'simulation', and whether a simulated physical oracle warrants domain tag 3 in addition to 2.
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Does this closed-loop scientific-discovery optimizer belong in an RSI list, and if so at what level?** (affects: inclusion; see §3 method; §3.5 (LLM inference-only); Limitations)
+     - Option A: include as R0 borderline case. Evidence: Meets closed loop + accumulation (Abstract; §3.1 growing dataset; §3.4 memory fed back) but not self-reference; identical pattern to ADAS (P002) and The AI Scientist (P003), both listed at R0 with 'closed loop; accumulation'
+     - Option B: exclude. Evidence: The system never modifies itself — the LLM runs in inference mode (§3.5 'without task-specific finetuning') and the scaffold/optimizer is fixed; it is an active-learning / symbolic-regression loop over external scientific artifacts, with no self-improvement claim
+     - **Recommendation: A.** By the repo's own taxonomy ('an optimizer iteratively optimizes ... molecules, and the optimizer itself does not change → R0', and R0 closed-loop work is a borderline inclusion), this is includable at R0 and mirrors P002/P003. Exclude only if the maintainers decide a pure experimental-design/active-learning discovery loop with zero self-referential flavor is out of scope.
+     - Annotator's choice: A (include as R0 borderline case).
+
+  2. **Is the self-reference depth R0 (external hypothesis only) or R1 (the re-injected structured memory counts as a memory/experience library)?** (affects: self-reference depth; see §3.4 and Appendix E.1 'Memory and Final Selection')
+     - Option A: R0. Evidence: The improved object is an external scientific law/graph; the memory (Appendix E.1) is a per-task evidence summary re-injected as prompt context and re-initialised each run (Algorithm 1 line 1 InitMemory), not a persistent capability the agent carries across tasks
+     - Option B: R1. Evidence: §3.4: refined mechanisms are 'written back into memory through UpdateMemory(·), informing subsequent hypothesis generation and acquisition decisions'; Appendix E.1 describes a structured memory with a hypothesis scoreboard and negative evidence that the agent calls later
+     - Option C: R0 or R1 (unclear). Evidence: Both readings are defensible depending on whether per-task working memory counts as a self-referential library
+     - **Recommendation: A.** The memory is task-local working state in service of recovering an external artifact, and the rules put optimizers that improve external artifacts with a fixed optimizer at R0. Choose R1 only if the maintainers treat the re-injected structured memory as the thing being improved.
+     - Annotator's choice: A (R0).
+
+  3. **What is the in-loop feedback source that decides which hypothesis is kept/refined?** (affects: feedback source; see §3 intro (refit + loss + stability filtering); §3.5 and Appendix B (simulator oracle))
+     - Option A: automated evaluation; simulation. Evidence: Hypotheses are kept/pruned by refitting and empirical loss + bootstrap stability (automated evaluation), computed on observations from a noiseless simulator oracle (simulation)
+     - Option B: automated evaluation. Evidence: The decisive signal is loss-based refit and stability filtering; the simulator is just the data-generating environment, like benchmark tests in P006
+     - Option C: simulation. Evidence: All data comes from a simulated chemistry/biology/physics oracle (Appendix B 'simulator-based oracle benchmark'); no real experiments
+     - **Recommendation: A.** Both labels apply: the selection rule is automated (loss/stability) and the data source is explicitly a simulator the paper flags as a limitation. Drop 'simulation' if the maintainers reserve it for the signal mechanism rather than the data source (then option B).
+     - Annotator's choice: A (automated evaluation; simulation).
+
+  4. **Should the domain be tagged 2 (Natural sciences) only, or also 3 (simulation of the physical world)?** (affects: domain tags; see Abstract; Appendix B (simulator oracles))
+     - Option A: 2. Evidence: Content is natural-science discovery (physics laws, enzyme kinetics, gene regulation); the simulators are scientific oracles, not embodied/physical-world loops
+     - Option B: 2;3. Evidence: The loop runs entirely through simulators of physical/chemical/biological systems, and tag 3 covers 'the loop runs through ... a simulation of it'
+     - **Recommendation: A.** Tag 3 in this list is used for embodied/physical-world (robots, game environments) loops; a scientific-oracle simulator for law discovery reads as natural sciences (tag 2). Add 3 only if the maintainers count any physical-system simulator as embodied.
+     - Annotator's choice: A (2).
+
+  5. **Is accumulation 'multi-generation single lineage' or 'open-ended population or archive'?** (affects: accumulation; see §3.1-§3.4; Appendix E.1 adaptive ensemble)
+     - Option A: multi-generation single lineage. Evidence: Per task the run refines an evolving hypothesis set and growing dataset over B rounds, converging to one best mechanism m̃B; the hypothesis set is regenerated each round, not kept as an ever-growing archive
+     - Option B: open-ended population or archive. Evidence: Each round maintains and prunes an ensemble of candidate mechanisms (Appendix E.1 'Adaptive Ensemble', clustering, scoreboard of validated/failed/uncertain structures)
+     - **Recommendation: A.** The target per task is a single converged mechanism, so single-lineage fits best; the ensemble is a per-round candidate pool rather than a persistent open-ended archive. Choose the archive option if the maintainers weight the maintained hypothesis scoreboard more heavily.
+     - Annotator's choice: A (multi-generation single lineage).
+
+  **Comparison with the existing list:** Most similar listed papers: P002 ADAS (R0; automated evaluation; closed loop; accumulation) and P003 The AI Scientist (R0; automated evaluation; self-evaluation; closed loop; accumulation). All three are R0 because a fixed LLM/meta-component iteratively produces and refines external artifacts without modifying itself; my R0 + 'closed loop; accumulation' is consistent with how both were annotated. Differences: this paper has no self-referential flavor at all (it discovers scientific laws, not agents or AI research), and its in-loop signal is automated/simulation fitting rather than LLM self-judging (unlike P003's self-evaluation, whose LLM judge here is only the final metric). It is also a per-task optimizer with no cross-task learning, so 'in-task' evidence is weaker than P002's cross-task result.
+
+  **Signals useful for the survey:** Useful boundary/negative case for the survey: a system explicitly framed as "closed-loop scientific discovery" that makes no self-improvement or RSI claim and never modifies itself (LLM fixed in inference mode, §3.5) — a clean example separating closed-loop discovery optimizers from genuine self-improvement. Reported failures worth citing: exact GRN topology recovery is fragile under observation noise (Appendix A.1); performance is bounded by LLM hypothesis quality and refinement-backend coverage (Limitations); simulator-only, with physical-lab noise/failures/costs unmodeled; and a stated risk that LLM priors favor well-represented mechanisms over genuinely novel ones (Impact Statement).
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
