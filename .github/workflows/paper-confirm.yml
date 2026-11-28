@@ -68,6 +68,8 @@ jobs:
           python3 scripts/build_readme.py
           python3 scripts/check_data.py
 
+          # a pull request opened by the intake workflow has a bot author: credit whoever opened the issue
+          case "$author" in app/*|*"[bot]") author=$(gh api "repos/$REPO/issues/$ISSUE" --jq .user.login) ;; esac
           author_id=$(gh api "users/$author" --jq .id)
           {
             echo "Add $id from #$ISSUE, confirmed by @$BY"
