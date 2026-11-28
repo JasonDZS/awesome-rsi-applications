@@ -118,31 +118,6 @@ def parse_pending(text):
     return out
 
 
-def dump_pending(row):
-    """Write a row in the format parse_pending reads. Only known keys are written."""
-    lines = []
-    for key in PENDING_KEYS[:-1]:
-        lines.append(f"{key}: {' '.join((row.get(key) or '').split())}")
-    points = (row.get("review_points") or "").strip()
-    if points:
-        lines += ["review_points: |"] + [f"  {ln}".rstrip() for ln in points.splitlines()]
-    else:
-        lines.append("review_points:")
-    return "\n".join(lines) + "\n"
-
-
-def arxiv_id(url):
-    """The arXiv identifier in a link (without version), or '' if it is not an arXiv link."""
-    m = re.search(r"arxiv\.org/(?:abs|pdf|html)/(\d{4}\.\d{4,5})", url or "")
-    return m.group(1) if m else ""
-
-
-def canonical_url(url):
-    """arXiv links are stored as the abstract page without a version; other links are kept as given."""
-    url = (url or "").strip()
-    return f"https://arxiv.org/abs/{arxiv_id(url)}" if arxiv_id(url) else url
-
-
 def split_multi(value):
     return [x for x in SPLIT.split(value or "") if x]
 

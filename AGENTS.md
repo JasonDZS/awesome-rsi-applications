@@ -23,8 +23,6 @@ This is a list of papers that apply RSI (recursive self-improvement). The data i
 - `scripts/build_readme.py`: generates the README from the data.
 - `data/pending/issue-<number>.yml`: annotation file for a paper awaiting confirmation; exists only on its branch.
 - `scripts/new_paper.py`: creates the annotation file for an issue.
-- `scripts/intake.py`: turns the annotation carried in an issue body into the annotation file; run by the `paper-intake` workflow, which then creates the branch and the pull request.
-- `tools/annotate-page/`: source of the annotation page (a claude.ai artifact) that drafts an annotation from a PDF and produces such an issue; `build.py` embeds the current rules and data.
 - `scripts/render_review.py`: renders an annotation file as the review shown on the issue page.
 - `scripts/confirm.py`: records a confirmation; run only by the `/confirm` workflow.
 - `scripts/paperlib.py`: columns, allowed values and validation rules.

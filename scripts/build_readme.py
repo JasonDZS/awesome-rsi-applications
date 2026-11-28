@@ -165,8 +165,6 @@ The data file is `|`-separated, one paper per row, 28 columns. Besides the colum
 
 **LaTeX tables and figures** for the survey are generated from the data by [`figure/build_figures.py`](figure/README.md).
 
-**Issues that carry the annotation.** If the issue already contains a complete annotation in its Annotation field, the `paper-intake` workflow creates the branch and the pull request for you; see [CONTRIBUTING.md](CONTRIBUTING.md).
-
 To correct an existing annotation, open an issue and cite the evidence (the section or sentence in the paper).
 
 ## Related resources

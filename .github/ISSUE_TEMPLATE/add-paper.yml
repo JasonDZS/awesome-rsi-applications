@@ -40,9 +40,3 @@ body:
         - label: "2 Natural sciences"
         - label: "3 Physical and embodied systems"
         - label: "4 Social sciences"
-  - type: textarea
-    id: annotation
-    attributes:
-      label: Annotation
-      description: "Optional. Leave empty unless you already have a complete annotation (for example from the annotation page): paste it here and the workflow creates the branch and the pull request for you."
-      render: yaml
