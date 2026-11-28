@@ -1,0 +1,93 @@
+# Annotation for the paper recommended in issue #19. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: Huxley-Gödel Machine: Human-Level Coding Agent Development by an Approximation of the Optimal Self-Improving Machine
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2510.21614
+
+# First released, YYYY-MM
+date: 2025-10
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;1
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Software engineering
+
+# Task: what the system does in the experiments
+task: Self-improving coding agent development: search on SWE-bench Verified (60-task subset SWE-Verified-60, and the full 500 tasks) and on Polyglot; the best SWE-Verified agent is then tested on SWE-bench Lite (300 tasks, and a filtered set without the 93 tasks that overlap with SWE-Verified), with GPT-5-mini and with GPT-5 as backbone
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The coding agent's own code repository (starting from the DGM initial agent, a single LLM loop with bash and file-editing tools): its tools and its attempt and test workflow in coding_agent.py. The selected agent produces its own child, so the modified code also carries out later self-modifications; the HGM tree-search policy (CMP estimate, Thompson sampling, expansion rule, final selection) stays fixed
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R2
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 2: "agents modify themselves to generate new agents, each empirically validated on downstream tasks" and "Action m_a instructs the agent a to produce a self-modification that is added as a child of a to the tree"; the policy pi (expansion, evaluation and selection sub-policies, Section 3.3 and Algorithm 1) is fixed and is not modified by the agents. The only reported change is in Appendix F (Listing 1): an automated error-resolution step added to the agent's attempt and test loop, which the authors interpret as "self-motivated repetitive self-modification" that "automatically creates arbitrary levels of meta-improvement"; this is a change to the agent's task workflow, shown in one example, and is the argument for R4. Sections 3.2 and 3.3 say CMP is meant to credit "improvement of self-improvement itself", but CMP only chooses which agent to expand and does not change how improvements are made
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: 800 benchmark task evaluations per method on SWE-Verified-60 and on Polyglot (Section 4.2); 8000 evaluations on the full SWE-bench Verified (Section 4.3.1); one evaluation is one agent on one task; the number of expansions (agents created) is not reported; the initial agent is first expanded 5 times per process (Appendix B)
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: self-improvement
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: With the same initial agent and 800 evaluations, the best-belief agent reaches 56.7% on SWE-Verified-60 from 40% (DGM 53.3%, SICA 50.0%) in 517 allocated CPU-hours (DGM 1231) and 30.5% on Polyglot from 20.3% (DGM 27.1%, SICA 25.4%) in 347 CPU-hours (DGM 2385, SICA 572) (Table 2); on the full SWE-bench Verified it goes from 53.2% to 61.4% after 8000 evaluations (Section 4.3.1); the best agent scores 40.1% on filtered SWE-bench Lite and 49.0% on the standard set, against 34.8% and 44.0% for its initial ancestor and 39.6% and 47.6% for SWE-agent with GPT-5-mini (Table 3), and 47.8% and 57.0% with GPT-5 against 48.3% and 56.7% for SWE-agent, the top checked entry on the leaderboard (Table 4)
+
+# Failures and limitations: as reported in the paper
+limits: The optimality result (Theorem 1) holds only under Assumption 1: only the final agent counts, evaluations are repeatable, proofs cost no budget and each self-modification costs one unit (Sections 3.1 and A); asynchronous execution biases evaluation toward agents with few evaluations, because easy tasks finish first: "many agents were successful on the first ten evaluated tasks; however, this accuracy drops quickly as the number of evaluations grows" (Appendix B); higher leaderboard scores "do not necessarily indicate superior general coding ability" since agents "may overfit to the benchmark" (Section 4.3.1); self-modifying agents produce nested diff patch files that the authors "find it mind-bending to understand" (Appendix F); a stronger initial agent (53.2%) leaves less room for improvement (Section 4.3.1)
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Feedback details: utility is "the average of binary success indicators across all downstream tasks" (Section 2); each evaluation runs one agent on one benchmark task; the expansion policy samples a parent by Thompson sampling on the clade's pooled successes and failures (CMP estimate, Section 3.3), the evaluation policy by Thompson sampling on the agent's own counts, and a new agent is created when N^alpha is at least the tree size (UCB-Air, alpha 0.6); the final agent is the best-belief agent by the epsilon percentile of its Beta posterior (epsilon 1). DGM and SICA are rerun as baselines with the same initial agent and budget, selected by empirical mean (Section 4.2). Models: GPT-5 for self-modification and GPT-5-mini for evaluation on SWE-Verified; a quantized Qwen3-Coder-480B-A35B for self-modification and Qwen3-Coder-30B-A3B for evaluation on Polyglot (Section 4.2, Appendix C.2), so the scored model is not the one that does the self-modification. Following DGM, Polyglot agents have no access to private tests (Section 4). Loop: people write the initial agent (adopted from DGM with API, timeout and interaction-length changes, Appendix C.1; for Section 4.3 the file-editing tool is removed), set the hyperparameters and the budget; no human step during the run is reported; the authors inspected diffs only afterwards (Appendix F). Accumulation: a tree of all self-modified agents, none removed (Section 2). Evidence: Table 2 reports scores on the same tasks that drive the search; SWE-bench Lite filtered removes the 93 tasks shared with SWE-Verified but is drawn from the same SWE-bench test pool, so under the rules it is a held-out set of the same benchmark (in-task), although the paper presents it as "completely unseen" tasks and the abstract as "strong transfer to other coding datasets and LLMs"; backbone transfer from GPT-5-mini to GPT-5 is on the same Lite tasks (Table 4); all scores, including the standard SWE-Lite numbers compared with the leaderboard, are the authors' own runs, and SWE-agent with GPT-5-mini is the authors' local rerun (Section 4.3.2); each method is run once, with no variance reported. Cost: the per-run time limit is one hour per agent execution, five hours in Section 4.3 (Appendix C.1); Table 2 gives total allocated CPU-hours for 800 evaluations; the time for one trustworthy evaluation of one agent is not reported; all experiments cost about USD 5000 (Appendix C.2). Text and table disagree on the Polyglot unweighted correlation (0.873 in Table 1, 0.8783 in Section 4.1). The Appendix F listing of a discovered self-modification only logs intended fixes ("Would attempt to fix syntax error ...", "This is just a demonstration of what could be done") while its new tests pass; the paper does not comment on this. SICA's run on SWE-Verified-60 stopped after about 360 evaluations because of "query length out-of-LLM-context-window" errors (Section 4.2, Figure 1). Venue: the arXiv v3 PDF (29 Oct 2025) shows no venue. Old list: this paper was P008 in data/local/unconfirmed-papers.tsv with an abstract-only annotation. Reading: main text and Appendices A-F read; the middle of the proof in Appendix A was only skimmed
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Do the reported self-modifications change how the system improves (R4), or only how the agent does tasks (R2)?** (affects: self-reference depth; see Sections 2 and 3.3, Algorithm 1, Appendix F)
+     - Option A: R2. Evidence: the HGM policy (CMP estimate, Thompson sampling, UCB-Air expansion rule, best-belief final selection) is fixed in all experiments. The only change shown, Listing 1 in Appendix F, adds an error-resolution step to the agent's attempt and test loop, which the same code uses both to solve tasks and to self-modify. This matches the borderline rule "the agent that makes the improvement is the same code as the agent being improved, but the reported changes are task tools or workflow → R2", and is how DGM (P006) and SICA (P005) were annotated.
+     - Option B: `R4 (shown only qualitatively, Appendix F)`. Evidence: Appendix F calls the change "self-motivated repetitive self-modification" that "automatically creates arbitrary levels of meta-improvement", and Sections 3.2-3.3 say CMP credits "improvement of self-improvement itself".
+     - **Recommendation: A.** The meta-improvement reading is the authors' interpretation of one example, and nothing in the experiments modifies the expansion, evaluation or selection policy; CMP only chooses which agent to expand. Choose B only if you count a change to the workflow the agent also uses when modifying itself as a change to the improvement process.
+  2. **Is the SWE-bench Lite result in-task or cross-task?** (affects: evidence strength; see Section 4.3.2, Tables 3 and 4)
+     - Option A: in-task. Evidence: SWE-bench Lite and SWE-bench Verified are both drawn from the SWE-bench test pool over the same repositories; the filtered set (93 overlapping tasks removed) is a held-out set of the same benchmark, which the rules count as in-task. Table 2 scores the same tasks that drive the search.
+     - Option B: cross-task. Evidence: Lite is a separately published benchmark, the filtered setting has no task used in the search, and the agent is also moved from GPT-5-mini to GPT-5 (Table 4); the abstract calls this "strong transfer to other coding datasets and LLMs".
+     - **Recommendation: A, weakly.** DGM (P006) got cross-task because its agents were tested on an entirely different benchmark (SWE-bench to Polyglot); HGM only moves between splits of SWE-bench, and its Polyglot run is a separate search, not a transfer. Choose B if you treat SWE-bench Lite as a different benchmark. In either case it is not independently verified: all scores, including the ones compared with the leaderboard, are the authors' own runs.
+  3. **Is the verification cost "not reported" or "hours"?** (affects: verification cost; see Appendix C.1 and Table 2)
+     - Option A: not reported. Evidence: the paper gives only a time limit (one hour per agent execution, five hours in Section 4.3) and total CPU-hours for 800 evaluations (517 on SWE-Verified-60), not the time for one trustworthy evaluation of an agent.
+     - Option B: hours. Evidence: 517 CPU-hours over 800 single-task evaluations is about 0.65 CPU-hours each, and an agent needs many tasks for a reliable score.
+     - **Recommendation: A.** B needs a calculation the rules forbid ("do not infer"), and SICA (P005) and DGM (P006), which also report per-task time or money, were annotated not reported.
+  4. **Should the paper be included?** (affects: inclusion)
+     - **Recommendation: include.** It meets all three criteria (closed loop over benchmark evaluations, the agent edits its own code, a growing tree of agents that are expanded further) and is a direct follow-up to DGM (P006) and SICA (P005), both rerun as baselines.
