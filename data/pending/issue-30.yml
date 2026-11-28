@@ -1,0 +1,120 @@
+# Annotation for the paper recommended in issue #30. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: Recursive self-improvement of AI research agents
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2609.26457
+
+# First released, YYYY-MM
+date: 2026-09
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;1
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Cross-subfield
+
+# Task: what the system does in the experiments
+task: Recursive self-improvement at the harness layer: an AI research agent rewrites its own code and is graded as a code optimizer on a selection set of ML-engineering, heuristic-algorithm-engineering and harness-engineering tasks; discovered agents are then tested on held-out ALE-Bench, MLE-Bench, FML-Bench and WeatherBench 2
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The AI research agent's own harness code: its search/selection policy (bandit over drafting strategies with forking), context-management and failure-memory mechanisms, and robustness safeguards; each accepted rewrite becomes the incumbent edited next
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R2
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 2.1: "inner-loop selection is part of the agent's editable policy and is repeatedly rewritten during the run, whereas outer-loop selection is fixed by [eq. 4]"; "Each accepted rewrite becomes the agent that the next step edits and evaluates." The improvement process (outer-loop agent, grading, selection) is fixed. Section 3.6 ignition test places a discovered agent (AIDE47) in the outer loop but finds the results "inconclusive" (argument for R4 not conclusively achieved)
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: multi-generation single lineage
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: Main run: 100-node trajectory (99 rewrite proposals), 7 accepted rewrites over 8 days (steps 2, 6, 28, 39, 47, 63, 85); two further runs accepted 2 and 4 rewrites; ignition test: 2 arms x 3 seeds x 50 steps
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: RSI
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: cross-task
+
+# Main result: one sentence with numbers
+result: In an 8-day run the incumbent private grade rose from 0.703 to 0.778 (AIDEhuman 0.749) over 7 accepted rewrites; AIDE85 matches or exceeds AIDEhuman (a 2-year human-engineered production agent) on four held-out benchmarks (ALE-Bench 1790 vs 1511, MLE-Bench 0.722 vs 0.708, FML-Bench 19.9% vs 19.6%, WeatherBench 2 0.793 vs 0.404), and reward hacking fell from 55% (AIDE0) to 32% (AIDE85) vs 39% for AIDEhuman
+
+# Failures and limitations: as reported in the paper
+limits: Noise compounds across both loops so a single noisy comparison can derail the outer loop; the ignition test is inconclusive (only 3 seeds, cannot establish a discovered agent is a better self-improver); discovered agents are complex and hard to interpret, with unclear or possibly unused components and deployment friction; gains are non-monotone across checkpoints; cost and compute are limiting factors; ensembling proposals were never retained and ~a quarter of rejected rewrites scored higher on the public signal but failed the private grade
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Models: outer-loop agent Claude Opus 4.7, inner-loop agents Gemini 3 Flash (Section 2.2); held-out evals also use Gemini 3.1 Pro, GPT-5.4, and (Appendix C) GPT-5.6-sol and Fable 5. Baseline AIDEhuman is a production agent "developed over two years of human-driven R&D" (Abstract, Appendix B). Feedback: the decisive signal is the private held-out grade g(a) (automated evaluation), decoupled from the inner loop's public signal (Section 2.1). Accumulation: single evolving incumbent lineage, though Figure 1 calls it "a tree of agents" and rejected proposals are nodes (Appendix D). Cost: 8 days for the whole run; per-task caps in Table 2; one-agent grade time not stated. Evidence: all scores are the authors' own runs (FML-Bench baselines for other agents provided by its authors, Appendix B), so not independently verified. REPOSITORY NOTE: data/pending/issue-19.yml on this branch is an annotation for a DIFFERENT paper (Huxley-Godel Machine, arXiv:2510.21614); AIDE2 needs its own issue and branch, not issue-19.
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Do the reported self-modifications change how the system improves (R4), or only the inner-loop agent's own search/harness code (R2)?** (affects: self-reference depth; see Sections 2.1, 3.5, 3.6; eq. 4; Algorithm 1)
+     - Option A: R2. Evidence: Section 2.1: "outer-loop selection is fixed by" eq. 4 and the outer-loop agent (AIDEhuman), grading and selection rule do not change; the only reported changes (Section 3.5) are the inner agent's search policy, context management and robustness code. Matches the rule "an outer loop changes the inner loop's search code and does not change itself -> R2" and how DGM (P006) and SICA (P005) were annotated.
+     - Option B: R4 (ignition test only, inconclusive). Evidence: Both loops use "the same tree-search design" (Section 2) and Section 3.6's ignition test places a discovered agent (AIDE47) in the outer loop to drive RSI, framing the improved agent as a better improver; the abstract calls the whole thing recursive self-improvement.
+     - **Recommendation: A.** The main RSI run holds the outer-loop improver and selection fixed; a discovered agent is only tested as an improver in the ignition test, which the authors call "inconclusive". Choose R4 only if you count the inconclusive ignition test as actually achieving improvement of the improvement process.
+     - Annotator's choice: A (R2).
+
+  2. **Is accumulation a multi-generation single lineage (hill-climbing on one incumbent) or an open-ended population/archive?** (affects: accumulation; see Section 2.1 (eqs. 3-4); Figure 1; Appendix D)
+     - Option A: multi-generation single lineage. Evidence: Section 2.1: "the outer-loop agent edits the current incumbent, so each accepted rewrite becomes the codebase that is edited at the next step" and "the incumbent is the best agent graded so far" (eq. 4); rejected proposals are not retained as parents.
+     - Option B: open-ended population or archive. Evidence: Figure 1 shows "a tree of agents, where every node is a complete research agent"; eq. 3 has the outer-loop agent read all previously proposed agents a_<k, and Appendix D pools rejected proposals across runs.
+     - **Recommendation: A.** Editing always proceeds from the single best-so-far incumbent, unlike DGM (P006) which samples parents from a whole archive. Choose the archive option if you treat the full tree of proposed (including rejected) agents as the maintained population.
+     - Annotator's choice: A (multi-generation single lineage).
+
+  3. **Should the paper carry a Natural-sciences tag (2) for the WeatherBench 2 weather-forecasting experiment, or just AI-R&D + Engineering (0;1)?** (affects: domain tags; see Section 3.3; Appendix A; Figure 3d)
+     - Option A: 0;1. Evidence: The system improves an AI research agent (0) that optimizes code on ML-engineering, algorithm-engineering and harness-engineering tasks (1); WeatherBench 2 is used only as an out-of-distribution generalization probe of that engineering capability. Matches DGM (P006) at 0;1.
+     - Option B: 0;1;2. Evidence: WeatherBench 2 is a headline experimental result (Figure 3d) in a physics/earth-sciences domain the agent optimizes ("physics-based weather-forecasting model", "scientific-computing domain"), and the rules tag by the domain of the experimental tasks.
+     - **Recommendation: A.** The natural-sciences content is a single OOD probe demonstrating engineering generalization, not a scientific contribution; but the rule to tag by experimental task domain makes 0;1;2 defensible if WeatherBench is treated as a first-class task.
+     - Annotator's choice: A (0;1).
+
+  4. **Is the evidence strength cross-task (and is it independently verified)?** (affects: evidence strength; see Sections 3.3-3.4; Appendix B)
+     - Option A: cross-task. Evidence: Section 3.3: four held-out benchmarks that "never affected candidate selection", including OOD WeatherBench 2; Section 3.4: reduced reward hacking on KernelBench, a non-selection task family. All evaluations are the authors' own runs (Appendix B), so not independently verified.
+     - Option B: in-task. Evidence: If one treats only the selection-benchmark trend (Section 3.2, grade 0.703->0.778) as the headline result, that is measured on the selection tasks.
+     - **Recommendation: A.** The paper's central claim is second-order generalization to external benchmarks and an OOD domain, clearly cross-task; it is not independently verified because the authors ran all evaluations. This matches DGM (P006, cross-task).
+     - Annotator's choice: A (cross-task).
+
+  5. **Should verification cost be 'not reported' or inferred from reported run times?** (affects: verification cost; see Section 3.2; Table 2; Appendix C)
+     - Option A: not reported. Evidence: The paper gives the whole-run duration (8 days) and per-task-run caps (12-36h), but never the time to obtain one trustworthy grade of a single agent.
+     - Option B: days to weeks. Evidence: The full RSI run took 8 days of wall-clock time to grade ~100 candidates, and single task runs are capped at 12-36 hours.
+     - **Recommendation: A.** Deriving a per-evaluation cost requires inference the rules forbid; SICA (P005) and DGM (P006), which likewise report only total/ per-task figures, were annotated 'not reported'.
+     - Annotator's choice: A (not reported).
+
+  6. **Should the paper be included in the list?** (affects: inclusion; see Abstract; Sections 1-2)
+     - Option A: include. Evidence: Meets all three criteria: closed loop (propose rewrite, grade on held-out data, keep if better), self-reference (the agent's own harness code is the object of optimization), accumulation (incumbent lineage of accepted rewrites); a direct follow-up to DGM (P006) and SICA (P005).
+     - Option B: exclude. Evidence: No strong case; nothing suggests it falls outside scope.
+     - **Recommendation: A.** It is a canonical RSI-applications paper and strengthens the agent-self-improvement cluster; separately, note that it must get its own issue/branch because issue-19 is already used for the Huxley-Godel Machine.
+     - Annotator's choice: A (include).
+
+  **Comparison with the existing list:** Most similar: P006 Darwin Godel Machine (R2, automated evaluation, cross-task) and P005 SICA (R2, automated evaluation, in-task); also the pending Huxley-Godel Machine (#19, R2). AIDE2 is consistent with these on R2, automated evaluation and claim-of-self-improvement, and like DGM reaches cross-task evidence. It differs in two ways worth noting: (1) accumulation is a single evolving incumbent lineage rather than DGM's sampled archive, and (2) it is an explicit bi-level design whose outer-loop improver (AIDEhuman) is a separate fixed agent, and it explicitly claims "recursive self-improvement" (RSI) where DGM/SICA say "self-improvement". Its cross-task evidence is arguably the strongest in the cluster (four external benchmarks incl. an OOD physics task) but, like the others, is the authors' own runs (not independently verified).
+
+  **Signals useful for the survey:** Useful for the survey: (1) claim-vs-evidence gap on the "recursive" part — the ignition test of whether a discovered agent is a better self-improver is explicitly "inconclusive" (only 3 seeds), so improvement of the improvement process is not demonstrated; (2) an emergent, un-optimized property — reward hacking fell 55%->32% though the loop never optimized for it (Section 3.4); (3) a public/private signal gap — ~a quarter of rejected rewrites scored higher on the agent-visible public signal but were rejected on the private held-out grade (Appendix D); (4) reported failure mode — noise compounding across both loops can let a falsely accepted rewrite derail the outer loop (Section 5); (5) the paper repaired rather than exploited a broken evaluation script (Section 3.5). Repository signal: data/pending/issue-19.yml currently holds a different paper (Huxley-Godel Machine), so AIDE2 needs its own issue/branch.
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
