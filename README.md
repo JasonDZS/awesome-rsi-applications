@@ -4,11 +4,11 @@ A list of papers that apply recursive self-improvement (RSI), maintained alongsi
 
 Most existing RSI surveys and lists are organized by mechanism: whether the model or the scaffold is changed, and how closed the loop is. This list is organized by **application domain** and asks one question: **how far has RSI progressed in each application domain?**
 
-It currently holds 18 paper(s). Every paper is annotated with the same set of fields, so papers can be compared side by side.
+It currently holds 19 paper(s). Every paper is annotated with the same set of fields, so papers can be compared side by side.
 
-> **Human confirmation: 18 / 18.** A paper is only formally included once a human developer has checked its annotation against the paper. The "Confirmed" column names the confirmer; entries marked "pending" are preliminary annotations drafted by an AI assistant and should not be cited as they are.
+> **Human confirmation: 19 / 19.** A paper is only formally included once a human developer has checked its annotation against the paper. The "Confirmed" column names the confirmer; entries marked "pending" are preliminary annotations drafted by an AI assistant and should not be cited as they are.
 >
-> **Status: in progress.** 18 paper(s) were read in full or in part, 0 only as far as the abstract or an excerpt, and 0 could not be accessed; the "Reading" column gives the details. "unclear" means there was not enough information to decide. Check the original paper before citing.
+> **Status: in progress.** 19 paper(s) were read in full or in part, 0 only as far as the abstract or an excerpt, and 0 could not be accessed; the "Reading" column gives the details. "unclear" means there was not enough information to decide. Check the original paper before citing.
 
 ## Contents
 
@@ -26,7 +26,7 @@ Papers in each domain by self-reference depth (R0–R4). A paper can carry sever
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 0. AI R&D itself | 3 | 1 | 7 | 3 | 3 | 0 | 17 |
 | 1. Engineering | 2 | 0 | 7 | 1 | 2 | 0 | 12 |
-| 2. Natural sciences | 2 | 1 | 2 | 1 | 2 | 0 | 8 |
+| 2. Natural sciences | 3 | 1 | 2 | 1 | 2 | 0 | 9 |
 | 3. Physical and embodied systems | 0 | 0 | 1 | 0 | 0 | 0 | 1 |
 | 4. Social sciences | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
@@ -111,7 +111,7 @@ Software engineering, algorithm discovery, chip design and systems optimization.
 | P017 | [Organon: From Evolutionary Search to Recursive Self-Improving Agents for Scientific Discovery](https://arxiv.org/abs/2610.33046) (also 0, 2) | 2026-10 | Agent self-improvement; Algorithm discovery; Chip design and systems optimization; Mathematics | The agent's own composition Cr: evolutionary search loop, parent selection, variation/recombination operators, survival policy, diagnostic tools, memory, worker coordination, execution loop, and the diagnostic/assessment procedures guiding its future revisions | R4 (limited to the diagnostic and assessment instruments and revision cadence that guide revisions; the core revision-reasoning model and the official evaluator are fixed) | automated evaluation | fully automatic | in-task | RSI | full text | ✅ @JasonDZS |
 | P013 | [Evaluation-Free Recursive Self-Improvement for Coding Agents](https://arxiv.org/abs/2611.21056) (also 0) | 2026-11 | Agent self-improvement; Software engineering | The agent's own scaffold source-code repository: tools, prompts, utilities and control logic | R2 | formal verification; self-evaluation | fully automatic | cross-task | RSI | full text | ✅ @JasonDZS |
 
-### 2. Natural sciences (8)
+### 2. Natural sciences (9)
 
 Mathematics, chemistry and materials, biology and medicine, physics and earth sciences.
 
@@ -123,6 +123,7 @@ Mathematics, chemistry and materials, biology and medicine, physics and earth sc
 | P005 | [A Self-Improving Coding Agent](https://arxiv.org/abs/2504.15228) (also 0, 1) | 2025-04 | Agent self-improvement; Software engineering; Mathematics | The agent's own Python codebase: tools, sub-agents, prompts and orchestration logic. The best agent so far is also the meta-agent that makes the next change, so the edited code takes part in later improvement steps | R2 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
 | P014 | [AlphaEvolve: A coding agent for scientific and algorithmic discovery](https://arxiv.org/abs/2506.13131) (also 0, 1) | 2025-06 | Automated ML research; Algorithm discovery; Mathematics; Chip design and systems optimization | External artifacts: the user-specified target program for each task (tensor-decomposition algorithms, math constructions, scheduling/kernel heuristics, Verilog, compiler IR); optionally co-evolved meta-prompts. The AlphaEvolve pipeline (prompt sampler, LLM ensemble, evaluators, database) itself is fixed | R0 | automated evaluation; simulation | fully automatic | in-task | not claimed | full text | ✅ @JasonDZS |
 | P018 | [STELLA: Self-Evolving LLM Agent for Biomedical Research](https://arxiv.org/abs/2507.02004) (also 0) | 2025-07 | Agent self-improvement; Biology and medicine | The reasoning Template Library (reasoning workflows/strategies) and the Tool Ocean (bioinformatics tool, database and model-API library), both grown during inference | R1 | self-evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
+| P019 | [LLM-AutoSciLab: Closed-Loop Scientific Discovery via Active Experimentation with LLMs](https://arxiv.org/abs/2605.24043) | 2026-05 | Chemistry and materials; Biology and medicine; Physics and earth sciences | Candidate scientific hypotheses / mechanisms: symbolic equations (physics laws, enzyme rate laws) and signed causal (gene-regulatory) graphs | R0 | automated evaluation; simulation | fully automatic | in-task | not claimed | full text | ✅ @JasonDZS |
 | P011 | [The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators](https://arxiv.org/abs/2606.26294) (also 0, 1, 3) | 2026-06 | Agent self-improvement; Software engineering; Mathematics; Automated reward and curriculum design; Automated ML research | The agents' and evaluators' own code (coder, code reviewer, paper writer/reviewer, prover/grader, reward designer) plus the utility itself — the learned evaluator is co-evolved and replaced across epochs; the meta-agent code is also editable, while the scoring/orchestration harness is fixed | R2 | automated evaluation; learned judge; simulation | fully automatic | in-task | RSI | partial text | ✅ @JasonDZS |
 | P017 | [Organon: From Evolutionary Search to Recursive Self-Improving Agents for Scientific Discovery](https://arxiv.org/abs/2610.33046) (also 0, 1) | 2026-10 | Agent self-improvement; Algorithm discovery; Chip design and systems optimization; Mathematics | The agent's own composition Cr: evolutionary search loop, parent selection, variation/recombination operators, survival policy, diagnostic tools, memory, worker coordination, execution loop, and the diagnostic/assessment procedures guiding its future revisions | R4 (limited to the diagnostic and assessment instruments and revision cadence that guide revisions; the core revision-reasoning model and the official evaluator are fixed) | automated evaluation | fully automatic | in-task | RSI | full text | ✅ @JasonDZS |
 
