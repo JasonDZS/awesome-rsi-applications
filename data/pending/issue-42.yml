@@ -1,0 +1,121 @@
+# Annotation for the paper recommended in issue #42. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: STELLA: Self-Evolving LLM Agent for Biomedical Research
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2507.02004
+
+# First released, YYYY-MM
+date: 2025-07
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;2
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Biology and medicine
+
+# Task: what the system does in the experiments
+task: Biomedical research question answering on Humanity's Last Exam (Biomedicine), LAB-Bench DBQA and LAB-Bench LitQA; plus a flagship case study uncovering a chemoresistance mechanism (identifying MTF1)
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The reasoning Template Library (reasoning workflows/strategies) and the Tool Ocean (bioinformatics tool, database and model-API library), both grown during inference
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R1
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: R1: skill/tool libraries grow but the scaffold is fixed
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: self-evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: up to 9 trials per question (1x-9x test-time compute budget); accuracy averaged over 3 runs
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: self-improvement
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: STELLA reaches ~26% on HLE: Biomedicine, ~54% on LAB-Bench DBQA and ~63% on LitQA (abstract: up to 6 pts, Results: up to 8 pts above the next-best model), and HLE accuracy nearly doubles from 14% to 26% as test-time trials rise from 1x to 9x
+
+# Failures and limitations: as reported in the paper
+limits: Authors note a remaining gap between benchmark performance and real-world laboratory application; deploying STELLA in real research workflows and human collaboration is left to future work
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Models: Dev Agent and Tool Creation Agent use Claude 4 Sonnet; Manager Agent and Critic Agent use Gemini 2.5 Pro (Methods). Feedback detail: in-loop signal is the Critic Agent's LLM assessment of intermediate results (self-evaluation); tool creation also involves 'Search -> Create -> Test and debug the tool' (Fig 1A), i.e. code execution that could count as automated evaluation; the Critic (Gemini) differs from the Dev (Claude), so learned judge is also arguable. Loop source: Fig 1 caption and Fig 2B. Accumulation source: Self-evolving Mechanisms ('dynamic and growing collection'). Rounds source: Results + Fig 2 caption (1x-9x trials, 3 runs averaged). Cost: not reported (only trial count). Evidence source: Fig 2B self-evolving measured on the same benchmarks. Result source: abstract/Results (note the 6 vs 8 percentage-point discrepancy between abstract and Results). Benchmarks are small sampled subsets: 50 HLE questions and a 12.5% sample of LAB-Bench DBQA/LitQA (Methods). Baselines: Gemini 2.5 Pro, Claude 4 Opus, DeepSeek-R1, OpenAI o3, and the Biomni agent. A legacy local scratch draft (data/local/unconfirmed-papers.tsv, P018, abstract-only, Chinese vocabulary) annotated this paper as tags=2, R1, feedback=automated evaluation, claim=self-improvement; it is not in data/papers.tsv or data/pending.
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Does STELLA change only its skill/tool libraries (R1), or does writing and integrating new executable tools count as changing its own code/scaffold (R2)?** (affects: self-reference depth; see Self-evolving Mechanisms section; Fig 1A/1C; abstract)
+     - Option A: R1. Evidence: The Template Library grows with successful reasoning workflows and the Tool Ocean grows with new tools the agent then calls; the four-agent Manager/Dev/Critic/Tool-Creation architecture itself is never modified (Self-evolving Mechanisms: libraries are 'dynamically updated'/'a dynamic and growing collection').
+     - Option B: R2. Evidence: The Tool Creation Agent autonomously writes, tests and debugs new tool code ('Search -> Create -> Test and debug the tool', Fig 1A), so executable code is being authored and added to the running system.
+     - **Recommendation: A.** Per the repo rule 'a growing tool, skill or experience library -> R1', and the paper reports changes only to the libraries, not to the agent's orchestration/scaffold code; this mirrors Voyager-style skill libraries. Choose R2 only if a reviewer judges that the newly authored tool code is part of the agent's own code rather than a called library entry.
+     - Annotator's choice: A (R1).
+
+  2. **What signal inside the loop decides whether a reasoning template or tool is kept and reused?** (affects: feedback source; see Introduction (Critic Agent); Fig 1A (tool test/debug); Methods (model assignment))
+     - Option A: self-evaluation. Evidence: The Critic Agent 'assesses intermediate results, identifying flaws and providing actionable feedback to refine the approach' (Introduction) — an internal LLM critique of the system's own output, with no external ground truth in the loop.
+     - Option B: learned judge. Evidence: The Critic uses Gemini 2.5 Pro while the Dev Agent whose work it judges uses Claude 4 Sonnet (Methods), so the judge is a different model from the one producing the analysis.
+     - Option C: automated evaluation. Evidence: New tools are integrated only after 'Test and debug the tool' (Fig 1A), i.e. code execution; the legacy P018 draft annotated feedback as automated evaluation.
+     - **Recommendation: A.** The explicit in-loop evaluator is the Critic's LLM assessment, and the paper describes no benchmark-score gate inside the loop, so self-evaluation is the most honest reading. Pick learned judge if the Critic counts as a separate model from 'the model being improved'; pick automated evaluation if the reviewer judges tool-testing/execution to be the decisive keep/discard signal.
+     - Annotator's choice: A (self-evaluation).
+
+  3. **Is the accumulation best described as a growing library/archive, or as a single evolving lineage?** (affects: accumulation; see Self-evolving Mechanisms section)
+     - Option A: open-ended population or archive. Evidence: Both mechanisms are continuously growing, append-only collections: the Tool Ocean is 'a dynamic and growing collection' and the Template Library is 'dynamically updated ... over time'.
+     - Option B: multi-generation single lineage. Evidence: There is a single STELLA agent whose capabilities evolve step by step across trials, with no population of competing agents and no selection/branching.
+     - **Recommendation: A.** The accumulated objects form an ever-growing library (archive) of reusable templates and tools, which fits 'open-ended population or archive'. Choose single lineage if the reviewer weighs 'one agent evolving over trials' more heavily than 'a growing archive of items' (note: unlike SICA/DGM there is no population of candidate agents with selection).
+     - Annotator's choice: A (open-ended population or archive).
+
+  4. **Is the improvement loop fully automatic, or semi-automatic because humans/wet-lab results enter the loop?** (affects: loop automation; see Fig 1 caption and Fig 1A; Fig 2B self-evolving experiments)
+     - Option A: fully automatic. Evidence: The quantitative self-evolving results (Fig 2B, 1x-9x trials over three runs) are produced automatically on QA benchmarks with no human step described.
+     - Option B: semi-automatic. Evidence: Fig 1A shows 'Human Expert/Wet Experiment in the loop' and the caption says 'Human expert and wet experiment results can provide valuable feedback and guidance in the loop'.
+     - **Recommendation: A.** The experiments that actually demonstrate self-evolution run automatically; the human/wet-lab step appears only as an optional element of the case-study figure. Choose semi-automatic if the reviewer treats the case-study pipeline (with human/wet-lab feedback) as the system being characterised.
+     - Annotator's choice: A (fully automatic).
+
+  5. **Should STELLA be included in the list, and at what status?** (affects: inclusion; see Abstract; Self-evolving Mechanisms; Results (Fig 2B))
+     - Option A: include. Evidence: It meets closed loop (Critic-driven iteration), self-reference (it improves its own template and tool libraries that it later reuses) and accumulation (libraries grow and are reused), and demonstrates in-task improvement (HLE 14%->26%).
+     - Option B: include as R0 borderline case. Evidence: If a reviewer concludes the libraries are closer to external artifacts and the loop does not truly self-reference, only the closed-loop criterion would clearly hold.
+     - **Recommendation: A.** Self-reference and accumulation are both clearly present (the template/tool libraries are parts of the system that are grown and reused), so full inclusion as R1 is warranted. Only drop to R0 borderline if the reviewer decides the grown tools/templates are external artifacts rather than parts of the agent.
+     - Annotator's choice: A (include).
+
+  6. **Should the domain tags be 0;2 (AI R&D itself + Natural sciences) or just 2 (Natural sciences)?** (affects: domain tags; see Abstract; Results / Q&A Benchmarks)
+     - Option A: 0;2. Evidence: STELLA improves parts of itself (its template/tool libraries), which triggers tag 0 by the repo rule 'a self-improving coding agent is tagged 0;1'; its tasks are biomedical (domain 2).
+     - Option B: 2. Evidence: All experiments are domain-specific biomedical QA, and the legacy P018 draft tagged it only 2; one could argue it is a biomedical application, not AI R&D.
+     - **Recommendation: A.** Because what changes is the agent's own skill/tool libraries, tag 0 applies by direct analogy to the self-improving coding agents already in the list (0;1). Choose 2 only if the reviewer decides the self-improvement is too domain-bound to count as general AI R&D.
+     - Annotator's choice: A (0;2).
+
+  **Comparison with the existing list:** Most similar listed papers: P005 (A Self-Improving Coding Agent, R2, automated evaluation, open-ended archive) and P006 (Darwin Godel Machine, R2, automated evaluation, open-ended archive) — both self-improving agents, but they edit their own codebase (R2) and gate changes on benchmark test scores (automated evaluation). STELLA is one level shallower: it only grows skill/tool libraries (R1, like a Voyager-style skill library) and its in-loop signal is an LLM Critic (self-evaluation), which is weaker than automated test-based feedback. P002 (ADAS, R0) is more distant: its meta-agent designs external agents and its archive is a population of agents, whereas STELLA keeps and reuses its own libraries (self-reference). The 'open-ended population or archive' label I assigned matches P005/P006's wording, but note STELLA has no population of candidate agents with selection — it is a monotonically growing library, so this label is less exact here and is flagged as a point to check. The legacy local draft (P018) is consistent on R1, claim=self-improvement, but differs on tags (2 vs my 0;2) and feedback (automated evaluation vs my self-evaluation).
+
+  **Signals useful for the survey:** Useful survey signals: (1) Claim-vs-evidence gap — the paper claims 'self-evolving' and shows accuracy rising with more trials (HLE 14%->26%), but never specifies the gate that decides which templates/tools are kept, and reports no ablation isolating the Template Library from the Tool Ocean, so the 'test-time self-evolving' effect may partly reflect more compute/trials rather than genuine capability accumulation. (2) In-loop feedback is an LLM Critic with no external ground truth, a self-reinforcement risk. (3) Evidence is in-task on small sampled benchmark subsets (50 HLE questions; 12.5% of LAB-Bench DBQA/LitQA), with no held-out or independent verification of the self-evolving claim. (4) Internal inconsistency: abstract says the lead over the next-best model is 'up to 6 percentage points' while Results says 'up to 8 percentage points'. (5) Authors themselves flag the gap between benchmark performance and real-world lab application.
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
