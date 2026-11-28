@@ -12,6 +12,14 @@ A paper goes from recommendation to inclusion in five steps. The annotator does 
 
 **The one hard rule: every paper must be confirmed by a human developer who has checked it against the paper.** AI assistants may help read papers and draft annotations, but they cannot confirm.
 
+## Shortcut: an issue that carries the whole annotation
+
+Steps 1 to 3 collapse into one if the issue already contains a complete annotation. Put it in the **Annotation** field of the "Recommend a paper" form (or in an `### Annotation` section with a fenced `yaml` block): the `paper-intake` workflow creates the branch `paper/issue-<number>`, the annotation file and the pull request, and shows the annotation on the issue page. Steps 4 and 5 are unchanged: a confirmer checks it against the paper and comments `/confirm`.
+
+The annotation uses the same `field: value` lines as `data/pending/issue-<number>.yml`. The maintainers' annotation page (source in `tools/annotate-page/`) produces such an issue: it asks Claude to draft every field from the paper's PDF, lists the uncertain points with options and a recommendation, and after you decide them opens the new-issue page with everything filled in.
+
+The workflow acts only on issues opened by collaborators. If it cannot open the pull request itself, it comments a link that does; to avoid that, enable *Settings → Actions → General → Allow GitHub Actions to create and approve pull requests*. Editing the Annotation section of the issue updates the branch.
+
 ## Step 1: Recommend the paper
 
 Open an issue with the ["Recommend a paper" form](../../issues/new?template=add-paper.yml): title, link, and a sentence or two on why it belongs. Domain tags are optional. Note the issue number; the examples below use `12`.
