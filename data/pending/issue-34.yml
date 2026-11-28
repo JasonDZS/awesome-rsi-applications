@@ -1,0 +1,116 @@
+# Annotation for the paper recommended in issue #34. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: AlphaEvolve: A coding agent for scientific and algorithmic discovery
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2506.13131
+
+# First released, YYYY-MM
+date: 2025-06
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;1;2
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Automated ML research; Algorithm discovery; Mathematics; Chip design and systems optimization
+
+# Task: what the system does in the experiments
+task: Evolves code to solve user-specified tasks: tensor-decomposition algorithms for faster matrix multiplication, constructions for 50+ open mathematics problems, data-center scheduling heuristics, Gemini training-kernel tiling heuristics, TPU Verilog circuits, and compiler-generated FlashAttention IR
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: External artifacts: the user-specified target program for each task (tensor-decomposition algorithms, math constructions, scheduling/kernel heuristics, Verilog, compiler IR); optionally co-evolved meta-prompts. The AlphaEvolve pipeline (prompt sampler, LLM ensemble, evaluators, database) itself is fixed
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R0
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Sec 2 / Fig 1-2: "produces algorithms that address a user-specified task"; controller loop is child_program = apply_diff(parent_program, diff) with a fixed prompt_sampler/evaluator/database — only external task code is evolved (R0). The only self-referential component is Sec 2.2 "Meta prompt evolution: instructions and context suggested by the LLM itself ... co-evolved in a separate database analogous to the solution programs", which the annotation rules map to R4 limited to the prompt level
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation; simulation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: Thousands of LLM samples per run (Table 1); number of generations not reported
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: hours
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: not claimed
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: Found the first rank-48 algorithm for multiplying two 4x4 complex matrices (beating Strassen's 49 after 56 years) and improved SOTA for 14 matrix-multiplication targets; matched best-known constructions on ~75% and surpassed SOTA on ~20% of 50+ open math problems; recovered on average 0.7% of Google's fleet-wide compute via a scheduling heuristic, achieved 23% average kernel speedup (1% Gemini training-time reduction) and a 32% FlashAttention kernel speedup
+
+# Failures and limitations: as reported in the paper
+limits: Only applicable to problems with an automated evaluator, excluding domains such as the natural sciences that require manual experimentation; gains to its own infrastructure and base LLMs are "moderate" and the feedback loops for improving the next AlphaEvolve are "on the order of months"
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: feedback: Sec 2.4 (evaluate function, evaluation cascade) and Sec 3.3.1 data-center simulator; optional LLM-generated feedback (Sec 2.4) could add learned judge/self-evaluation. loop: Fig 1-2, autonomous pipeline; human only sets problem/evaluator/initial solution. accumulation: Sec 2.5 MAP-elites + island-model database. rounds: Table 1 "thousands of LLM samples suffice". cost: Sec 2.4 "on the order of 100 compute-hours" per solution, but seconds for simple math. claim: title/abstract, no RSI/self-improvement label; Sec 6 envisions distilling AlphaEvolve-augmented performance into the base model to "uplift the next version of AlphaEvolve" (loop not closed in the paper). evidence: Sec 3 results are on each task's own target (in-task); math results provably correct/independently verifiable and Sec 3.3.3 TPU rewrite independently caught by synthesis tools. Predecessor FunSearch (Romera-Paredes et al. 2023) is not yet in the list. Open questions in review_points.
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Is the self-reference depth R0 (the system only evolves external task code; the optimizer itself is fixed) or R4 limited to the prompt level (because meta-prompt evolution co-evolves the prompts that generate the improvements)?** (affects: self-reference depth; see Figures 1-2 and the controller loop; Section 2.2 "Meta prompt evolution"; Section 4 ablation "No meta prompt evolution" (Figure 8))
+     - Option A: R0. Evidence: Fig 1-2: the human defines the problem and evaluator and the pipeline evolves only the user's EVOLVE-marked task code via apply_diff(parent, diff); the prompt sampler, LLM ensemble, evaluators and database do not change. This mirrors ADAS (meta-agent designs external artifacts, does not change itself) = R0.
+     - Option B: R4 (limited to the prompt level). Evidence: Sec 2.2: "Meta prompt evolution: instructions and context suggested by the LLM itself in an additional prompt-generation step, co-evolved in a separate database analogous to the solution programs." The annotation rules map evolving the mutation prompts (the part that generates improvements) to R4 limited to the prompt level, and the component is actually tested (ablated in Fig 8).
+     - Option C: R1. Evidence: If one treats the co-evolved meta-prompts simply as "prompts" being improved (R1 = prompts, memory, skill/tool libraries) rather than as improving the improvement process.
+     - **Recommendation: A.** The headline contribution evolves external task code with a fixed optimizer, directly analogous to ADAS/AI Scientist (R0 in this list). Meta-prompt evolution is one optional, ablated component in service of each task's external solution, not AlphaEvolve improving its own general machinery across tasks. Choose R4 (limited to the prompt level) if the reviewer judges the meta-prompt co-evolution central enough to count as improving the improvement process; choose R1 if they read it as merely improving prompts.
+     - Annotator's choice: A (R0).
+
+  2. **Does the paper meet the self-reference criterion, and therefore what is the criteria set / inclusion status?** (affects: inclusion; see Section 2.2 (meta-prompt evolution); Section 2.5 (archive); Figure 2 (closed loop); Section 3.3.2 (optimizing its own training))
+     - Option A: closed loop; accumulation. Evidence: Clear closed loop (Fig 2) and accumulation (Sec 2.5 evolutionary database). The evolved objects are external task artifacts, so self-reference is not clearly met; still a solid inclusion (2 of 3 criteria), like ADAS.
+     - Option B: closed loop; self-reference; accumulation. Evidence: If meta-prompt co-evolution (Sec 2.2) counts as improving part of the system, self-reference is also met; the paper also "optimizes its own training process" (Sec 3.3.2) and accelerates the LLM underpinning AlphaEvolve (abstract).
+     - **Recommendation: A.** Include the paper regardless. Recommend "closed loop; accumulation": the core loop evolves external artifacts, so self-reference is only arguable via the optional meta-prompt component and the not-yet-closed loop back to improving AlphaEvolve itself. Add "self-reference" (and move to R4-limited) only if the reviewer accepts meta-prompt evolution as self-reference.
+     - Annotator's choice: A (closed loop; accumulation).
+
+  3. **Should domain tag 0 (AI R&D itself) be included, and should the subfield be the explicit list or Cross-subfield?** (affects: domain tags; see Section 3.3.2 (Gemini kernels / "optimizes its own training process"); abstract ("accelerated the training of the LLM underpinning AlphaEvolve itself"); Section 3.1-3.3 for the breadth of subfields)
+     - Option A: 0;1;2. Evidence: Sec 3.3.2 optimizes the kernels that train Gemini (an AI R&D task, "Gemini ... optimizes its own training process") and the abstract accelerates the LLM underpinning AlphaEvolve itself, supporting tag 0; plus engineering (1) and mathematics (2).
+     - Option B: 1;2. Evidence: One could argue AlphaEvolve is a general-purpose optimizer applied to application tasks rather than "AI that improves itself"; then only engineering (1) and natural sciences/mathematics (2) apply.
+     - **Recommendation: A.** Recommend 0;1;2 because at least one task (optimizing Gemini's own training kernels) is squarely AI R&D and the paper frames it as improving its own infrastructure. For the subfield, the experiments span 4+ subfields; the explicit list (Automated ML research; Algorithm discovery; Mathematics; Chip design and systems optimization) is more informative than Cross-subfield, but Cross-subfield is a reasonable alternative. Drop tag 0 (and Automated ML research) if the reviewer treats the self-optimization as incidental.
+     - Annotator's choice: A (0;1;2).
+
+  4. **Is the evidence strength in-task, or cross-task / cross-task, independently verified, given the provably-correct and independently-checkable discoveries?** (affects: evidence strength; see Section 3.1 (matrix multiplication), Section 3.2 (math constructions), Section 3.3.3 (TPU circuit independently caught by synthesis tools))
+     - Option A: in-task. Evidence: Each improvement is measured on the exact target being optimized (held-out input shapes/test sets of the same task count as in-task); AlphaEvolve is re-run per problem and no single optimized artifact is shown to transfer to an untuned task.
+     - Option B: cross-task, independently verified. Evidence: Math/algorithm discoveries (e.g., the rank-48 4x4 decomposition) are provably correct and independently verifiable, published in a public Colab, and Sec 3.3.3 states the TPU rewrite "was also independently caught by downstream synthesis tools".
+     - Option C: cross-task. Evidence: The same system solves 50+ distinct math problems plus several engineering tasks, demonstrating broad applicability across many different tasks.
+     - **Recommendation: A.** Recommend in-task: improvement is shown on each optimization's own target, consistent with how this list treats same-task evaluation. Provable correctness is a correctness guarantee, not cross-task generalization. Choose cross-task, independently verified if the reviewer weights the provably-correct, publicly verifiable discoveries and the independent synthesis-tool confirmation as independent evaluation.
+     - Annotator's choice: A (in-task).
+
+  5. **What single verification-cost bucket best fits, given evaluation cost ranges from seconds to ~100 compute-hours?** (affects: verification cost; see Section 2.4 (parallelized evaluation / 100 compute-hours); Section 2.1 ("only seconds on a single device"))
+     - Option A: hours. Evidence: Sec 2.4: "feasible to spend on the order of 100 compute-hours to evaluate any new solution" (parallelized to reduce wall-clock), and ML-involving evaluations may "spawn extensive computations".
+     - Option B: seconds to minutes. Evidence: Sec 2.1: for mathematical problems the evaluator "is typically very simple" and "may take only seconds on a single device".
+     - **Recommendation: A.** Recommend hours because the paper explicitly reports up to ~100 compute-hours per solution as a feasible, intended regime, bounding the heavier tasks. Choose seconds to minutes if the annotation should reflect the headline mathematics results, whose evaluators run in seconds.
+     - Annotator's choice: A (hours).
+
+  **Comparison with the existing list:** Most similar listed papers: P002 ADAS (R0, automated evaluation, open-ended population/archive, cross-task) and P006 Darwin Gödel Machine (R2, automated evaluation, open-ended archive, cross-task). AlphaEvolve matches ADAS most closely: both run a fixed optimizer that produces/evolves external code artifacts (ADAS designs agents; AlphaEvolve evolves task programs) and neither changes its own machinery, so R0 and the open-ended archive annotation are consistent with ADAS. It differs from DGM, which edits its own agent repository (R2). Feedback (automated evaluation, plus simulation here) and fully-automatic loop are consistent with both. The direct predecessor FunSearch (Romera-Paredes et al. 2023) is not yet listed.
+
+  **Signals useful for the survey:** Useful survey signals: (1) a gap between the self-referential framing and what is actually closed in the loop — the abstract touts that AlphaEvolve "accelerated the training of the LLM underpinning AlphaEvolve itself" and Sec 6 envisions "uplift[ing] the next version of AlphaEvolve", yet it states the gains are "moderate" and "the feedback loops for improving the next version of AlphaEvolve are on the order of months", and distillation into the next base model is only proposed, not executed; (2) the only genuinely self-referential mechanism (meta-prompt evolution) is an optional, ablated component, not the core; (3) the paper's own stated limitation — it only works where an automated evaluator exists, excluding wet-lab natural sciences — marks a boundary of code-grounded RSI.
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
