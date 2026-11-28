@@ -1,0 +1,114 @@
+# Annotation for the paper recommended in issue #24. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: Group-Evolving Agents: Open-Ended Self-Improvement via Experience Sharing
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2602.04837
+
+# First released, YYYY-MM
+date: 2026-02
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;1
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Software engineering
+
+# Task: what the system does in the experiments
+task: Evolve coding-agent frameworks via group-level experience sharing, evaluated on SWE-bench Verified and Polyglot
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The coding agent's own framework code: its tools, workflow and prompting strategies
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R2
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 3.1: "evolution in GEA proceeds through iterative modifications of the agent's implementation, which itself constitutes a form of solving coding problems"; Section 3.2: directives "targeting the agent's workflow, tool usage, or prompting strategies" and "the evolution module to generate framework-level patches". The parent-group selection and archive (the improvement process itself) are fixed, as in DGM; the reflection module is a fixed GPT-o1 across all iterations (Section 4.2)
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: SWE-bench: 30 iterations; Polyglot: 20 iterations (group size K=2, 2 offspring per iteration); DGM baseline run 60/40 iterations; robustness study 5 trials
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: self-improvement
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: GEA improves SWE-bench Verified from 20.0% to 71.0% and Polyglot from 38.2% to 88.3%, vs DGM baseline 56.7% and 68.3% under the same number of evolved agents, matching/surpassing human-designed frameworks (71.8% OpenHands+GPT-5, 52.0% Aider+GPT-5)
+
+# Failures and limitations: as reported in the paper
+limits: Impact Statement: open-ended exploration may introduce directions misaligned with human intent, consume substantial compute, and produce patches lacking structural clarity that make systems increasingly complex and hard to understand; the improvement process (parent selection, archive) is fixed; only coding benchmarks evaluated; transferring the best agent to other backbone models gives much lower absolute scores (e.g. 23-36% on SWE-bench with gpt-5.1/o3-mini/sonnet)
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Feedback: automated evaluation, staged benchmark success rate (SWE-bench sanity 10 -> Verified-Mini 50 -> full; Polyglot 10 -> unseen 50), only compiling agents with basic coding functionality archived (Algorithm 2, Section 4.1). The reflection module (fixed GPT-o1) only proposes evolution directives; it does not decide what is kept, so it is not counted as learned judge. Loop: fully automatic, no human intervention, isolated sandbox (Section 5.1, Impact Statement); bugs in the robustness study are manually injected as a perturbation test, not part of the loop (Section 5.4). Accumulation: archive of all discovered agents, parent groups chosen by a Performance-Novelty (KNN cosine-distance novelty) score (Algorithms 1-2). Models (Section 4.2): evolving/acting by Claude Haiku 4.5 then Claude Sonnet 4.5; reflection by GPT-o1 throughout. Rounds: SWE-bench 30, Polyglot 20, K=2 (Section 4.2); DGM baseline run for twice as many iterations for matched agent counts (Section 4.3). Cost: Appendix A.1 gives money only (about USD 13,000 SWE-bench, USD 1,500 Polyglot per full run), not time, so cost = not reported. Evidence: main numbers are on held-out subsets of the same benchmarks used for evolution (in-task); unlike DGM there is no cross-benchmark transfer (e.g. SWE-bench agent on Polyglot) reported, only cross-model transfer (Section 5.3). Most similar listed paper: P006 DGM (same protocol, R2, automated evaluation).
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Is the self-modification carried out by the coding agent's own code (R2, self-reference, like DGM/SICA), or by a fixed external meta-process that designs agents treated as external artifacts (R0, like ADAS)?** (affects: self-reference depth; see Section 3.1-3.2 and Algorithm 2; Section 4.2 on which modules are fixed)
+     - Option A: R2. Evidence: Section 3.1: "evolution in GEA proceeds through iterative modifications of the agent's implementation, which itself constitutes a form of solving coding problems"; patches target the agent's own workflow/tools/prompts (Section 3.2); the paper follows the DGM protocol, which is annotated R2.
+     - Option B: R0. Evidence: The reflection module is a fixed GPT-o1 across all iterations and the parent-group selection, novelty metric and archive are fixed machinery (Section 4.2, Algorithms 1-2); if the evolving module is also fixed outer scaffolding and the archived agents are just external artifacts it designs, it would be R0 like ADAS.
+     - **Recommendation: A.** GEA is explicitly a DGM variant and frames evolution as the agent modifying its own implementation, so R2 matches P006. Choose R0 only if the confirmer finds that the evolving module that writes the patches is fixed code separate from the agent being evolved, with no path by which an evolved agent's improved coding ability feeds the next modification.
+     - Annotator's choice: A (R2).
+
+  2. **Is the evidence in-task or cross-task?** (affects: evidence strength; see Section 4.1 (staged evaluation on subsets of the same benchmark) and Section 5.3 (model transfer))
+     - Option A: in-task. Evidence: Headline results are on full/held-out subsets of the same benchmarks the agents evolved on (SWE-bench Verified; Polyglot 50-task medium set); held-out subsets of the same benchmark count as in-task. Model transfer (Section 5.3) keeps the same tasks and only swaps the backbone.
+     - Option B: cross-task. Evidence: Polyglot is described as an "out-of-domain generalization test ... rarely used for training" (Section 4.1), and improvements transfer across GPT- and Claude-series backbones (Section 5.3), which the paper presents as generalization.
+     - **Recommendation: A.** Unlike DGM (P006, cross-task), GEA reports no cross-benchmark transfer (e.g. a SWE-bench agent run on Polyglot); its generalization evidence is model transfer on the same tasks, so in-task is the defensible reading. Choose cross-task if the confirmer treats cross-backbone transfer or the two separate benchmarks as cross-task evidence.
+     - Annotator's choice: A (in-task).
+
+  3. **Should verification cost be 'not reported' or an estimated time band?** (affects: verification cost; see Appendix A.1 Cost Estimate)
+     - Option A: not reported. Evidence: Appendix A.1 reports only dollar costs (about USD 13,000 per SWE-bench run, USD 370 for 60 Sonnet SWE-bench tasks) and never states wall-clock time for one evaluation.
+     - Option B: days to weeks. Evidence: The run is the same scale as DGM, whose annotation notes about 2 weeks for a full SWE-bench run; but GEA itself does not state any time.
+     - **Recommendation: A.** The rules forbid inferring cost. GEA reports money but no time, so 'not reported'. Pick a time band only if the confirmer finds an explicit runtime figure in the paper that I missed.
+     - Annotator's choice: A (not reported).
+
+  4. **How do the authors frame the claim?** (affects: authors' claim; see Title and Abstract)
+     - Option A: self-improvement. Evidence: Title: "Open-Ended Self-Improvement"; Abstract: "Open-ended self-improving agents can autonomously modify their own structural designs".
+     - Option B: RSI. Evidence: The system modifies its own code recursively in the DGM sense, but the title and abstract use "self-improvement"/"self-evolving", not "recursive self-improvement".
+     - **Recommendation: A.** Claim is judged by the wording of title and abstract, which say self-improvement, not recursive. There is no explicit disclaimer of recursiveness to record.
+     - Annotator's choice: A (self-improvement).
+
+  5. **Does the paper belong in the list, and at what status?** (affects: inclusion; see Whole paper; Section 3 (self-modification) and Section 5 (closed-loop results))
+     - Option A: include. Evidence: Meets all three criteria: closed loop (Algorithm 2), self-reference (agent modifies its own framework code, Section 3.1-3.2), and accumulation (archive of discovered agents, Section 3).
+     - Option B: include as R0 borderline case. Evidence: If the self-reference reading is rejected (see the R question) and only the closed loop holds, it would be an R0 borderline inclusion.
+     - **Recommendation: A.** It is a clear self-improving coding agent in the DGM lineage, so include. It would drop to R0 borderline only if the confirmer decides the agents are external artifacts designed by a fixed meta-process.
+     - Annotator's choice: A (include).
+
+  **Comparison with the existing list:** Most similar: P006 Darwin Gödel Machine (R2, automated evaluation, open-ended population or archive, fully automatic, self-improvement) — GEA explicitly follows DGM's evaluation protocol and is its direct comparison baseline, so R, feedback, loop, accumulation, object and claim are annotated identically. The one deliberate difference is evidence strength: I recommend in-task for GEA (vs cross-task for DGM) because GEA reports only cross-model transfer, not the cross-benchmark transfer DGM used. Also similar: P005 SICA (R2 self-modifying coding agent) and P002 ADAS (R0 fixed meta-agent) — the R question turns on which of these GEA resembles.
+
+  **Signals useful for the survey:** Gap between claim and evidence: headline numbers (71.0% SWE-bench, 88.3% Polyglot, "matching or surpassing human-designed frameworks") are on held-out subsets of the same benchmarks the agents evolved on; the claim that self-improvement capability grows over evolution is supported only indirectly (bug repair in 1.4 vs 5 iterations, more ancestors integrated), not by a direct measure of self-modification quality. Objective-hacking and goal-drift risks are acknowledged in the Impact Statement but not observed/measured (unlike DGM, which reported a concrete hacking incident). Model transfer to non-evolution backbones drops absolute scores sharply (23-36% on SWE-bench). Full run costs about USD 13,000 (SWE-bench).
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
