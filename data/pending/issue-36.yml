@@ -1,0 +1,115 @@
+# Annotation for the paper recommended in issue #36. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: CoEvoP&R: Co-Evolving Placement Objectives with Routing Feedback via Large Language Models
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2607.17398
+
+# First released, YYYY-MM
+date: 2026-07
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 1
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Chip design and systems optimization
+
+# Task: what the system does in the experiments
+task: Evolving differentiable analytical placement objective functions for chip global placement, evaluated on ChiPBench Nangate45 (8 designs), ICCAD 2015 Superblue, and ASAP7 designs
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: Analytical placement objective functions (differentiable symbolic objective programs embedded into a fixed DREAMPlace placer); the LLM proposer and the archive/validation framework are not changed
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R0
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 4: "CoEvoP&R searches for readable differentiable placement objectives that run inside an analytical placer while the placer, benchmarks, and downstream evaluation flow remain fixed"; Algorithm 1 samples candidates from a fixed proposer q(./Pi_g) and the MAP-Elites archive/validation machinery is fixed, so only external objective programs change (R0, same as ADAS P002).
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: not reported
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: not claimed
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: cross-task
+
+# Main result: one sentence with numbers
+result: Across 8 ChiPBench Nangate45 designs (3 seeds), CoEvoP&R-E reduces post-route routed wirelength by 16.9% and congestion by 36.7%, with +0.70 ns WNS and +912 ns TNS over DREAMPlace; across 8 Superblue designs rWL and congestion drop 5.4% and 23.2%
+
+# Failures and limitations: as reported in the paper
+limits: ASAP7 zero-shot transfer (T) retains only 46-80% of target-evolution (E) gains and Superblue1 is the clearest transfer-limit case; ablations show random-DSL evolution and one-shot LLM sampling lose most routing/timing gains (gains depend on archive-conditioned iteration); the TNS timing proxy tracks HPWL strongly and acts mainly as a tie-breaker; weaker LLM proposers reduce validity and score; limited to the placement objective, with multi-corner timing, power and signoff-accurate routing left to future work
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Date: "arXiv:2607.17398v1 [cs.LG] 19 Jul 2026". Venue: no conference marked on the PDF. R0 (r_evidence): Section 4, the placer/flow/proposer stay fixed and only external objective programs are evolved; the MAP-Elites archive conditions proposals but stores external candidate solutions, as in ADAS (P002), not a skill/tool library the proposer calls. Feedback: Section 4.3 Tiers A/B/C -- DREAMPlace placement metrics, a placement-stage timing proxy, and real OpenROAD routing + OpenTimer timing (automated evaluation); open question whether running the router/STA counts as simulation. Loop: Algorithm 1 is autonomous; humans only seed it (Section 5.1). Accumulation: Section 4.4 MAP-Elites grid + island model + negative memory (open-ended archive). Evidence: Section 5.3 LODO (CoEvoP&R-L) and zero-shot cross-technology transfer (CoEvoP&R-T), all author-run. Rounds: generations G and samples-per-generation K not given numerically; ~68 valid candidates / 24 Tier-C evals per run (Table 3). Cost: Table 3 gives total GPU-hours (32 GPU-h full run) but not per-evaluation wall-clock. Default proposer gpt-5.4; claude-opus-4-8 nearly matches (Table 3). Most similar listed papers: P002 ADAS and P003 The AI Scientist.
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Does this paper belong in the list, and if so at what level? It meets the closed loop and accumulation criteria but not self-reference (the LLM proposer and framework are fixed; only external placement-objective programs evolve).** (affects: inclusion; see Section 4 Method; Algorithm 1; Section 4.4 archive)
+     - Option A: include as R0 borderline case. Evidence: Closed loop (Figure 1) + accumulation (MAP-Elites archive, Section 4.4), but the thing improved is external objective programs run in a fixed DREAMPlace flow -- the same pattern as ADAS (P002) and The AI Scientist (P003), both listed as R0.
+     - Option B: exclude. Evidence: If the maintainers decide that LLM-guided program evolution with a fixed proposer (FunSearch/ADAS-style) over a single application domain is out of scope, it could be excluded.
+     - **Recommendation: A.** ADAS (P002) and The AI Scientist (P003) are already in the list on exactly this basis (closed loop + accumulation, no self-reference, R0), so for consistency CoEvoP&R should be included as an R0 borderline case. Exclude only if the maintainers retroactively narrow scope to require self-reference.
+     - Annotator's choice: A (include as R0 borderline case).
+
+  2. **Is the self-reference depth R0 (external artifacts only) or R1 (a reused library)? The MAP-Elites archive of evolved objectives conditions later prompts.** (affects: self-reference depth; see Section 4, Section 4.1 and 4.4; Algorithm 1)
+     - Option A: R0. Evidence: Section 4: the placer, benchmarks and downstream flow "remain fixed"; the LLM proposer q(./Pi_g) is fixed; the archived objectives are external candidate solutions searched over, not tools/skills the proposer invokes -- identical to ADAS (R0).
+     - Option B: R1. Evidence: Section 4.1/4.4: the archive of prior candidates and 'negative memory' condition every later proposal, which could be read as a growing experience/skill library the system reuses (R1).
+     - **Recommendation: A.** R0 matches ADAS (P002), whose discovered-agent archive also conditions the meta-agent yet was annotated R0 because archived items are external artifacts, not tools the agent calls. Choose R1 only if the maintainers treat an archive-of-solutions that conditions prompts as a reused library, which would also require re-annotating ADAS.
+     - Annotator's choice: A (R0).
+
+  3. **Is the in-loop feedback 'automated evaluation' or 'simulation'? Tier C runs the OpenROAD router and OpenTimer static timing analysis on each placement.** (affects: feedback source; see Section 4.3 (cost-scaled evaluation); Section 5.1 (evaluation flow))
+     - Option A: automated evaluation. Evidence: Section 5.1: "OpenROAD routing, OpenTimer timing analysis, and metric extraction" produce deterministic design metrics (routed wirelength, congestion, WNS, TNS) -- tool-computed scores akin to benchmark evaluation.
+     - Option B: simulation. Evidence: Routing and static timing analysis model the downstream physical-design flow rather than running tests against ground-truth answers, which could be read as simulating the fabricated chip's behavior.
+     - **Recommendation: A.** Routing and STA are deterministic EDA-tool computations of design metrics (no physics/world model and no fabricated chip), so 'automated evaluation' fits the taxonomy's examples best; pick 'simulation' only if the maintainers treat the EDA tool flow as a physical-process simulator. The signal reliability is unaffected either way at this level.
+     - Annotator's choice: A (automated evaluation).
+
+  4. **What verification-cost bucket should be recorded? The paper reports total GPU-hours per run but not the wall-clock of one routed evaluation.** (affects: verification cost; see Table 3 (Evals and GPU-h columns); Section 5.1 (hardware))
+     - Option A: not reported. Evidence: No per-evaluation time is given; Table 3 reports only aggregate GPU-hours (Full run 32 GPU-h over 24 Tier-C evals, 16 OpenROAD/OpenTimer workers).
+     - Option B: hours. Evidence: If the 32 GPU-h run (or 64 GPU-h for 'Direct Tier C', 68 evals) is divided by the number of routed evaluations, one trustworthy place-and-route evaluation is on the order of ~1 GPU-hour.
+     - Option C: seconds to minutes. Evidence: Tier-A-only selection uses just 5 GPU-h for 68 placement evaluations, so a placement-only (non-routed) evaluation is minutes-scale.
+     - **Recommendation: A.** The rules say never infer cost, and the per-evaluation wall-clock is not reported -- so 'not reported' is the strict answer. If the confirmer accepts dividing the reported GPU-hours by the Tier-C evaluation count, 'hours' is the most defensible informative value for a full routed evaluation; 'seconds to minutes' only describes a placement-only (not trustworthy) evaluation.
+     - Annotator's choice: A (not reported).
+
+  5. **Is the evidence strength 'in-task' or 'cross-task'? The paper reports both same-design evolution and held-out / cross-technology results.** (affects: evidence strength; see Section 5.1 (E vs L vs T protocols); Section 5.3; Tables 1-2)
+     - Option A: cross-task. Evidence: CoEvoP&R-L uses leave-one-design-out ("the target design is excluded from objective evolution") and CoEvoP&R-T zero-shot transfers the best candidate to cross-family Superblue and cross-technology ASAP7 designs (Section 5.3).
+     - Option B: in-task. Evidence: The headline 16.9%/36.7% numbers are from CoEvoP&R-E, which "uses feedback from the same design on which it is evaluated" (Section 5.1).
+     - **Recommendation: A.** The paper's contribution includes LODO and zero-shot cross-technology transfer that still improve over DREAMPlace, so cross-task best characterizes the demonstrated generalization; all evaluations are author-run, so it is not independently verified. Choose in-task if the confirmer wants the annotation to reflect only the headline same-design (E) setting.
+     - Annotator's choice: A (cross-task).
+
+  **Comparison with the existing list:** Most similar listed papers: P002 ADAS (R0; automated evaluation; closed loop; accumulation; open-ended archive) and P003 The AI Scientist (R0; automated evaluation + self-evaluation; closed loop; accumulation; open-ended archive). CoEvoP&R is the same LLM-as-mutation-operator pattern (fixed proposer + accumulating archive evolving external programs), applied to chip-placement objective functions, so R0 / closed loop; accumulation / open-ended population or archive / fully automatic is consistent with both. Like ADAS, the proposer/meta-agent is explicitly fixed, and like ADAS the paper does not claim self-improvement. It differs from the self-referential coding agents in the list (P004 Gödel Agent R4, P005 SICA R2, P006 DGM R2) in that nothing of the system itself is modified.
+
+  **Signals useful for the survey:** Useful for the survey: (1) a clear non-self-referential counterpart -- the authors frame it purely as LLM-guided evolutionary search and claim neither self-improvement nor RSI, despite an ADAS/FunSearch-style closed loop; (2) honest transfer-limit reporting (ASAP7 zero-shot retains only 46-80% of gains; Superblue1 is the clearest failure); (3) an explicit evidence-gating mechanism (timing-proxy admission audit) to prevent a weak/redundant proxy from steering the search -- a safeguard against reward-signal gaming that most archive-based evolutionary RSI papers omit; (4) cost is only reported as aggregate GPU-hours, a recurring gap in this family (ADAS, DGM also report only money/aggregate, never per-evaluation time).
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
