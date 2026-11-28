@@ -1,0 +1,116 @@
+# Annotation for the paper recommended in issue #28. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2606.26294
+
+# First released, YYYY-MM
+date: 2026-06
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;1;2;3
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Software engineering; Mathematics; Automated reward and curriculum design; Automated ML research
+
+# Task: what the system does in the experiments
+task: Co-evolve self-modifying agents with their learned evaluators via archive/tree search: coding with a co-evolved code reviewer (DeepSWE, Polyglot), paper writing with a co-evolved reviewer (APReS), Olympiad proof writing with a co-evolved grader (IMO-GradingBench), and RL reward-function design for a simulated quadruped (walking, held-out jumping)
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The agents' and evaluators' own code (coder, code reviewer, paper writer/reviewer, prover/grader, reward designer) plus the utility itself — the learned evaluator is co-evolved and replaced across epochs; the meta-agent code is also editable, while the scoring/orchestration harness is fixed
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R2
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Sec. 3: "Since the meta-agent and role-agent code are editable, roles may reuse each other's code if the meta-agent deems it useful. Only the scoring and orchestration harness are fixed." Table 5: "Meta-agent-editable surface... The meta-agent may change any" (output tokens, timeouts, tool-call limits, coder tool budget). Related Work: builds on HGM/HyperAgents, which "hold their evaluation criterion fixed outside the loop" — RQGM instead "pulling the evaluation criterion itself inside the loop". The fixed orchestration harness (archive maintenance, Thompson sampling, checkpoint selection, selective erasure) is the DGM/HGM-style search process and is not modified
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation; learned judge; simulation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: up to 12,288 task evaluations per run (DeepSWE run ~587M blended search tokens); a handful of evaluator-replacement epochs per run at power-of-two checkpoints (e.g. 258/512/1024/2048/8192 evaluations in Fig. 4); reward design ~21-22 nodes per run
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: seconds to minutes
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: RSI
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: On DeepSWE the co-evolved RQGM coder (low effort) reaches 82.1% held-out pass vs 75.0% for the fixed-evaluator HGM-H baseline; co-evolved paper writers raise mean reviewer-panel acceptance from 21.8% to 40.5% (1.86x); a co-evolved IMO grader beats baselines at 3x lower search cost, driving the prover to the best mean score (4.33/7)
+
+# Failures and limitations: as reported in the paper
+limits: The adversarial reviewer "costs raw accuracy by construction," leaving the best-found reviewer below the lenient HGM-H on raw accuracy; fixed LLM reviewers show self-preference bias (accept AI papers at 1.42x-1.91x the human rate); the prover reaches high scores mainly by finding more near-complete (6/7) proofs; selective erasure is required for the curriculum effect (no-erasure control keeps rankings stable, rho>=0.90); benchmark-based supervision "may impose a ceiling on evaluator quality"; high search cost (e.g. 587M blended tokens on DeepSWE); dual-use risk of flooding peer review
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: partial text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Sources by field: R2 depth — Sec. 3 "the meta-agent and role-agent code are editable... Only the scoring and orchestration harness are fixed" + Table 5 editable surface (R4 argument: the meta-agent that generates edits is itself editable, and the utility/evaluator co-evolves inside the loop). Feedback — Sec. 3.2 ground-truth anchors (fixed datasets of objective/human labels, used automatically = automated evaluation), Abstract/Sec. 5.1 co-evolved agent-as-a-judge reviewers/graders (learned judge; share the base model so a self-evaluation reading is possible), Sec. 5.1/App. C.8 PPO quadruped (simulation). Loop fully automatic — anchors are fixed datasets, no human step in the loop (Sec. 3.2, Ethics). Accumulation — archive tree T (Sec. 3.1). Rounds/cost — Tables 4-6, Fig. 4. Evidence — Sec. 4 Data splits (held-out test never seen; post-hoc scoring), reward design walk->jump is cross-task. Claim RSI — Abstract + Contribution 1. Baselines are HGM-H (Huxley-Gödel Machine search with frozen evaluators), Sakana reviewer, ProofAutoGrader, IMO25 prover; direct lineage from DGM (P006). Open questions: exact R depth; whether any accepted edits actually modify the meta-agent's own code; whether the co-evolved evaluator counts as learned judge or self-evaluation; subclass breadth (explicit list vs Cross-subfield). The paper runs only 2026 frontier models (GPT-6 Astra, GPT-5.5/5.6 Sol, Nemotron 3) and benchmarks (DeepSWE, HyperAgents) — a confirmer should verify these exist as described
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **What is the self-reference depth: R2 (edits agents'/evaluators' own code, search harness fixed, as with DGM/HGM) or R4 (the meta-agent that generates edits is itself editable, and the utility/evaluator co-evolves inside the loop)?** (affects: self-reference depth; see Sec. 3 ("the meta-agent and role-agent code are editable... Only the scoring and orchestration harness are fixed"), Table 5 (meta-agent-editable surface), Fig. 11 (where accepted edits land))
+     - Option A: R2. Evidence: Sec. 3: "Only the scoring and orchestration harness are fixed" — the archive/search/erasure process is not modified, exactly the reasoning used to annotate DGM (P006) as R2; reported edits (Fig. 11) modify shared task-agent/reviewer infrastructure and role code, i.e. scaffold and own code
+     - Option B: R4 (limited to the meta-agent/utility level; search harness fixed). Evidence: Sec. 3: "the meta-agent ... code are editable" and Table 5 says "The meta-agent may change any" — the part that generates improvements is itself editable; and controlled utility evolution pulls the evaluator/utility inside the loop, co-evolving the feedback signal
+     - Option C: R2 or R4 (unclear). Evidence: The editable surface explicitly includes the meta-agent (R4 reading), but the paper does not clearly report accepted edits that actually rewrite the meta-agent's own improvement code, and the search orchestration is fixed (R2 reading)
+     - **Recommendation: A.** R2 keeps calibration with DGM (P006) and HGM: what is demonstrably edited is agent/evaluator code while the search/exploration harness is fixed. Choose R4 if the confirmer reads the editable meta-agent plus the co-evolving utility as 'improving the improvement process', or finds experimental evidence of the meta-agent rewriting its own edit-generating code.
+     - Annotator's choice: A (R2).
+
+  2. **Is the co-evolved reviewer/grader a 'learned judge' or 'self-evaluation'?** (affects: feedback source; see Abstract ("agent-as-a-judge code-review signal"), Sec. 5.1-5.4, Table 4/6 models)
+     - Option A: automated evaluation; learned judge; simulation. Evidence: The reviewer/grader is a distinct co-evolved agent role (an 'agent-as-a-judge'), separate from the coder/writer it scores; anchors are automated comparisons to ground-truth datasets; reward design uses a physics simulator
+     - Option B: automated evaluation; self-evaluation; simulation. Evidence: The reviewer/grader and the task agent are built on the same base model family (GPT-5.5/GPT-6 Astra, Table 4/6), so the judge is essentially the same model being improved — which the rules classify as self-evaluation
+     - **Recommendation: A.** The evaluator is a separate, co-evolved role explicitly framed as an agent-as-a-judge, so 'learned judge' fits best. Choose the self-evaluation variant if the confirmer weights the shared base model more heavily than the separate role.
+     - Annotator's choice: A (automated evaluation; learned judge; simulation).
+
+  3. **Should the paper be included, and does the verifiability of its (very recent) baselines matter?** (affects: inclusion; see Title/Abstract, Sec. 2 Related Work, Sec. 4 Baselines, References)
+     - Option A: include. Evidence: Meets all three criteria (closed loop, self-reference, accumulation), explicitly claims recursive self-improvement, and is the direct successor to DGM (P006) and HGM already tracked by the list
+     - Option B: include (verify 2026 baselines). Evidence: The paper runs only 2026 frontier models (GPT-6 Astra, GPT-5.5/5.6 Sol, Nemotron 3) and benchmarks (DeepSWE, HyperAgents); a confirmer who cannot verify these may want to flag the evidence as unconfirmed
+     - **Recommendation: A.** Inclusion is clear on the criteria and claim. The baseline-verifiability caveat is a confidence note, not an inclusion blocker.
+     - Annotator's choice: A (include).
+
+  4. **What verification-cost bucket best reflects one trustworthy evaluation?** (affects: verification cost; see Table 4/5 caps; Table 6 limits; App. C.8 (PPO training))
+     - Option A: seconds to minutes. Evidence: Per-task evaluation is capped at 1,200 s (20 min) for validation/expansion (Table 4/5)
+     - Option B: hours. Evidence: A trustworthy node utility aggregates dozens of task evaluations (49-166 validation tasks); reward design trains a full PPO policy (101 iterations, 4,096 envs); run/expansion limits are 24 h / 6 h (Tables 5-6)
+     - Option C: not reported. Evidence: The paper reports per-evaluation caps and a total token budget but never states the wall-clock time to obtain one trustworthy agent utility
+     - **Recommendation: A.** Taking the field literally (one task-level evaluation, capped at 20 min), 'seconds to minutes' is defensible. Choose 'hours' if the confirmer defines a trustworthy evaluation as a full per-node validation utility (or the reward-design PPO run); choose 'not reported' if only an explicit single-evaluation time counts.
+     - Annotator's choice: A (seconds to minutes).
+
+  5. **Is the evidence strength in-task or cross-task?** (affects: evidence strength; see Sec. 4 Data splits; Sec. 5.1 reward design (walk->jump); Tables 1-3)
+     - Option A: in-task. Evidence: Headline coding/paper/proof results are post-hoc scored on held-out test splits of the same benchmarks used in search, which the rules count as in-task
+     - Option B: cross-task. Evidence: Reward design trains on walking and is evaluated on a held-out jumping task (0.306->0.365, 5/5 runs jump vs 3/5), a genuine cross-task generalization; results span four domains
+     - **Recommendation: A.** The dominant/headline results are held-out splits of the same benchmarks (in-task), matching how SICA (P005) was annotated. Choose cross-task if the confirmer treats the walking->jumping generalization as the defining evidence.
+     - Annotator's choice: A (in-task).
+
+  **Comparison with the existing list:** Most similar in the list is P006 Darwin Gödel Machine (R2; automated evaluation; fully automatic; open-ended population or archive; cross-task) — RQGM is its direct descendant and uses the Huxley-Gödel Machine's more sample-efficient search as its baseline (HGM-H). It is also close to P005 SICA (R2; self-improving coding agent). Consistency: like DGM/HGM it is an open-ended archive of self-modifying agents, fully automatic, and the search/exploration harness is fixed → so R2 is the calibration-consistent depth. It DIFFERS from DGM/HGM in its feedback: the utility is supplied by co-evolved learned evaluators (agent-as-a-judge), so feedback adds "learned judge" (and "simulation" for reward design) beyond DGM's pure "automated evaluation." On evidence strength, DGM earned "cross-task" via SWE-bench→Polyglot transfer; RQGM's headline coding results are held-out test splits of the same benchmark (in-task), with the reward-design walking→jumping result being its main cross-task generalization.
+
+  **Signals useful for the survey:** (1) Clear claim-vs-evidence gap worth noting for the survey: the paper explicitly claims "recursive self-improvement," but the self-reference ceiling is contested — the meta-agent and role code are editable (R4-ish reading) while the actual search/orchestration harness is fixed (R2 reading, as with DGM). (2) It documents a feedback-loop failure mode it then fixes: fixed LLM reviewers accept AI papers at 1.42×–1.91× the human rate (self-preference bias), motivating the adversarial objective. (3) Honest negative: the adversarial reviewer "costs raw accuracy by construction," falling below the lenient baseline on raw accuracy; and the prover reaches high scores mainly by finding more near-complete (6/7) proofs. (4) Selective erasure is necessary for the curriculum effect (no-erasure control keeps rankings stable, ρ≥0.90). (5) The paper cites and runs only very recent/frontier models (GPT-6 Astra, GPT-5.5/5.6 Sol, Nemotron 3), DeepSWE and HyperAgents — all 2026 artifacts — so a confirmer should verify these baselines exist as described. (6) All evaluations are the authors' own (no independent third-party verification).
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
