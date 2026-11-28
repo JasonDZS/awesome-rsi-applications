@@ -1,0 +1,114 @@
+# Annotation for the paper recommended in issue #40. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: Organon: From Evolutionary Search to Recursive Self-Improving Agents for Scientific Discovery
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2610.33046
+
+# First released, YYYY-MM
+date: 2026-10
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;1;2
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Algorithm discovery; Chip design and systems optimization; Mathematics
+
+# Task: what the system does in the experiments
+task: A single persistent agent runs an evolutionary program search and revises its own search policy, diagnostics, memory and revision procedures at runtime; evaluated on 21 tasks: 10 ALE-Bench Lite algorithm-design tasks, 4 KernelBench GPU kernels, 3 mathematical constructions, and 4 systems-optimization tasks
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The agent's own composition Cr: evolutionary search loop, parent selection, variation/recombination operators, survival policy, diagnostic tools, memory, worker coordination, execution loop, and the diagnostic/assessment procedures guiding its future revisions
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R4 (limited to the diagnostic and assessment instruments and revision cadence that guide revisions; the core revision-reasoning model and the official evaluator are fixed)
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 3.2.2: "Because diagnostics and assessment procedures are themselves part of Cr , refining how H' is analyzed directly improves the agent's capacity to propose and evaluate subsequent self-improvements"; Appendix A.11: "the instruments used to decide further revisions were themselves revised, and the corrected instruments shaped later revisions" (e.g. AHC011 regression check, Heilbronn budget estimator, AHC016 sample estimator)
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: multi-generation single lineage
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: 2-22 activated capability revisions per run (median 11) across 21 single-run tasks, with up to B=100 candidate-generation attempts per task
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: seconds to minutes
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: RSI
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: On ALE-Bench Lite mean private performance 2478.6 vs 2056.3 for the strongest baseline EvoX (+20.5%) and 1875.4 for the ALE-Agent reference (+32.2%), best on all 10 tasks; on KernelBench best on 3 of 4 workloads, up to 1.67x speedup over the strongest competitor (ConvDiv 5.58x vs 3.34x)
+
+# Failures and limitations: as reported in the paper
+limits: Analysis is one run per task with revisions applied jointly, so gains are temporal associations not causal and no ablation isolates individual revisions (future work); some revisions had undetected errors (LLM-SQL sign error, Cloudcast arithmetic inconsistencies) and some were never activated or used; on the geometric math tasks (circle packing, Heilbronn) EvoX and ShinkaEvolve score higher; capabilities do not yet carry across tasks
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Authors: Cheikh Ahmed et al., Huawei Technologies (Canada). Code: https://github.com/cheikh025/Organon. Backbone: DeepSeek-V4.1-Flash for all methods, with a few AHC016/AHC046/autocorrelation candidates routed to DeepSeek-V4-Pro (Section 4.1 footnote). Implemented on DeepSeek Harness with Cordis spatiotemporal composability (Section 3.3). Feedback: Section 3.1.2 (official evaluator f) and 4.1 (public/private cases, Modal correctness+timing); workers cannot execute code, so execution checks exist only when the agent adds them (Section 4.1, A.4). Loop: Section 3.2 (autonomous run). Accumulation: Figure 2a and A.1-A.2. Rounds/cost: Table 5 and A.7. Reversibility: Section 3.2.3 and A.11. Evidence: Section 4.2 (held-out private cases = in-task); cross-task transfer is future work (Conclusion). Open question: whether revising the diagnostic/assessment instruments that guide future revisions is enough for R4, versus R2 as the Darwin Godel Machine was annotated (P006 fixes its exploration process).
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Does revising the diagnostic and assessment instruments that decide the next revision qualify as R4 (the improvement process itself), or is this R2 (scaffold and own code) like the Darwin Godel Machine?** (affects: self-reference depth; see Section 3.2.2, Appendix A.11 and A.13; compare P006 (R2) and P004 (R4))
+     - Option A: R4 (limited to the diagnostic and assessment instruments and revision cadence that guide revisions; the core revision-reasoning model and the official evaluator are fixed). Evidence: Abstract claims "recursive improvement of the mechanisms that guide its future self-improvement"; A.11 shows the instruments deciding further revisions were themselves revised (AHC011 regression check, Heilbronn budget estimator, AHC016 estimator), and A.13 concludes it "corrected or withdrew its revisions, including the diagnostic procedures through which it judged them"
+     - Option B: R2. Evidence: What the agent rewrites is its own search/scaffold code and diagnostic tools (software); the high-level revise/continue/conclude decision is taken by the fixed base model's reasoning, and the official evaluator f is fixed. The Darwin Godel Machine, which also rewrites its own coding scaffold, was annotated R2 because its exploration process is fixed
+     - **Recommendation: A.** Organon goes beyond DGM: DGM explicitly fixes archive maintenance and parent selection, whereas Organon rewrites selection/survival/variation code AND the diagnostic procedures used to choose and judge later revisions, which is exactly the improvement process itself. The rules give R4 to cases where the part that generates improvements is improved, stating the level it is limited to. Choose R2 if the confirmer judges that improving diagnostic tools is still just scaffold code and that the actual revise-decision procedure (the base model's reasoning) never changes.
+     - Annotator's choice: A (R4 (limited to the diagnostic and assessment instruments and revision cadence that guide revisions; the core revision-reasoning model and the official evaluator are fixed)).
+
+  2. **Is the improvement in-task, or cross-task given the 21 diverse task families?** (affects: evidence strength; see Section 4.2 (public vs private cases), Section 4.1, Conclusion)
+     - Option A: in-task. Evidence: Self-improvement is run independently per task; search and selection use each task's own public cases, and gains are reported on that same task's private cases, which Section 4.2 frames as held-out cases within the evaluated tasks; capabilities are not carried across tasks (Conclusion: future work)
+     - Option B: cross-task. Evidence: Results span four very different domains (algorithm design, kernels, math, systems), suggesting generality of the method
+     - **Recommendation: A.** The breadth is of the method, not of transfer: each run self-improves and is evaluated on the same task, and held-out private cases of the same task count as in-task per the rules. Choose cross-task only if the confirmer counts the diversity of tasks solved by one unchanged system as cross-task evidence, but no capability learned on one task is shown to help another.
+     - Annotator's choice: A (in-task).
+
+  3. **Is accumulation a single evolving agent lineage, or an open-ended population/archive?** (affects: accumulation; see Figure 2a, Section 3.1.1, Appendix A.1)
+     - Option A: multi-generation single lineage. Evidence: "One agent throughout the task"; Ar is revised in place to Ar+1 with reverts/withdrawals, a single trajectory per task (Appendix A.1)
+     - Option B: open-ended population or archive. Evidence: The agent maintains a persistent population P of candidate programs with survival/archive policies that it evolves (Section 3.1.2, Appendix A.6)
+     - **Recommendation: A.** The self-referential thing that accumulates (the agent's composition) is a single in-place lineage, as with Godel Agent (P004). The open-ended population is of candidate programs (external artifacts), not of agents. Choose open-ended population/archive if the confirmer annotates accumulation at the candidate-program level rather than the agent level.
+     - Annotator's choice: A (multi-generation single lineage).
+
+  4. **How should the subfield be recorded given the four task families?** (affects: subfield; see Section 4.1)
+     - Option A: Agent self-improvement; Algorithm discovery; Chip design and systems optimization; Mathematics. Evidence: Tasks are ALE-Bench algorithm design, KernelBench GPU kernels and four systems-optimization tasks, and three mathematical constructions, built by a self-improving agent
+     - Option B: Agent self-improvement; Cross-subfield. Evidence: Experiments span many subfields and no single application subfield describes the paper
+     - **Recommendation: A.** The explicit list mirrors how P005 records multiple subfields and is more informative. Choose the Cross-subfield form if the maintainers prefer to cap the number of listed subfields; do not add any new subfield name.
+     - Annotator's choice: A (Agent self-improvement; Algorithm discovery; Chip design and systems optimization; Mathematics).
+
+  5. **Is the in-loop feedback purely automated evaluation, or should self-evaluation be added for the agent-built diagnostics?** (affects: feedback source; see Section 3.1.2, Section 4.1, Appendix A.4-A.8)
+     - Option A: automated evaluation. Evidence: The authoritative signal that decides what is kept is the fixed official evaluator f (public/private cases, correctness+timing, task objectives); the agent's internal checkers are validated against official scores
+     - Option B: automated evaluation; self-evaluation. Evidence: The agent builds local simulators/scorers and diagnostic tools that it uses to pre-screen candidates and to judge its own revisions before official evaluation (Appendix A.4, A.10)
+     - **Recommendation: A.** The kept/discarded decision is driven by the fixed external evaluator f, so automated evaluation is the in-loop signal; the agent's own diagnostics are measurement tools calibrated to f rather than an independent judge. Add self-evaluation if the confirmer judges the agent-built scorers to be a distinct feedback source gating what survives.
+     - Annotator's choice: A (automated evaluation).
+
+  **Comparison with the existing list:** Most similar listed papers: P004 Godel Agent (R4, automated evaluation, multi-generation single lineage) and P006 Darwin Godel Machine (R2, automated evaluation, open-ended population/archive); also P005 SICA (R2, 0;1;2). Organon is consistent with P004 in being a single agent that modifies its own running code in place with reverts, and claims R4 like P004 (P004's R4 is noted as qualitative/case-study only; Organon supports it across all 21 runs in Appendix A.11). It differs from P006, which is annotated R2 precisely because its exploration/selection process is fixed, whereas Organon rewrites selection, survival and the diagnostic procedures that guide revisions — the main reason I recommend R4 over R2. Like P005 it reports only in-task, single-run-per-setting, authors'-own evaluations with no held-out cross-task transfer, so the evidence annotation matches.
+
+  **Signals useful for the survey:** Useful for the survey: (1) a clear RSI claim with empirical support that the revision-guiding instruments themselves were revised (Appendix A.11), a stronger R4 demonstration than P004's single case study, and a clean contrast with P006's deliberately fixed exploration process; (2) honest self-reported gap between claim and evidence — A.13 states gains are temporal associations not causal, one run per task, no ablation isolating revisions, and documents undetected revision errors (LLM-SQL sign error, Cloudcast arithmetic inconsistencies); (3) note the paper is future-dated (17 Oct 2026) and cites many 2026 works and tools (DeepSeek Harness, DeepSeek-V4.1-Flash), which the confirmer should sanity-check.
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
