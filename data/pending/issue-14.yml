@@ -77,25 +77,17 @@ notes: Feedback details: each new agent is evaluated on a coding benchmark in st
 # Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
 # Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
 review_points: |
-  1. **Does DGM change how it improves, or only its task tools and workflow?** (affects: self-reference depth; see Section 3, Appendix C.3, Appendix J)
-     - **R2:** the open-ended exploration process (archive maintenance, parent selection) is "fixed and not modifiable by the DGM" (Section 3); what to change is diagnosed by a separate fixed o1 model with a fixed prompt (Appendix C.3); the reported changes are editing tools, patch generation and ranking, retries and context summarization (Figure 3, Appendix F). Same structure as SICA (#12), which the maintainer set to R2.
-     - **R4 (only indirectly, through code shared with the task agent):** the abstract says it modifies its own code "thereby also improving its ability to modify its own codebase", and the modified agent performs the next self-modification. The ablation without self-improvement ends lower (Table 1) and has fewer working children (Table 2).
-     - **Recommendation: R2.** No part of how improvements are proposed or selected is changed in the experiments, so the improvement process itself is not modified; the gain in self-modification is a side effect of better task tools. Choose R4 only if this "the improver is the improved" structure should count as R4 in general, in which case SICA should change too.
-  2. **Evidence strength: cross-task or in-task?** (see Section 4.4, Figure 4, Appendix A.2)
-     - **cross-task:** the best agent from each benchmark improves on the other benchmark, which it never saw (Polyglot 14.2% to 28.9%, SWE-bench 20.0% to 24.5%); search on Python-only tasks transfers to other languages.
+  1. **Self-reference depth: decided by the maintainer as R2.** DGM edits its own codebase, and the edited agent performs the next self-modification.
+     - **R2 (chosen):** the open-ended exploration process (archive maintenance, parent selection) is "fixed and not modifiable by the DGM" (Section 3); what to change is diagnosed by a separate fixed o1 model with a fixed prompt (Appendix C.3); the reported changes are editing tools, patch generation and ranking, retries and context summarization (Figure 3, Appendix F). No part of how improvements are proposed or selected is changed in the experiments, so the improvement process itself is not modified. Same structure as SICA (#12), also set to R2.
+     - **R4 (only indirectly, through code shared with the task agent):** the abstract says it modifies its own code "thereby also improving its ability to modify its own codebase"; the ablation without self-improvement ends lower (Table 1) and has fewer working children (Table 2). Not chosen: the gain in self-modification is a side effect of better task tools.
+     - Look at: Section 3, Appendix C.3, Appendix J.
+  2. **Evidence strength: decided by the maintainer as cross-task.**
+     - **cross-task (chosen):** the best agent from each benchmark improves on the other benchmark, which it never saw (Polyglot 14.2% to 28.9%, SWE-bench 20.0% to 24.5%); search on Python-only tasks transfers to other languages (Section 4.4, Figure 4). All evaluations are the authors' own, so not "independently verified".
      - **in-task:** the headline 50.0% and 38.0% are on the subsets that drive selection, and the full Polyglot set includes the 50 search tasks.
-     - **Recommendation: cross-task.** The cross-benchmark results meet "other benchmarks not used for tuning"; all evaluations are the authors' own, so not "independently verified".
-  3. **Verification cost: not reported or days to weeks?** (see Section 6, Appendix E.1)
-     - **not reported:** no time is given for one evaluation of an agent (10, 60 or 200 tasks), only money.
+  3. **Verification cost: decided by the maintainer as "not reported".**
+     - **not reported (chosen):** no time is given for one evaluation of an agent (10, 60 or 200 tasks), only money (Appendix E.1); the rules forbid inferring, as for SICA (#12).
      - **days to weeks:** Section 6 says a SWE-bench run takes about 2 weeks, but that is the whole run of 80 iterations.
-     - **Recommendation: not reported.** The rules forbid inferring, and SICA (#12) was handled the same way.
-  4. **Authors' claim: self-improvement or RSI?** (see the abstract and Section 1)
-     - **self-improvement:** the title and abstract use only "self-improving" and "self-improve".
-     - **RSI:** Section 1 says "recursively improving" and "improve recursively".
-     - **Recommendation: self-improvement.** The rule goes by the title and abstract.
-  5. **Does the hallucination case study add a domain or subfield?** (see Appendix H)
-     - **No:** it still runs on SWE-bench tasks with an automated scoring function, so tags 0;1 and automated evaluation stay.
-     - **Yes:** it is an AI-safety use, but no such subfield exists, and adding one is the maintainers' decision.
-     - **Recommendation: no.** It is recorded in the notes and limitations, including the objective hacking it reports.
+  4. **Authors' claim: decided by the maintainer as self-improvement.** The title and abstract use only "self-improving" and "self-improve"; "recursively improving" appears only in Section 1, and the rule goes by the title and abstract.
+  5. **Domain tags 0;1, no extra subfield for the hallucination case study: decided by the maintainer.** The case study (Appendix H) still runs on SWE-bench tasks with an automated scoring function; it is recorded in the notes and limitations, including the objective hacking it reports.
 
-  Reading: main text and Appendices A-E and G-J in full; Appendix F (diffs of the best agents) only looked over for structure.
+  Reading: main text and Appendices A-E and G-J in full; Appendix F (diffs of the best agents) only looked over for structure. Whether this counts as full text is left to the confirmer.
