@@ -1,0 +1,115 @@
+# Annotation for the paper recommended in issue #32. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: Evaluation-Free Recursive Self-Improvement for Coding Agents
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2611.21056
+
+# First released, YYYY-MM
+date: 2026-11
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;1
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Software engineering
+
+# Task: what the system does in the experiments
+task: A coding agent iteratively rewrites its own scaffold source-code repository via explore-then-integrate, evaluated on SWE-bench Pro (60-task subset), SWE-bench Verified (50), Polyglot (50), and a mini-swe-agent scaffold
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The agent's own scaffold source-code repository: tools, prompts, utilities and control logic
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R2
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 3.1: 'Sigma_t is implemented as a source-code repository (Appendix A.2), allowing the scaffold and its modifications to be inspected before downstream evaluation'; Appendix A.7: 'The underlying LLM parameters remain fixed, while the scaffold controls tool use, execution feedback, and the problem-solving process'; the proposal/exploration/integration operators and validity gates are fixed ELITE framework code, and Limitations states 'The current implementation also maintains a single lineage' (no modification of the improvement process itself, hence R2 not R4)
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: formal verification; self-evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: multi-generation single lineage
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: 10 generations (T=10) per run, with 5 accepted updates in the analyzed DeepSeek run; mini-swe-agent run also 10 rounds (6 accepted); 3 independent runs per DeepSeek method
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: seconds to minutes
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: RSI
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: cross-task
+
+# Main result: one sentence with numbers
+result: On SWE-bench Pro (60-task subset, DeepSeek-V4-Flash), ELITE raises the initial agent from 60.0% to 85.6% (vs DGM 86.7%, HGM 88.3%) using zero candidate task evaluations and 8.8x/3.2x less wall-clock evolution time, and transfers without further adaptation to 73.3% on SWE-bench Verified and 69.3% on Polyglot
+
+# Failures and limitations: as reported in the paper
+limits: Single lineage with no archive; downstream performance is non-monotonic across accepted updates (two regressions); removing deterministic gates collapses average from 76.1% to 52.0%; one exploratory child collapsed to 3.3% and integration need not recover the best child; below DGM/HGM on target Pro; evaluation-based select-one beats ELITE on Pro (91.7% vs 85.6%); limited benchmark subsets and few repetitions (Qwen and most ablations single-run)
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Feedback: the loop uses NO downstream task evaluation (the paper's central claim); in-loop signals are the deterministic validity gates Gexp/Gacc (compilation, imports, assertions, smoke tests of tool-call protocol and main flow; Appendix A.5.2, Table 12) and the LLM integrator's implementation-level reasoning that selects compatible mechanisms (Section 4.2). Loop: fully automatic, Docker-isolated (A.5.1). Accumulation: single lineage, retained agent + evolution history mt (Section 4.1, Limitations). Rounds: T=10, Table 11; 5 accepted updates (Figure 3b). Cost: inferred seconds-to-minutes from gate description + 16.35 self-mod/h; per-gate time not itemized, so a strict reading could be 'not reported'. Evidence: transfer to held-out Verified/Polyglot and cross-backbone, authors' own (Section 5.2, Figure 2). Models: DeepSeek-V4-Flash and Qwen-3.7-Plus backbones, same LLM for self-modification and task solving, weights fixed (Section 5.1, A.5.1); mini-swe-agent run uses Claude-opus-5.5 (A.5.2). R2 rationale: modifies own scaffold code only; P/E/I operators, gates and single lineage are fixed framework (Section 3.1, A.7). Open question: whether the deterministic gates count as 'formal verification' or 'automated evaluation', and whether the LLM integrator's selection counts as 'self-evaluation' (the LLM is fixed, only the scaffold is improved).
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **What is the in-loop feedback signal, given the paper uses NO downstream task evaluation? Classify the deterministic validity gates and the LLM integrator.** (affects: feedback source; see Section 4.2 (integration); Appendix A.5.2 and Table 12 (validity gates); Algorithm 1)
+     - Option A: formal verification; self-evaluation. Evidence: Gates 'check compilation, imports, and predefined program assertions ... without LLM judgments or downstream benchmark scores' plus smoke tests (A.5.2, Table 12) = deterministic validity/formal checks; the integrator (the agent's own LLM) reasons over implementations and rejects redundant/conflicting/incomplete mechanisms (Section 4.2) = self-evaluation.
+     - Option B: automated evaluation; self-evaluation. Evidence: If the gates' smoke tests/assertions (call-return correspondence, message ordering, bounded execution) are read as 'tests' they fall under automated evaluation; the integrator still provides an LLM self-evaluation signal.
+     - Option C: formal verification. Evidence: If one follows DGM's precedent that an LLM proposal/diagnosis step 'does not decide what is kept' (only the gate accepts/rejects the descendant), then the sole hard keep/discard signal is the deterministic gate.
+     - **Recommendation: A.** The gates are deterministic structural/operational checks (compile/import/assert/smoke-test), closest to 'formal verification' (type-checking-and-similar) and explicitly not benchmark/ground-truth task tests; and unlike DGM's diagnosis step, ELITE's integrator actively selects which mechanisms survive into the descendant with no later task test, so its judgment is a genuine keep/discard signal (self-evaluation). Choose option 2 if the confirmer counts the smoke tests/assertions as 'tests' (automated evaluation); choose option 3 if they judge the integrator to be a generator rather than an evaluator.
+     - Annotator's choice: A (formal verification; self-evaluation).
+
+  2. **Is the self-reference depth R2 (modifies own scaffold code) or does the recursive-improvement claim reach R4 (improving the improvement process)?** (affects: self-reference depth; see Section 3.1; Section 4; Appendix A.7; Section 6 Limitations)
+     - Option A: R2. Evidence: The agent modifies only its scaffold source code (tools, prompts, control logic); the proposal/exploration/integration operators, validity gates and single lineage are fixed framework code; Limitations: 'maintains a single lineage'; A.7 lists adding an archive as future work. LLM weights fixed (A.7).
+     - Option B: R2 or R4 (unclear). Evidence: Title claims 'Recursive Self-Improvement' and the modified coding agent is itself used to implement later self-modifications, so improving coding ability may improve its ability to self-modify (the same indirect argument DGM made for R4).
+     - **Recommendation: A.** DGM (P006) was annotated R2 on exactly this reasoning: the agent edits its own code but the exploration/selection process is fixed. ELITE is analogous, so R2 keeps the list consistent. Choose option 2 only if the confirmer wants to credit the title's recursive framing; the paper shows no measured improvement of the improvement process itself.
+     - Annotator's choice: A (R2).
+
+  3. **Is the evidence strength cross-task or in-task?** (affects: evidence strength; see Section 5.2; Table 1; Figure 2; Appendix A.4)
+     - Option A: cross-task. Evidence: The agent evolved on SWE-bench Pro transfers without further adaptation to held-out SWE-bench Verified (73.3%) and Polyglot (69.3%), and across LLM backbones (Figure 2); these benchmarks never provide feedback during evolution (A.4).
+     - Option B: cross-task, independently verified. Evidence: Transfer results exist, but all evaluations are run by the authors; there is no third-party or independent evaluation, so this stronger level is not met.
+     - **Recommendation: A.** Transfer to benchmarks not used in the loop is clear cross-task evidence, matching DGM's annotation; it is not independently verified because the authors ran all evaluations. (Note: because ELITE uses no task scores even on Pro, the Pro result is arguably not in-task either, but the Verified/Polyglot transfer is the cleaner basis for cross-task.)
+     - Annotator's choice: A (cross-task).
+
+  4. **What verification cost should be recorded for the in-loop signal?** (affects: verification cost; see Appendix A.5.2, Table 12; Table 2; case studies A.1.4)
+     - Option A: seconds to minutes. Evidence: The in-loop verification is deterministic compile/import/assertion/smoke-test scripts; case-study probes use a 3-second timeout, and Table 2 reports 16.35 self-modifications/hour (~minutes per attempt, including the gate).
+     - Option B: not reported. Evidence: The paper reports total evolution wall-clock (4.90 h for 10 generations) and self-mod throughput, but does not separately time a single gate check, so a strict 'only as reported' reading gives not reported (as was done for DGM).
+     - **Recommendation: A.** The gates are inherently fast deterministic checks and the throughput figures imply minutes per cycle, so 'seconds to minutes' is honest and supported; pick 'not reported' if the confirmer wants strict parity with how DGM's cost was handled (no explicit per-evaluation time).
+     - Annotator's choice: A (seconds to minutes).
+
+  5. **Confirm the accumulation mode is a single lineage, not an archive/population.** (affects: accumulation; see Section 6 Limitations; Section 4.1; Algorithm 1; Appendix A.7)
+     - Option A: multi-generation single lineage. Evidence: Limitations: 'The current implementation also maintains a single lineage'; each generation carries forward one retained agent plus a compact evolution history mt; A.7 lists archive-based search only as future work.
+     - Option B: open-ended population or archive. Evidence: The method is positioned against DGM's archive and explores K=7 children per generation, but these children are not retained as a population; only the single integrated descendant is carried forward.
+     - **Recommendation: A.** The paper is explicit that it keeps a single lineage (unlike DGM/HGM's archive), so 'multi-generation single lineage'. The K=7 exploratory children are intra-generation candidates, not a retained archive, so option 2 would be a misreading.
+     - Annotator's choice: A (multi-generation single lineage).
+
+  **Comparison with the existing list:** Most similar: P006 Darwin Gödel Machine (R2, automated evaluation, loop fully automatic, cross-task) and the Huxley-Gödel Machine (the paper's main baselines; HGM appears to be the pending issue #19 annotation). ELITE is consistent with DGM on R (R2: modifies own scaffold code, but the explore-then-integrate process/archive logic is fixed), tags (0;1), subclass (Agent self-improvement; Software engineering), loop (fully automatic), reversibility (fully reversible), and evidence (cross-task, transfers to held-out Verified/Polyglot, authors' own evaluation). It DIFFERS from DGM in two ways worth flagging: (1) feedback — DGM/HGM use automated benchmark evaluation inside the loop, whereas ELITE deliberately uses no downstream task evaluation, relying on deterministic structural/operational validity gates plus LLM implementation-level integration; (2) accumulation — DGM keeps an open-ended archive/population, whereas ELITE maintains a single lineage (the paper lists adding an archive as future work).
+
+  **Signals useful for the survey:** Clear claim-vs-evidence point: the title claims "Recursive Self-Improvement" but the loop never improves the improvement process itself (R2; single fixed lineage; P/E/I operators and gates are fixed framework code), and the agent's weights/LLM are fixed — so the "recursive" claim rests on the same indirect argument as DGM (improving coding ability may improve the ability to self-modify), not on a measured meta-level improvement. Reported failures useful for the survey: downstream performance is non-monotonic across accepted updates (two intermediate regressions; 60.0%->81.7%->...->86.7%); one exploratory child collapsed to 3.3%; integration does not always recover the best child (reaches 81.7% vs a best child 83.3%); removing the deterministic validity gates collapses performance from 76.1% to 52.0% average, showing the loop still depends on a hard verification signal; an evaluation-based select-one variant beats ELITE on the target Pro benchmark (91.7% vs 85.6%) while transferring worse, highlighting the benchmark-adaptation vs transfer trade-off; most Qwen and ablation numbers are single runs.
+
+  _Drafted with Claude Code (paper-reading skill); each point above was decided by the annotator._
