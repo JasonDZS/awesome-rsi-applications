@@ -4,11 +4,11 @@ A list of papers that apply recursive self-improvement (RSI), maintained alongsi
 
 Most existing RSI surveys and lists are organized by mechanism: whether the model or the scaffold is changed, and how closed the loop is. This list is organized by **application domain** and asks one question: **how far has RSI progressed in each application domain?**
 
-It currently holds 10 paper(s). Every paper is annotated with the same set of fields, so papers can be compared side by side.
+It currently holds 11 paper(s). Every paper is annotated with the same set of fields, so papers can be compared side by side.
 
-> **Human confirmation: 10 / 10.** A paper is only formally included once a human developer has checked its annotation against the paper. The "Confirmed" column names the confirmer; entries marked "pending" are preliminary annotations drafted by an AI assistant and should not be cited as they are.
+> **Human confirmation: 11 / 11.** A paper is only formally included once a human developer has checked its annotation against the paper. The "Confirmed" column names the confirmer; entries marked "pending" are preliminary annotations drafted by an AI assistant and should not be cited as they are.
 >
-> **Status: in progress.** 10 paper(s) were read in full or in part, 0 only as far as the abstract or an excerpt, and 0 could not be accessed; the "Reading" column gives the details. "unclear" means there was not enough information to decide. Check the original paper before citing.
+> **Status: in progress.** 11 paper(s) were read in full or in part, 0 only as far as the abstract or an excerpt, and 0 could not be accessed; the "Reading" column gives the details. "unclear" means there was not enough information to decide. Check the original paper before citing.
 
 ## Contents
 
@@ -24,10 +24,10 @@ Papers in each domain by self-reference depth (R0–R4). A paper can carry sever
 
 | Domain | R0 | R1 | R2 | R3 | R4 | Unclear | Total |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0. AI R&D itself | 2 | 0 | 4 | 2 | 2 | 0 | 10 |
-| 1. Engineering | 0 | 0 | 4 | 0 | 1 | 0 | 5 |
-| 2. Natural sciences | 1 | 0 | 1 | 1 | 1 | 0 | 4 |
-| 3. Physical and embodied systems | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 0. AI R&D itself | 2 | 0 | 5 | 2 | 2 | 0 | 11 |
+| 1. Engineering | 0 | 0 | 5 | 0 | 1 | 0 | 6 |
+| 2. Natural sciences | 1 | 0 | 2 | 1 | 1 | 0 | 5 |
+| 3. Physical and embodied systems | 0 | 0 | 1 | 0 | 0 | 0 | 1 |
 | 4. Social sciences | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 Observations from the annotations so far (tentative, given the sample size):
@@ -68,7 +68,7 @@ R0 marks a borderline case. R0–R4 is not the same scale as the L0–L5 levels 
 
 ## Papers
 
-### 0. AI R&D itself (10)
+### 0. AI R&D itself (11)
 
 General-purpose AI that improves itself, not tied to one application domain. May be tagged together with domains 1–4.
 
@@ -84,8 +84,9 @@ General-purpose AI that improves itself, not tied to one application domain. May
 | P007 | [Self-Adapting Language Models](https://arxiv.org/abs/2506.10943) | 2025-06 | Data and weight self-adaptation | The model's own weights. The outer ReST-EM loop finetunes the model to generate better self-edits (synthetic finetuning data, and on ARC the choice of augmentations, learning rate, epochs and loss tokens); each self-edit is applied to the same model as an SFT update (LoRA or full finetuning) | R3 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
 | P008 | [Huxley-Gödel Machine: Human-Level Coding Agent Development by an Approximation of the Optimal Self-Improving Machine](https://arxiv.org/abs/2510.21614) (also 1) | 2025-10 | Agent self-improvement; Software engineering | The coding agent's own code repository (starting from the DGM initial agent, a single LLM loop with bash and file-editing tools): its tools and its attempt and test workflow in coding_agent.py. The selected agent produces its own child, so the modified code also carries out later self-modifications; the HGM tree-search policy (CMP estimate, Thompson sampling, expansion rule, final selection) stays fixed | R2 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
 | P009 | [Group-Evolving Agents: Open-Ended Self-Improvement via Experience Sharing](https://arxiv.org/abs/2602.04837) (also 1) | 2026-02 | Agent self-improvement; Software engineering | The coding agent's own framework code: its tools, workflow and prompting strategies | R2 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
+| P011 | [The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators](https://arxiv.org/abs/2606.26294) (also 1, 2, 3) | 2026-06 | Agent self-improvement; Software engineering; Mathematics; Automated reward and curriculum design; Automated ML research | The agents' and evaluators' own code (coder, code reviewer, paper writer/reviewer, prover/grader, reward designer) plus the utility itself — the learned evaluator is co-evolved and replaced across epochs; the meta-agent code is also editable, while the scoring/orchestration harness is fixed | R2 | automated evaluation; learned judge; simulation | fully automatic | in-task | RSI | partial text | ✅ @JasonDZS |
 
-### 1. Engineering (5)
+### 1. Engineering (6)
 
 Software engineering, algorithm discovery, chip design and systems optimization. The loop runs only through digital environments.
 
@@ -96,8 +97,9 @@ Software engineering, algorithm discovery, chip design and systems optimization.
 | P006 | [Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents](https://arxiv.org/abs/2505.22954) (also 0) | 2025-05 | Agent self-improvement; Software engineering | The coding agent's own Python repository: its tools (e.g. line-range file viewing, string-replacement editing), workflow (several patch attempts, ranking by another FM, history-aware retries, non-empty patch validation) and context handling (auto-summarize at the context limit). The modified agent then carries out the next self-modification; the archive and parent selection stay fixed | R2 | automated evaluation | fully automatic | cross-task | self-improvement | full text | ✅ @JasonDZS |
 | P008 | [Huxley-Gödel Machine: Human-Level Coding Agent Development by an Approximation of the Optimal Self-Improving Machine](https://arxiv.org/abs/2510.21614) (also 0) | 2025-10 | Agent self-improvement; Software engineering | The coding agent's own code repository (starting from the DGM initial agent, a single LLM loop with bash and file-editing tools): its tools and its attempt and test workflow in coding_agent.py. The selected agent produces its own child, so the modified code also carries out later self-modifications; the HGM tree-search policy (CMP estimate, Thompson sampling, expansion rule, final selection) stays fixed | R2 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
 | P009 | [Group-Evolving Agents: Open-Ended Self-Improvement via Experience Sharing](https://arxiv.org/abs/2602.04837) (also 0) | 2026-02 | Agent self-improvement; Software engineering | The coding agent's own framework code: its tools, workflow and prompting strategies | R2 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
+| P011 | [The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators](https://arxiv.org/abs/2606.26294) (also 0, 2, 3) | 2026-06 | Agent self-improvement; Software engineering; Mathematics; Automated reward and curriculum design; Automated ML research | The agents' and evaluators' own code (coder, code reviewer, paper writer/reviewer, prover/grader, reward designer) plus the utility itself — the learned evaluator is co-evolved and replaced across epochs; the meta-agent code is also editable, while the scoring/orchestration harness is fixed | R2 | automated evaluation; learned judge; simulation | fully automatic | in-task | RSI | partial text | ✅ @JasonDZS |
 
-### 2. Natural sciences (4)
+### 2. Natural sciences (5)
 
 Mathematics, chemistry and materials, biology and medicine, physics and earth sciences.
 
@@ -107,13 +109,15 @@ Mathematics, chemistry and materials, biology and medicine, physics and earth sc
 | P002 | [ADAS: Automated Design of Agentic Systems](https://arxiv.org/abs/2408.08435) (also 0) | 2024-08 | Agent self-improvement; Mathematics | External artifacts only: the meta agent designs new agents in code (their forward function); the meta agent itself does not change | R0 | automated evaluation | fully automatic | cross-task | not claimed (Section 6 lists self-improvement of the meta agent as future work) | partial text | ✅ @JasonDZS |
 | P004 | [Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement](https://arxiv.org/abs/2410.04444) (also 0) | 2024-10 | Agent self-improvement; Mathematics | The agent's own running code, changed by monkey patching: the task policy (solver) and, in the case study, the self-improvement logic itself | R4 (changes to the improvement logic shown only qualitatively, in the Game of 24 case study) | automated evaluation | fully automatic | in-task | RSI | full text | ✅ @JasonDZS |
 | P005 | [A Self-Improving Coding Agent](https://arxiv.org/abs/2504.15228) (also 0, 1) | 2025-04 | Agent self-improvement; Software engineering; Mathematics | The agent's own Python codebase: tools, sub-agents, prompts and orchestration logic. The best agent so far is also the meta-agent that makes the next change, so the edited code takes part in later improvement steps | R2 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
+| P011 | [The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators](https://arxiv.org/abs/2606.26294) (also 0, 1, 3) | 2026-06 | Agent self-improvement; Software engineering; Mathematics; Automated reward and curriculum design; Automated ML research | The agents' and evaluators' own code (coder, code reviewer, paper writer/reviewer, prover/grader, reward designer) plus the utility itself — the learned evaluator is co-evolved and replaced across epochs; the meta-agent code is also editable, while the scoring/orchestration harness is fixed | R2 | automated evaluation; learned judge; simulation | fully automatic | in-task | RSI | partial text | ✅ @JasonDZS |
 
-### 3. Physical and embodied systems (0)
+### 3. Physical and embodied systems (1)
 
 Robot skill acquisition, automated reward and curriculum design, open-ended embodied learning. The loop runs through the physical world or a simulation of it.
 
 | ID | Paper | First released | Subfield | What is improved | R | Feedback | Loop | Evidence | Claim | Reading | Confirmed |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| P011 | [The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators](https://arxiv.org/abs/2606.26294) (also 0, 1, 2) | 2026-06 | Agent self-improvement; Software engineering; Mathematics; Automated reward and curriculum design; Automated ML research | The agents' and evaluators' own code (coder, code reviewer, paper writer/reviewer, prover/grader, reward designer) plus the utility itself — the learned evaluator is co-evolved and replaced across epochs; the meta-agent code is also editable, while the scoring/orchestration harness is fixed | R2 | automated evaluation; learned judge; simulation | fully automatic | in-task | RSI | partial text | ✅ @JasonDZS |
 
 ### 4. Social sciences (0)
 
