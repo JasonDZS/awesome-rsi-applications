@@ -1,0 +1,93 @@
+# Annotation for the paper recommended in issue #12. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: A Self-Improving Coding Agent
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2504.15228
+
+# First released, YYYY-MM
+date: 2025-04
+
+# Publication status: arXiv preprint, or venue and year
+venue: arXiv preprint
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;1;2
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Software engineering; Mathematics
+
+# Task: what the system does in the experiments
+task: Main run: a fixed random 50-problem subset of SWE-Bench Verified; 50 random LiveCodeBench problems; a synthetic file-editing benchmark and a synthetic symbol-location (codebase navigation) benchmark built from Python repositories. Second run: AIME 2024 and GPQA Diamond
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The agent's own Python codebase: tools, sub-agents, prompts and orchestration logic. The best agent so far is also the meta-agent that makes the next change, so the edited code takes part in later improvement steps
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R2
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 1: SICA “eliminates the distinction between meta-agent and target agent, and is capable of editing its own codebase to improve itself”; Section 3: “SICA takes the best performing agent from the archive up until this point as the meta-agent, which is instructed to look through the archive, identify an improvement, and implement it” (Algorithm 1). The changes reported in Appendix D are new tools and routing (smart editor, diff-based editing, code context summarizer, AST and hybrid symbol locators, file edit routing in MainAgent); none of them is reported to change the meta-improvement procedure (archive explorer, meta-improvement prompt) or the outer loop, whose utility function (Equations 1-2) and selection rule are fixed
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: 15 iterations in the main run (Table 1, iterations 0-15); 9 iterations in the AIME and GPQA run (Figure 4)
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: self-improvement
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: in-task
+
+# Main result: one sentence with numbers
+result: From iteration 0 to 15 on the same benchmarks used for selection: SWE-Bench Verified subset 17% to 51% (peak 53% at iteration 14), LiveCodeBench 65% to 71%, file editing 82% to 91%, symbol location 35% to 40%, with average time per problem 130 s to 115 s and cost USD 1.91 to 1.70 (Table 1); on AIME 2024 and GPQA Diamond the gains were marginal (Figure 4)
+
+# Failures and limitations: as reported in the paper
+limits: Little improvement on AIME and GPQA, where the agent system as a whole averaged 76% while o3-mini alone scores 87% and 79%; the main agent often just delegated to the o3-mini reasoning sub-agent, and the added reasoning components may interrupt the reasoning model's chain of thought (Section 4, Figure 4); it was hard for the agent to come up with truly novel and feasible modification ideas, and a bad idea costs a long editing step plus an even more expensive benchmark run (Limitations); early feature ideas heavily shaped later ones, so poor initial ideas (e.g. fixating on caching open files) lowered later ones, which may make runs high-variance (Limitations); the short 5-minute timeout and per-problem cost cap lower the initial scores, and much of the initial improvement comes from faster file editing and lower cost rather than from what SWE-Bench normally measures (Limitations); the low symbol-location scores are attributed to poor benchmark data quality (Section 4, footnote 3); improvement from scaffolding alone appears limited (Safety Considerations)
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Feedback details: each new agent is run on the benchmark set and scored by a fixed utility U = 0.5 x normalised score + 0.25 x cost term (capped at USD 10 per problem) + 0.25 x time term (300 s timeout), halved on timeout (Section 3, Equations 1-2); the agent with the highest utility in the archive becomes the next meta-agent and the base for the next iteration, and every agent with its results stays in the archive (Section 3, Algorithm 1). File editing is scored by closeness to the target file, symbol location by the returned location, SWE-Bench and LiveCodeBench by their own tests (Section 4). An asynchronous LLM overseer, called every 30 s, can notify or cancel running agents to stop loops and off-task behaviour (Section 3.1, Appendix A.2); it does not decide which agent is kept. The meta-improvement step itself uses an archive explorer sub-agent and LLM reasoning sub-agents to pick a change (Appendix B). Models: Sonnet 3.5 (v2) for most agents and o3-mini for the reasoning sub-agent (Section 4). Loop: people write the initial agent, the benchmarks and the utility; the paper reports no human step inside the run. Accumulation: all agents are kept in an archive that the meta-agent consults, and each new agent is built by the best agent so far, as in ADAS but with the meta-agent chosen from the archive (Section 3). Evidence: Table 1 reports scores on the same benchmark problems that drive selection (fixed 50-problem subsets); there is no held-out test set, no transfer to other benchmarks or models, and a single run per setting; all evaluations are the authors' own. Cost: Table 1 reports average time per benchmark problem (about 104-151 s, capped at 300 s), and Section 3.1 says one meta-improvement step may take on the order of an hour, but the time for a full benchmark evaluation of one agent is not reported; the 15-iteration run cost about USD 7,000 in API fees (Section 4). Publication status: the arXiv v2 PDF (May 2025) is marked Preprint. Related work: the paper argues that ADAS is not self-improving because its meta-agent is fixed, and that Gödel Agent is not a general-purpose coding agent (Section 2). Reading: the whole paper including Appendices A-D was read
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Self-reference depth: R2 or R4?** SICA edits its whole codebase, and the edited agent then performs the next improvement step, so the change does take part in later improvement.
+     - **R2 (recommended):** the changes actually reported (Appendix D) are task tools and routing: editing tools, a code summarizer, symbol locators, file edit routing. None is reported to change how the agent decides or makes improvements (the archive explorer or the meta-improvement prompt), and the outer loop (utility in Equations 1-2, pick the best agent) is fixed. This matches the rule "use the level actually achieved", and STaR (P001) was treated the same way: the improved model produces the next round's data and is still R3, not R4.
+     - **R4:** because meta-agent and target agent are the same code, every improvement to the coding tools is also an improvement to the agent that does the improving (Section 1: "the improvements in coding abilities may be leveraged during subsequent improvement steps"). If you choose this, I suggest a qualifier such as "R4 (only indirectly, through tools shared with the task agent)".
+     - Look at: Section 3, Algorithm 1, Appendix D.
+  2. **Accumulation: archive or single lineage?**
+     - **open-ended population or archive (recommended):** every agent and its results are kept in an archive that the meta-agent analyses (Section 3, Appendix B); the paper calls its loop ADAS-like, and ADAS (P002) uses this value.
+     - **multi-generation single lineage:** each new agent is always built by the best agent so far, so there is no branching from weaker agents; Gödel Agent (P004), which reverts to the best version, uses this value.
+  3. **Verification cost: "not reported" or "seconds to minutes"?**
+     - **not reported (recommended):** the time for one full benchmark evaluation of an agent is not given; Table 1 only gives the average time per problem (about 104-151 s, 300 s timeout), and the rules forbid inferring.
+     - **seconds to minutes:** if one benchmark problem counts as one evaluation.
+  4. **Domain tags 0;1;2:** 0 and 1 for the self-modifying coding agent and the coding benchmarks. Tag 2 and the subfield Mathematics come from the second run on AIME 2024 and GPQA Diamond (Figure 4), following ADAS and Gödel Agent, which got 2 for MGSM. Alternative: 0;1 without Mathematics, since that run is secondary and shows little improvement. Recommended: 0;1;2.
+  5. **Evidence strength: in-task.** Table 1 scores the same fixed 50-problem subsets that drive selection; there is no held-out set, no transfer, and only one run, so no value above in-task fits. Venue "arXiv preprint": the v2 PDF is marked Preprint.
+
+  Reading: the whole paper including Appendices A-D was read.
