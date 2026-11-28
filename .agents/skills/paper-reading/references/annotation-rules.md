@@ -50,6 +50,14 @@ Use the highest level the paper **actually achieves**.
 | R3 | Weights and training pipeline |
 | R4 | The improvement process itself |
 
+R4 requires all three of the following:
+
+1. **What is changed is part of how improvements are made**, not part of how tasks are done: what proposes a change (diagnosis, mutation prompts, mutation operators), the procedure that implements it, or how candidates are evaluated and selected (utility, parent selection, archive policy, data generation or training algorithm). Test: if the change only affects how the system performs tasks, it is R2; if it changes which improvements are proposed in later rounds or how they are chosen, it is R4.
+2. **It is actually changed in the reported experiments.** A component that "can in principle be modified" but stays fixed does not count.
+3. **The changed improvement process is then used to improve the system itself** in later rounds, not only an inner component that is separate from it.
+
+If the paper also shows that the change matters (an ablation of the meta-level change, or a measure of improvement quality across rounds), write plain `R4`. If the only evidence is a qualitative case study or example, write `R4 (shown only qualitatively)` or give the specific case, e.g. `R4 (changes to the improvement logic shown only qualitatively, in the Game of 24 case study)`.
+
 Borderline cases:
 
 - **A meta-agent designs other agents and does not change itself** → R0. The designed agents are external artifacts.
@@ -60,6 +68,9 @@ Borderline cases:
 - **Each round retrains from the original model, but on data produced by the previous round's model** → still R3; say so in the notes.
 - **The mutation prompts themselves are also evolved (the part that generates improvements is improved)** → R4, stating which level it is limited to, e.g. `R4 (limited to the prompt level)`.
 - **An outer loop changes the inner loop's search code and does not change itself** → R2, not R4.
+- **The agent that makes the improvement is the same code as the agent being improved, but the reported changes are task tools or workflow** (e.g. better editing tools that also make later self-modification easier) → R2, not R4.
+- **The model changes how its own next round of training data or rewards is produced, and that procedure is then used to train it** → R4, e.g. `R4 (limited to the training-pipeline level)`, but only if the model trained this way is the one that keeps being improved. If a fixed outer step makes the persistent update and the learned procedure only updates temporary copies that are scored and discarded (e.g. SEAL), it is R3. Only retraining on new data is R3.
+- **The system games its evaluator** (e.g. deletes what the checker relies on) → not R4; record it under failures and limitations.
 - When unsure, write e.g. `R2 or R4 (unclear)` and put the evidence for both readings in the points to check.
 
 ## Feedback source (feedback)
