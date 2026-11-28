@@ -165,6 +165,8 @@ The data file is `|`-separated, one paper per row, 28 columns. Besides the colum
 
 **LaTeX tables and figures** for the survey are generated from the data by [`figure/build_figures.py`](figure/README.md).
 
+**Adding a paper from a link.** With an assistant that supports skills, give it the link and ask it to add the paper. The `add-paper` skill ([`.agents/skills/add-paper/`](.agents/skills/add-paper/SKILL.md)) reads the paper, opens the issue, drafts the annotation, asks you about the uncertain points, and opens the pull request once you have answered. You then check the annotation on the issue page and comment `/confirm`.
+
 To correct an existing annotation, open an issue and cite the evidence (the section or sentence in the paper).
 
 ## Related resources

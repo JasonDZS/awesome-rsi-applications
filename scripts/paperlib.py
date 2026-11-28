@@ -1,6 +1,9 @@
 """Shared definitions for the paper list: columns, allowed values, parsing and validation."""
 import csv
+import json
+import os
 import re
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -66,6 +69,57 @@ NOT_HUMAN = re.compile(r"(\[bot\]$|^claude$|^copilot$|^codex$|^github-actions$|b
 # separators accepted in multi-valued fields; "; " is canonical
 SPLIT = re.compile(r"\s*[;；、]\s*")
 MULTI = ("subclass", "criteria", "feedback")
+
+
+def repo_slug():
+    """owner/repo of this repository: $GH_REPO if set, else parsed from the origin remote."""
+    if os.environ.get("GH_REPO"):
+        return os.environ["GH_REPO"]
+    url = subprocess.run(["git", "-C", str(ROOT), "remote", "get-url", "origin"],
+                         capture_output=True, text=True, check=True).stdout.strip()
+    m = re.search(r"[:/]([^/:]+/[^/]+?)(?:\.git)?/?$", url)
+    if not m:
+        raise ValueError(f"cannot tell the GitHub repository from the origin remote: {url}")
+    return m.group(1)
+
+
+def gh_api(path, method="GET", fields=None, paginate=False):
+    """Call the GitHub REST API through the gh CLI and return the parsed JSON.
+
+    REST only: some environments (for example cloud agent sessions) block gh's GraphQL commands
+    such as `gh issue create` and `gh pr create`.
+    """
+    cmd = ["gh", "api", f"repos/{repo_slug()}/{path}", "-X", method]
+    if paginate:
+        cmd += ["--paginate", "--slurp"]
+    data = None
+    if fields is not None:
+        cmd += ["--input", "-"]
+        data = json.dumps(fields)
+    out = subprocess.run(cmd, input=data, capture_output=True, text=True)
+    if out.returncode:
+        raise RuntimeError((out.stderr or out.stdout).strip())
+    result = json.loads(out.stdout) if out.stdout.strip() else None
+    if paginate:
+        result = [item for page in result for item in page]
+    return result
+
+
+def arxiv_id(url):
+    """The arXiv identifier in a link (without version), or '' if it is not an arXiv link."""
+    m = re.search(r"arxiv\.org/(?:abs|pdf|html)/(\d{4}\.\d{4,5})", url or "")
+    return m.group(1) if m else ""
+
+
+def canonical_url(url):
+    """arXiv links are stored as the abstract page without a version; other links are kept as given."""
+    url = (url or "").strip()
+    return f"https://arxiv.org/abs/{arxiv_id(url)}" if arxiv_id(url) else url
+
+
+def same_paper(a, b):
+    a, b = canonical_url(a), canonical_url(b)
+    return bool(a) and a.rstrip("/").lower() == b.rstrip("/").lower()
 
 
 def load_tsv(path=DATA):

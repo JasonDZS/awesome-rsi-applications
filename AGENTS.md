@@ -14,6 +14,7 @@ This is a list of papers that apply RSI (recursive self-improvement). The data i
 
 ## Skills
 
+- When the user gives a paper link and asks to add it, use the `add-paper` skill in `.agents/skills/add-paper/`. It goes from the link to a pull request; the user then comments `/confirm` on the issue.
 - When reading or annotating a paper, use the `paper-reading` skill in `.agents/skills/paper-reading/`.
 
 ## Files
@@ -22,6 +23,7 @@ This is a list of papers that apply RSI (recursive self-improvement). The data i
 - `scripts/check_data.py`: validates the data and the confirmation rules.
 - `scripts/build_readme.py`: generates the README from the data.
 - `data/pending/issue-<number>.yml`: annotation file for a paper awaiting confirmation; exists only on its branch.
+- `scripts/add_paper.py`: `check`, `open` and `submit` commands that take a paper from a link to a pull request (used by the `add-paper` skill).
 - `scripts/new_paper.py`: creates the annotation file for an issue.
 - `scripts/render_review.py`: renders an annotation file as the review shown on the issue page.
 - `scripts/confirm.py`: records a confirmation; run only by the `/confirm` workflow.

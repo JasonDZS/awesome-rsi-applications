@@ -12,6 +12,16 @@ A paper goes from recommendation to inclusion in five steps. The annotator does 
 
 **The one hard rule: every paper must be confirmed by a human developer who has checked it against the paper.** AI assistants may help read papers and draft annotations, but they cannot confirm.
 
+## Shortcut: give an AI assistant the link
+
+If you work with an AI coding assistant that reads this repository's skills (Claude Code, Codex and others), steps 1 to 3 can be done for you. Give it the link:
+
+> Add this paper: https://arxiv.org/abs/2505.22954
+
+Using the `add-paper` skill, the assistant checks for duplicates, reads the paper, opens the issue, drafts every field, and shows you the draft together with the points it was unsure about, each with options and a recommendation. After you answer, it opens the pull request. Steps 4 and 5 stay with you: check the annotation on the issue page against the paper and comment `/confirm`.
+
+The assistant needs the `gh` CLI signed in with permission to open issues and push branches. It cannot confirm a paper, and your answer in the conversation does not count as the confirmation.
+
 ## Step 1: Recommend the paper
 
 Open an issue with the ["Recommend a paper" form](../../issues/new?template=add-paper.yml): title, link, and a sentence or two on why it belongs. Domain tags are optional. Note the issue number; the examples below use `12`.

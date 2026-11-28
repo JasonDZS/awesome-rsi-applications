@@ -3,14 +3,13 @@
 
   python3 scripts/new_paper.py 12                      # reads the issue with the gh CLI
   python3 scripts/new_paper.py 12 --title "..." --url https://arxiv.org/abs/....   # without gh
+  python3 scripts/add_paper.py open ...                # opens the issue, the branch and this file in one go
 
 Run it on a branch named paper/issue-<N>. Fill the file in while reading the paper, then open a
 pull request. The confirmer reviews it on the issue page and comments /confirm there.
 """
 import argparse
-import json
 import re
-import subprocess
 import sys
 from pathlib import Path
 
@@ -53,9 +52,7 @@ HEADINGS = {"title": ("Paper title", "论文标题"), "url": ("Link", "链接"),
 
 
 def issue_fields(number):
-    out = subprocess.run(["gh", "issue", "view", str(number), "--json", "title,body"],
-                         capture_output=True, text=True, check=True).stdout
-    body = json.loads(out)["body"] or ""
+    body = pl.gh_api(f"issues/{number}")["body"] or ""
     sections = {}
     for m in re.finditer(r"^### (.+?)\n+(.*?)(?=^### |\Z)", body, re.S | re.M):
         value = m.group(2).strip()
@@ -71,13 +68,14 @@ def main():
     ap.add_argument("issue", type=int)
     ap.add_argument("--title", default="")
     ap.add_argument("--url", default="")
+    ap.add_argument("--tags", default="", help="domain tags, e.g. '0;1'")
     args = ap.parse_args()
 
-    known = {"title": args.title, "url": args.url, "tags": ""}
+    known = {"title": args.title, "url": pl.canonical_url(args.url), "tags": args.tags}
     if not (args.title and args.url):
         try:
             known.update({k: v for k, v in issue_fields(args.issue).items() if v})
-        except (OSError, subprocess.CalledProcessError, ValueError):
+        except (OSError, RuntimeError, ValueError, KeyError, TypeError):
             print("Could not read the issue (needs the gh CLI). Writing an empty template; "
                   "fill in the title and link by hand.", file=sys.stderr)
 
@@ -85,7 +83,7 @@ def main():
     if path.exists():
         sys.exit(f"{path.relative_to(pl.ROOT)} already exists")
     _, rows = pl.load_tsv()
-    dup = next((r["id"] for r in rows if known["url"] and r["url"] == known["url"]), None)
+    dup = next((r["id"] for r in rows if pl.same_paper(r["url"], known["url"])), None)
     if dup:
         sys.exit(f"This paper is already listed as {dup}")
 
