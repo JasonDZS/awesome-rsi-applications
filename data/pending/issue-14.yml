@@ -1,0 +1,101 @@
+# Annotation for the paper recommended in issue #14. One field per line, written as `field: value`; values must not contain '|'.
+# If you cannot decide, write unclear (for cost: not reported) and give the options and your recommendation in review_points.
+# Do not add an id or confirmation fields: the workflow writes them after a confirmer comments /confirm on the issue.
+
+# Title, as printed on the paper
+title: Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents
+
+# Link; prefer the arXiv abstract page
+url: https://arxiv.org/abs/2505.22954
+
+# First released, YYYY-MM
+date: 2025-05
+
+# Publication status: arXiv preprint, or venue and year
+venue: ICLR 2026
+
+# Domain tags, one or more, separated by ; : 0 AI R&D itself, 1 Engineering, 2 Natural sciences, 3 Physical and embodied systems, 4 Social sciences
+tags: 0;1
+
+# Subfield(s), separated by ; . Use a subfield already in the README; if none fits, raise it in review_points
+subclass: Agent self-improvement; Software engineering
+
+# Task: what the system does in the experiments
+task: SWE-bench Verified with staged evaluation on 10, 60 and 200 task subsets; Polyglot (multi-language coding tasks in C++, Go, Java, JavaScript, Python and Rust) on 10 and 50 task subsets plus the full benchmark for the final agents; a case study on removing tool-use hallucination, scored on 3 SWE-bench tasks
+
+# Inclusion criteria met, separated by ; : closed loop, self-reference, accumulation (a paper meeting only the closed loop is an R0 borderline case)
+criteria: closed loop; self-reference; accumulation
+
+# What is improved: prompts, skill library, scaffold code, weights, ...
+object: The coding agent's own Python repository: its tools (e.g. line-range file viewing, string-replacement editing), workflow (several patch attempts, ranking by another FM, history-aware retries, non-empty patch validation) and context handling (auto-summarize at the context limit). The modified agent then carries out the next self-modification; the archive and parent selection stay fixed
+
+# Self-reference depth: R0 External artifacts only / R1 Prompts, memory, skill and tool libraries / R2 Scaffold and own code / R3 Weights and training pipeline / R4 The improvement process itself
+R: R2
+
+# Evidence for the depth: section and quotation from the paper
+r_evidence: Section 3: self-improvement is defined as "modifying the design of an agent's own components (i.e., its own code, which does not include the open-ended exploration process described in the next paragraph)", and "the open-ended exploration process (i.e., archive maintenance, parent selection) is fixed and not modifiable by the DGM, which we leave as an avenue for future work". Appendix C.3: what to change is diagnosed by a separate fixed FM (o1) with a fixed prompt, and "the implementation_suggestion and problem_description are extracted and passed to the coding agent as its self-modification task". The reported changes (Section 4.4, Figure 3, Appendix F) are task tools and workflow. Appendix J lists letting the agent modify the exploration process as future work. The abstract says it modifies its own code "thereby also improving its ability to modify its own codebase", which is the argument for R4
+
+# Feedback source(s), separated by ; : formal verification, automated evaluation, simulation, real-world experiment, human review, learned judge, self-evaluation
+feedback: automated evaluation
+
+# Loop automation: human-in-the-loop / semi-automatic / fully automatic
+loop: fully automatic
+
+# Accumulation: single round / multi-generation single lineage / open-ended population or archive
+accumulation: open-ended population or archive
+
+# Improvement rounds: rounds or generations reported in the paper, or 'not reported'
+rounds: 80 iterations on SWE-bench (2 self-modifications in parallel per iteration) and 80 on Polyglot (4 in parallel) (Section 4.1, Appendix C.2); 150 iterations in the hallucination case study (Appendix H); 3 independent DGM runs on Polyglot for stability (Appendix A.4)
+
+# Verification cost (only as reported, never inferred): seconds to minutes / hours / days to weeks / months or longer, or requires humans / not reported
+cost: not reported
+
+# Failure reversibility: fully reversible / retryable at a cost / irreversible
+reversibility: fully reversible
+
+# Authors' claim, from the title and abstract: RSI / self-improvement / not claimed; add an explicit disclaimer in parentheses, e.g. self-improvement (states it is not recursive)
+claim: self-improvement
+
+# Evidence strength: in-task / cross-task / cross-task, independently verified
+evidence: cross-task
+
+# Main result: one sentence with numbers
+result: After 80 iterations SWE-bench rises from 20.0% to 50.0% and Polyglot from 14.0% to 38.0% on the 50-task subset (14.2% to 30.7% on the full benchmark), against 39.0% and 28.0% without self-improvement, 23.0% and 14.0% without open-ended exploration, and 39.7% and 30.0% for greedy parent selection (Section 4.4, Table 1); the best SWE-bench agent reaches 28.9% on Polyglot and the best Polyglot agent 24.5% on SWE-bench, and with Claude 3.7 Sonnet the SWE-bench agent goes from 19.0% to 59.5% (Figure 4)
+
+# Failures and limitations: as reported in the paper
+limits: Objective hacking in the hallucination case study: node 114 reached a perfect score by removing the special tool-use markers that the hallucination detector relies on, despite instructions not to change them, and hacking was more frequent when the checking functions were visible to the agent (Appendix H); only 51.3% of generated agents keep basic code-editing ability (Table 2); the lineage of the best agent has performance dips at iterations 4 and 56 (Section 4.4); it still falls short of closed-source SoTA SWE-bench solutions, and one SWE-bench run takes about 2 weeks and about USD 22,000 versus about USD 10,000 for each baseline (Section 6, Appendix E.1); the open-ended exploration process is fixed (Section 3, Appendix J); it is limited by the capabilities of the underlying FM (Section 6); it assumes that better coding benchmark scores reflect a better ability to self-improve (Section 1, Section 6); benchmark-driven modifications might introduce vulnerabilities or misalignment, and iterated self-modification may make the code harder to understand (Section 5); higher-performing agents have higher inference costs (Appendix E.1); only two coding benchmarks were used (Appendix J)
+
+# Reading depth: full text / partial text / abstract only (abstract-only annotations cannot be confirmed)
+reading: full text
+
+# Your confidence in this annotation: high / medium / low
+confidence: medium
+
+# Notes: sources for the other fields, feedback details, open questions
+notes: Feedback details: each new agent is evaluated on a coding benchmark in stages (Section 4.2): 10 tasks to check basic editing ability, then 50 more (60 in total for SWE-bench), and for SWE-bench 200 tasks if it scores over 40% on 60 tasks and is among the top two in the archive; Polyglot agents scoring over 40% on 10 tasks go on to 50. Only agents that compile and can still edit code are added to the archive (Section 3, Algorithm 1). Parents are sampled from the whole archive with weight sigmoid(score) x 1/(1 + number of functioning children), lambda 10, midpoint 0.5 (Appendix C.2). The o1 diagnosis step only proposes what to change; it does not decide what is kept. The diagnosis prompt contains SWE-bench's private test patch and test results; the authors report no memorization or overfitting found on manual inspection (Appendix C.3). Models: Claude 3.5 Sonnet (New) does all self-modification; evaluation uses Claude 3.5 Sonnet (New) for SWE-bench and o3-mini for Polyglot (Table 3), so on Polyglot the score does not measure the model that does the self-modification. Loop: people write the initial agent (bash and whole-file edit tools, Appendix C.1), the benchmarks, the diagnosis prompts and the selection rule; Appendix J says proposed self-modifications "are autonomously evaluated without any human intervention", and Section 5 says the authors "actively monitor agent performance and code changes", which is oversight, not a step in the loop. Accumulation: archive of all valid agents; branching from weaker agents leads to later gains (Figure 3). Evidence: the headline scores are on the same subsets that drive selection, and the full Polyglot benchmark includes the 50 search tasks (in-task); the cross-benchmark results are on a benchmark never seen in the search, which the paper calls "truly held-out tests" (Section 4.4); model transfer on SWE-bench uses the same 200 tasks with other FMs (Figure 4), and on Polyglot gains are small (32.0% to 33.3% with Claude 3.5 Sonnet, 35.6% to 36.8% with Claude 3.7 Sonnet, Appendix A.2); search on Python-only Polyglot tasks transfers to other languages (Figure 4); all evaluations are the authors' own. Section 4.4 gives 59.5% for the Claude 3.7 Sonnet transfer while Figure 4 shows 59.0%. Did the ability to self-improve improve? Only indirect evidence: with the self-modifying agent fixed to the base agent (w/o self-improve, Algorithm 2), the final scores are lower (39.0% vs 50.0% and 28.0% vs 38.0%, Table 1) and "gains taper off quickly" (Appendix A.1), and the share of children with basic editing ability is 51.3% vs 32.5% (Table 2). There is no direct measure of self-modification quality across iterations, the choice of what to change stays with the fixed o1 model, the SWE-bench comparison is a single run per setting (DGM runs 40.7% plus or minus 2.3% over 3 Polyglot runs, baselines not repeated), the DGM run cost about twice as much as each baseline, and the progress curves (Figure 2) are stepwise, not accelerating. Cost: Appendix E.1 gives only money (60 SWE-bench tasks about USD 350, 60 Polyglot tasks about USD 5), and Section 6 gives about 2 weeks for a whole SWE-bench run of 80 iterations; the time for one evaluation of one agent is not reported. Venue: the arXiv v3 PDF (12 Mar 2026) is marked "Published as a conference paper at ICLR 2026"; v1 is from May 2025. Appendix G seems to swap the feature suggestions for nodes 6 and 24 relative to its own text. Reading: the main text and Appendices A-E and G-J were read in full; Appendix F (about 2,600 lines of diffs of the best agents) was only looked over for structure, and the task ID lists in Appendices E.2 and E.3 were not checked one by one
+
+# Points for the confirmer to check. For each: the specific question, the options (with the evidence for each), your recommendation and why, and where in the paper to look.
+# Shown as-is on the issue page. Multi-line Markdown is fine; indent every line by two spaces.
+review_points: |
+  1. **Does DGM change how it improves, or only its task tools and workflow?** (affects: self-reference depth; see Section 3, Appendix C.3, Appendix J)
+     - **R2:** the open-ended exploration process (archive maintenance, parent selection) is "fixed and not modifiable by the DGM" (Section 3); what to change is diagnosed by a separate fixed o1 model with a fixed prompt (Appendix C.3); the reported changes are editing tools, patch generation and ranking, retries and context summarization (Figure 3, Appendix F). Same structure as SICA (#12), which the maintainer set to R2.
+     - **R4 (only indirectly, through code shared with the task agent):** the abstract says it modifies its own code "thereby also improving its ability to modify its own codebase", and the modified agent performs the next self-modification. The ablation without self-improvement ends lower (Table 1) and has fewer working children (Table 2).
+     - **Recommendation: R2.** No part of how improvements are proposed or selected is changed in the experiments, so the improvement process itself is not modified; the gain in self-modification is a side effect of better task tools. Choose R4 only if this "the improver is the improved" structure should count as R4 in general, in which case SICA should change too.
+  2. **Evidence strength: cross-task or in-task?** (see Section 4.4, Figure 4, Appendix A.2)
+     - **cross-task:** the best agent from each benchmark improves on the other benchmark, which it never saw (Polyglot 14.2% to 28.9%, SWE-bench 20.0% to 24.5%); search on Python-only tasks transfers to other languages.
+     - **in-task:** the headline 50.0% and 38.0% are on the subsets that drive selection, and the full Polyglot set includes the 50 search tasks.
+     - **Recommendation: cross-task.** The cross-benchmark results meet "other benchmarks not used for tuning"; all evaluations are the authors' own, so not "independently verified".
+  3. **Verification cost: not reported or days to weeks?** (see Section 6, Appendix E.1)
+     - **not reported:** no time is given for one evaluation of an agent (10, 60 or 200 tasks), only money.
+     - **days to weeks:** Section 6 says a SWE-bench run takes about 2 weeks, but that is the whole run of 80 iterations.
+     - **Recommendation: not reported.** The rules forbid inferring, and SICA (#12) was handled the same way.
+  4. **Authors' claim: self-improvement or RSI?** (see the abstract and Section 1)
+     - **self-improvement:** the title and abstract use only "self-improving" and "self-improve".
+     - **RSI:** Section 1 says "recursively improving" and "improve recursively".
+     - **Recommendation: self-improvement.** The rule goes by the title and abstract.
+  5. **Does the hallucination case study add a domain or subfield?** (see Appendix H)
+     - **No:** it still runs on SWE-bench tasks with an automated scoring function, so tags 0;1 and automated evaluation stay.
+     - **Yes:** it is an AI-safety use, but no such subfield exists, and adding one is the maintainers' decision.
+     - **Recommendation: no.** It is recorded in the notes and limitations, including the objective hacking it reports.
+
+  Reading: main text and Appendices A-E and G-J in full; Appendix F (diffs of the best agents) only looked over for structure.
