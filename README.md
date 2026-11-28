@@ -4,11 +4,11 @@ A list of papers that apply recursive self-improvement (RSI), maintained alongsi
 
 Most existing RSI surveys and lists are organized by mechanism: whether the model or the scaffold is changed, and how closed the loop is. This list is organized by **application domain** and asks one question: **how far has RSI progressed in each application domain?**
 
-It currently holds 5 paper(s). Every paper is annotated with the same set of fields, so papers can be compared side by side.
+It currently holds 6 paper(s). Every paper is annotated with the same set of fields, so papers can be compared side by side.
 
-> **Human confirmation: 5 / 5.** A paper is only formally included once a human developer has checked its annotation against the paper. The "Confirmed" column names the confirmer; entries marked "pending" are preliminary annotations drafted by an AI assistant and should not be cited as they are.
+> **Human confirmation: 6 / 6.** A paper is only formally included once a human developer has checked its annotation against the paper. The "Confirmed" column names the confirmer; entries marked "pending" are preliminary annotations drafted by an AI assistant and should not be cited as they are.
 >
-> **Status: in progress.** 5 paper(s) were read in full or in part, 0 only as far as the abstract or an excerpt, and 0 could not be accessed; the "Reading" column gives the details. "unclear" means there was not enough information to decide. Check the original paper before citing.
+> **Status: in progress.** 6 paper(s) were read in full or in part, 0 only as far as the abstract or an excerpt, and 0 could not be accessed; the "Reading" column gives the details. "unclear" means there was not enough information to decide. Check the original paper before citing.
 
 ## Contents
 
@@ -24,8 +24,8 @@ Papers in each domain by self-reference depth (R0–R4). A paper can carry sever
 
 | Domain | R0 | R1 | R2 | R3 | R4 | Unclear | Total |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0. AI R&D itself | 2 | 0 | 1 | 1 | 1 | 0 | 5 |
-| 1. Engineering | 0 | 0 | 1 | 0 | 0 | 0 | 1 |
+| 0. AI R&D itself | 2 | 0 | 2 | 1 | 1 | 0 | 6 |
+| 1. Engineering | 0 | 0 | 2 | 0 | 0 | 0 | 2 |
 | 2. Natural sciences | 1 | 0 | 1 | 1 | 1 | 0 | 4 |
 | 3. Physical and embodied systems | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | 4. Social sciences | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -68,7 +68,7 @@ R0 marks a borderline case. R0–R4 is not the same scale as the L0–L5 levels 
 
 ## Papers
 
-### 0. AI R&D itself (5)
+### 0. AI R&D itself (6)
 
 General-purpose AI that improves itself, not tied to one application domain. May be tagged together with domains 1–4.
 
@@ -79,14 +79,16 @@ General-purpose AI that improves itself, not tied to one application domain. May
 | P003 | [The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery](https://arxiv.org/abs/2408.06292) | 2024-08 | Automated ML research | External artifacts only: research ideas, experiment code edited from the template, and papers; the LLM pipeline itself does not change | R0 | automated evaluation; self-evaluation | fully automatic | in-task | not claimed (Section 9 lists self-improving and self-referential use as future work) | partial text | ✅ @JasonDZS |
 | P004 | [Gödel Agent: A Self-Referential Agent Framework for Recursively Self-Improvement](https://arxiv.org/abs/2410.04444) (also 2) | 2024-10 | Agent self-improvement; Mathematics | The agent's own running code, changed by monkey patching: the task policy (solver) and, in the case study, the self-improvement logic itself | R4 (changes to the improvement logic shown only qualitatively, in the Game of 24 case study) | automated evaluation | fully automatic | in-task | RSI | full text | ✅ @JasonDZS |
 | P005 | [A Self-Improving Coding Agent](https://arxiv.org/abs/2504.15228) (also 1, 2) | 2025-04 | Agent self-improvement; Software engineering; Mathematics | The agent's own Python codebase: tools, sub-agents, prompts and orchestration logic. The best agent so far is also the meta-agent that makes the next change, so the edited code takes part in later improvement steps | R2 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
+| P006 | [Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents](https://arxiv.org/abs/2505.22954) (also 1) | 2025-05 | Agent self-improvement; Software engineering | The coding agent's own Python repository: its tools (e.g. line-range file viewing, string-replacement editing), workflow (several patch attempts, ranking by another FM, history-aware retries, non-empty patch validation) and context handling (auto-summarize at the context limit). The modified agent then carries out the next self-modification; the archive and parent selection stay fixed | R2 | automated evaluation | fully automatic | cross-task | self-improvement | full text | ✅ @JasonDZS |
 
-### 1. Engineering (1)
+### 1. Engineering (2)
 
 Software engineering, algorithm discovery, chip design and systems optimization. The loop runs only through digital environments.
 
 | ID | Paper | First released | Subfield | What is improved | R | Feedback | Loop | Evidence | Claim | Reading | Confirmed |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | P005 | [A Self-Improving Coding Agent](https://arxiv.org/abs/2504.15228) (also 0, 2) | 2025-04 | Agent self-improvement; Software engineering; Mathematics | The agent's own Python codebase: tools, sub-agents, prompts and orchestration logic. The best agent so far is also the meta-agent that makes the next change, so the edited code takes part in later improvement steps | R2 | automated evaluation | fully automatic | in-task | self-improvement | full text | ✅ @JasonDZS |
+| P006 | [Darwin Gödel Machine: Open-Ended Evolution of Self-Improving Agents](https://arxiv.org/abs/2505.22954) (also 0) | 2025-05 | Agent self-improvement; Software engineering | The coding agent's own Python repository: its tools (e.g. line-range file viewing, string-replacement editing), workflow (several patch attempts, ranking by another FM, history-aware retries, non-empty patch validation) and context handling (auto-summarize at the context limit). The modified agent then carries out the next self-modification; the archive and parent selection stay fixed | R2 | automated evaluation | fully automatic | cross-task | self-improvement | full text | ✅ @JasonDZS |
 
 ### 2. Natural sciences (4)
 
